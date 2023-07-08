@@ -1,12 +1,11 @@
 from django.urls import include, path
 
-from .views import EventCreation, EventDetail, EventEdition
+from .views import EventCreation, EventDetail, EventEdition, EventListing
 
 
 urlpatterns = [
-    # path('', EventListing.as_view(), name='index'),
-    # path('<str:category_id>', EventListing.as_view(), name='category'),
+    path('list/', EventListing.as_view(), name='list'),
     path('create/', EventCreation.as_view(), name='event_creation'),
     path('<str:pk>/', EventDetail.as_view(), name='detail'),
-    path('<str:pk>/update/', EventCreation.as_view(), name='event_creation'),
+    path('<str:pk>/update/', EventEdition.as_view(), name='event_creation'),
 ]
