@@ -20,8 +20,8 @@ class Event(BaseModel):
     name = fields.CharField(max_length=250, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True)
     description = fields.TextField(max_length=250, null=True, blank=True)
-    start_date = fields.DateTimeField()
-    end_date = fields.DateTimeField()
+    start_date = fields.DateTimeField(null=True, blank=True)
+    end_date = fields.DateTimeField(null=True, blank=True)
     users = models.ManyToManyField(User, null=True, blank=True)
 
     class Meta:
