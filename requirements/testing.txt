@@ -1,0 +1,5 @@
+-r common.txt
+
+pytest>=6.2.4,<7.4.0
+pytest-xdist>=1.34.0
+pytest-cov>=2.10.0
