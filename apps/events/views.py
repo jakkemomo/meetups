@@ -1,4 +1,5 @@
-from django.views.generic import CreateView, ListView, DetailView
+from django.contrib.auth.decorators import login_required
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from apps.events.models.events import Event, Categories
 
 
@@ -10,6 +11,27 @@ class EventCreation(CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(EventCreation, self).get_context_data()
         context['title'] = 'Создание ивента'
+        return context
+
+
+class EventEdition(UpdateView):
+    model = Event
+    template_name = 'events/edition.html'
+    fields = ['name', 'category', 'address', 'description', 'start_date', 'end_date', 'users']
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(EventEdition, self).get_context_data()
+        context['title'] = 'Изменение ивента'
+        return context
+
+
+class EventDeletion(DeleteView):
+    model = Event
+    template_name = 'events/delition.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(EventDeletion, self).get_context_data()
+        context['title'] = 'Удаление ивента'
         return context
 
 
