@@ -1,0 +1,12 @@
+{% extends 'bootstrap4/bootstrap4.html' %}
+{% load bootstrap4 %}
+
+{# Display a form #}
+{% block bootstrap4_content %}
+    <div class="container-sm">
+        <p>{{ object.id }}</p>
+        <p>{{ object.name }}</p>
+        <p>{{ object.description }}</p>
+        <p>{{ object.address }}</p>
+    </div>
+{% endblock %}
