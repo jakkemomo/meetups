@@ -10,20 +10,22 @@ class Categories(BaseModel):
     name = fields.CharField(max_length=250)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} {self.id}"
 
 
 class Event(BaseModel):
-    category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="category_events")
-    name = fields.CharField(max_length=250)
-    address = fields.CharField(max_length=250)
-    description = fields.TextField(max_length=250)
+    category = models.ForeignKey(
+        Categories, on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
+    )
+    name = fields.CharField(max_length=250, null=True, blank=True)
+    address = fields.CharField(max_length=250, null=True, blank=True)
+    description = fields.TextField(max_length=250, null=True, blank=True)
     start_date = fields.DateTimeField()
     end_date = fields.DateTimeField()
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, null=True, blank=True)
 
     class Meta:
         ordering = ["start_date"]
 
     def __str__(self):
-        return self.name
+        return f"{self.name} {self.id}"
