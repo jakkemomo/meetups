@@ -9,7 +9,7 @@ class EventCreation(CreateView):
     fields = ['name', 'category', 'address', 'description', 'start_date', 'end_date', 'users']
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(EventCreation, self).get_context_data()
+        context = super().get_context_data()
         context['title'] = 'Создание ивента'
         return context
 
@@ -20,7 +20,7 @@ class EventEdition(UpdateView):
     fields = ['name', 'category', 'address', 'description', 'start_date', 'end_date', 'users']
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(EventEdition, self).get_context_data()
+        context = super().get_context_data()
         context['title'] = 'Изменение ивента'
         return context
 
@@ -30,7 +30,7 @@ class EventDeletion(DeleteView):
     template_name = 'events/delition.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(EventDeletion, self).get_context_data()
+        context = super().get_context_data()
         context['title'] = 'Удаление ивента'
         return context
 
@@ -41,12 +41,12 @@ class EventListing(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = super(EventListing, self).get_queryset()
+        queryset = super().get_queryset()
         category_id = self.kwargs.get('category_id')
         return queryset.filter(category_id=category_id) if category_id else queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(EventListing, self).get_context_data()
+        context = super().get_context_data()
         context['title'] = 'Доступные ивенты'
         context['categories'] = Categories.objects.all()
         return context
@@ -62,7 +62,7 @@ class EventDetail(DetailView):
         return Event.objects.get(category_id=category_id, id=event_id)
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(EventDetail, self).get_context_data()
+        context = super().get_context_data()
         event = self.get_object()
         context['title'] = f'Ивент {event.name}'
         return context
