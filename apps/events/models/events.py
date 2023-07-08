@@ -2,6 +2,7 @@ from django.db.models import fields
 from django.contrib.auth.models import User
 
 from django.db import models
+from django.urls import reverse
 
 from apps.core.models import BaseModel
 
@@ -11,6 +12,9 @@ class Categories(BaseModel):
 
     def __str__(self):
         return f"{self.name} {self.id}"
+
+    def get_absolute_url(self):
+        return reverse('events:category', args=[str(self.id)])
 
 
 class Event(BaseModel):
@@ -29,3 +33,6 @@ class Event(BaseModel):
 
     def __str__(self):
         return f"{self.name} {self.id}"
+
+    def get_absolute_url(self):
+        return reverse('events:detail', args=[str(self.id)])
