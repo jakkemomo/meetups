@@ -18,6 +18,21 @@
             <p>Start date: {{ object.start_date }}</p>
             <p>End date: {{ object.end_date }}</p>
             <a href="{% url 'event_creation' object.id %}" class="btn btn-warning">Edit</a>
+
+            {% if request.user.is_authenticated %}
+            {% if request.user in object.participants.all %}
+            <form action="{% url 'leave_from_event' object.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Leave">
+            </form>
+            {% else %}
+            <form action="{% url 'register_to_event' object.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Register">
+            </form>
+            {% endif %}
+            {% endif %}
+
         </div>
         <div class="product-device shadow-sm d-none d-md-block"></div>
         <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
