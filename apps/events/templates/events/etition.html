@@ -1,0 +1,46 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1>Edit meetup</h1>
+            <form method="post" class="form">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.name.label_tag }}
+                    {{ form.name|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.category.label_tag }}
+                    {{ form.category|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.address.label_tag }}
+                    {{ form.address|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label_tag }}
+                    {{ form.description|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.start_date.label_tag }}
+                    {{ form.start_date|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.end_date.label_tag }}
+                    {{ form.end_date|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.users.label_tag }}
+                    {{ form.users|add_class:"form-control" }}
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
