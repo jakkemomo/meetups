@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "bootstrap4",
     "apps.core.apps.CoreConfig",
     "apps.events.apps.EventsConfig",
+    "apps.permissions.apps.PermissionsConfig",
     'widget_tweaks',
 ]
 
