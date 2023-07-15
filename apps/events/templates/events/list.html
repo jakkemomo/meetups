@@ -1,0 +1,37 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{# Display a form #}
+
+
+{% block css %}
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="album py-5 bg-body-tertiary">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+                {% for event in object_list %}
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <img src="https://www.profocustechnology.com/wp-content/uploads/2017/02/tech-meetup.jpg">
+                        <div class="card-body">
+                            <h4 class="card-text"> {{ event.name }}</h4>
+                            <p class="card-text">{{ event.description }}</p>
+                            <a href="{% url 'detail' event.id %}" class="stretched-link"></a>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">Start date: {{ event.start_date }}</small>
+                                <small class="text-body-secondary">End date: {{ event.end_date }}</small>
+                            </div>
+                    </div>
+                </div>
+                {% empty %}
+                <li>No events yet.</li>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
