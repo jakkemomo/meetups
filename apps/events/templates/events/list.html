@@ -15,7 +15,7 @@
                 {% for event in object_list %}
                 <div class="col">
                     <div class="card shadow-sm">
-                        <img src="https://www.profocustechnology.com/wp-content/uploads/2017/02/tech-meetup.jpg">
+                         <img src="/media/{{ event.image }}" alt="image alt text" />
                         <div class="card-body">
                             <h4 class="card-text"> {{ event.name }}</h4>
                             <p class="card-text">{{ event.description }}</p>
