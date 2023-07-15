@@ -35,8 +35,16 @@
                     {{ form.end_date|add_class:"form-control" }}
                 </div>
                 <div class="form-group">
-                    {{ form.users.label_tag }}
-                    {{ form.users|add_class:"form-control" }}
+                    {{ form.participants.label_tag }}
+                    {{ form.participants|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    {{ form.is_finished.label_tag }}
+                    {{ form.is_finished.value }}
+                </div>
+                <div class="form-group">
+                    {{ form.is_visible.label_tag }}
+                    {{ form.is_visible.value }}
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>

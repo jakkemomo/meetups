@@ -27,8 +27,8 @@ class Event(AbstractBaseModel):
     start_date = fields.DateTimeField(null=True, blank=True)
     end_date = fields.DateTimeField(null=True, blank=True)
 
-    is_finished = fields.BooleanField(default=False)
-    is_visible = fields.BooleanField(default=True)
+    is_finished = fields.BooleanField(null=False, blank=False, default=False)
+    is_visible = fields.BooleanField(null=False, blank=False, default=True)
 
     participants = models.ManyToManyField(user_model, blank=True)
 

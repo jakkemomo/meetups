@@ -13,7 +13,7 @@ class EventCreation(CreateView):
 
 class EventEdition(UpdateView):
     model = Event
-    template_name = "events/etition.html"
+    template_name = "events/edition.html"
     fields = ["name", "category", "address", "description", "start_date", "end_date", "participants", "is_visible", "is_finished"]
 
 
