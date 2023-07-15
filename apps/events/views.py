@@ -6,14 +6,14 @@ from apps.events.models.events import Event, Categories
 
 class EventCreation(CreateView):
     model = Event
-    template_name = 'events/creation.html'
-    fields = ['name', 'category', 'address', 'description', 'start_date', 'end_date', 'users']
+    template_name = "events/creation.html"
+    fields = ["name", "category", "address", "description", "start_date", "end_date", "users"]
 
 
 class EventEdition(UpdateView):
     model = Event
-    template_name = 'events/etition.html'
-    fields = ['name', 'category', 'address', 'description', 'start_date', 'end_date', 'users']
+    template_name = "events/etition.html"
+    fields = ["name", "category", "address", "description", "start_date", "end_date", "users"]
 
 
 class EventDeletion(DeleteView):
@@ -23,15 +23,15 @@ class EventDeletion(DeleteView):
 
 class EventListing(ListView):
     model = Event
-    template_name = 'events/list.html'
+    template_name = "events/list.html"
     paginate_by = 20
 
 
 class EventDetail(DetailView):
     model = Event
-    template_name = 'events/detail.html'
+    template_name = "events/detail.html"
 
 
 class EventMap(ListView):
     model = Event
-    template_name = 'events/map.html'
+    template_name = "events/map.html"
