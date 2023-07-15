@@ -4,51 +4,55 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <h1>Edit meetup</h1>
-            <form method="post" class="form">
-                {% csrf_token %}
-                <div class="form-group">
-                    {{ form.name.label_tag }}
-                    {{ form.name|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.category.label_tag }}
-                    {{ form.category|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.address.label_tag }}
-                    {{ form.address|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.description.label_tag }}
-                    {{ form.description|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.start_date.label_tag }}
-                    {{ form.start_date|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.end_date.label_tag }}
-                    {{ form.end_date|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.participants.label_tag }}
-                    {{ form.participants|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.is_finished.label_tag }}
-                    {{ form.is_finished.value }}
-                </div>
-                <div class="form-group">
-                    {{ form.is_visible.label_tag }}
-                    {{ form.is_visible.value }}
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h1>Edit meetup</h1>
+                <form method="post" class="form" enctype='multipart/form-data'>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.name.label_tag }}
+                        {{ form.name|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.image.label_tag }}
+                        {{ form.image|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.category.label_tag }}
+                        {{ form.category|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.address.label_tag }}
+                        {{ form.address|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label_tag }}
+                        {{ form.description|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.start_date.label_tag }}
+                        {{ form.start_date|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.end_date.label_tag }}
+                        {{ form.end_date|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.participants.label_tag }}
+                        {{ form.participants|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.is_finished.label_tag }}
+                        {{ form.is_finished }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.is_visible.label_tag }}
+                        {{ form.is_visible }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

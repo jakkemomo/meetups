@@ -1,20 +1,27 @@
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
-from apps.events.models.events import Event, Categories
+
+from apps.events.forms import EventForm
+from apps.events.models.events import Event
 
 
 class EventCreation(CreateView):
     model = Event
     template_name = "events/creation.html"
-    fields = ["name", "category", "address", "description", "start_date", "end_date", "participants", "is_visible", "is_finished"]
+    form_class = EventForm
+
+    def get_success_url(self):
+        return reverse_lazy('detail', kwargs={'pk': self.object.pk})
 
 
 class EventEdition(UpdateView):
     model = Event
     template_name = "events/edition.html"
-    fields = ["name", "category", "address", "description", "start_date", "end_date", "participants", "is_visible", "is_finished"]
+    form_class = EventForm
+
+    def get_success_url(self):
+        return reverse_lazy('detail', kwargs={'pk': self.object.pk})
 
 
 class EventDeletion(DeleteView):
