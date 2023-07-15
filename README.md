@@ -6,7 +6,9 @@ The project is meant to be easily clone-able, and used as the starter template f
 the next big thing our team develops.
 
 ## Getting Started
-Run the project using `python manage.py runserver` and you should see the default
+1. `python manage.py migrate`
+2. (optional) `python manage.py createsuperuser`
+3. Run the project using `python manage.py runserver` and you should see the default
 success page provided by Django at [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
 

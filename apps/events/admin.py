@@ -4,6 +4,7 @@ from .models import Categories, Event
 
 # Register your models here.
 
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "category", "address", "description", "start_date", "end_date"]
