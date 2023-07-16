@@ -13,31 +13,34 @@
                 <img src="/media/{{ event.image }}" class="w-25" alt="Beautiful Event">
             </div>
             <div class="card-body">
-                <h5 class="card-title fw-bold h2">{{ object.name }}</h5>
+                <h5 class="card-title fw-bold">{{ object.name }}</h5>
                 <div class="card-text">
                     <p>{{ object.description }}</p>
                     <p>Address: {{ object.address }}</p>
                     <p>Start date: {{ object.start_date }}</p>
                     <p>End date: {{ object.end_date }}</p>
                 </div>
-                <a href="{% url 'event_creation' object.id %}" class="btn btn-warning">Edit</a>
-                <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a></div>
 
-            {% if request.user.is_authenticated %}
                 {% if request.user in object.participants.all %}
                     <form action="{% url 'leave_from_event' object.id %}" method="post">
                         {% csrf_token %}
-                        <input type="submit" value="Leave">
+                        <button type="submit" class="btn btn-secondary">Leave</button>
                     </form>
                 {% else %}
                     <form action="{% url 'register_to_event' object.id %}" method="post">
-                        {% csrf_token %}
-                        <input type="submit" value="Register">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Register</button>
                     </form>
                 {% endif %}
-            {% endif %}
-            <div class="product-device shadow-sm d-none d-md-block"></div>
-            <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+
+                <br/>
+
+                {% if request.user == object.created_by %}
+                    <a href="{% url 'event_creation' object.id %}" class="btn btn-info">Edit</a>
+                    <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a>
+                {% endif %}
+            </div>
         </div>
     </main>
+
 {% endblock %}

@@ -4,8 +4,8 @@ from .views import EventCreation, EventDetail, EventEdition, EventListing, Event
 from .views import RegisterToEvent, LeaveFromEvent
 
 urlpatterns = [
-    path('map/', EventMap.as_view(), name='events_map'),
-    path('list/', EventListing.as_view(), name='events_list'),
+    path('map/', EventMap.as_view(), name='event_map'),
+    path('list/', EventListing.as_view(), name='event_list'),
     path('create/', EventCreation.as_view(), name='event_creation'),
     path('<str:pk>/', EventDetail.as_view(), name='event_detail'),
     path('<str:pk>/update/', EventEdition.as_view(), name='event_creation'),

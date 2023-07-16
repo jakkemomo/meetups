@@ -14,7 +14,16 @@ class EventCreation(CreateView):
     form_class = EventForm
 
     def get_success_url(self):
-        return reverse_lazy('detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.instance.created_by = request.user
+            form.instance.updated_by = request.user
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 class EventEdition(UpdateView):
@@ -23,12 +32,12 @@ class EventEdition(UpdateView):
     form_class = EventForm
 
     def get_success_url(self):
-        return reverse_lazy('detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
 
 
 class EventDeletion(DeleteView):
     model = Event
-    success_url = reverse_lazy("list")
+    success_url = reverse_lazy("event_list")
 
 
 class EventListing(ListView):
