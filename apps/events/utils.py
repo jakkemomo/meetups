@@ -3,4 +3,4 @@ import hashlib
 
 def events_image_upload_path(instance, filename):
     filename_hash = hashlib.sha1(f'{filename}_{instance.name}'.encode()).hexdigest()
-    return f'events/image/{filename_hash}'
+    return f'events/image/{filename_hash}.jpeg'

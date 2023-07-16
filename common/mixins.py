@@ -10,10 +10,10 @@ from django.db import models
 class ResizeImageMixin:
     def resize(self, imageField: models.ImageField, size: tuple):
         im = Image.open(imageField)  # Catch original
-        source_image = im.convert('RGB')
-        source_image.thumbnail(size)  # Resize to size
+        source_image: Image = im.convert('RGB')
+        new_image = source_image.resize(size)
         output = BytesIO()
-        source_image.save(output, format='JPEG')  # Save resize image to bytes
+        new_image.save(output, format='JPEG')  # Save resize image to bytes
         output.seek(0)
 
         content_file = ContentFile(output.read())  # Read output and create ContentFile in memory

@@ -43,7 +43,6 @@ class Event(AbstractBaseModel, ResizeImageMixin):
         return f"/events/{self.id}/"
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.resize(self.image, (480, 720))
-
+        if self.pk is None or self.objects.get(pk=self.pk) != self.image:
+            self.resize(self.image, (400, 500))
         super().save(*args, **kwargs)
