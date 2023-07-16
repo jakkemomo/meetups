@@ -1,27 +1,43 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView, View
-from apps.events.models.events import Event, Categories
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+
+from apps.events.forms import EventForm
+from apps.events.models.events import Event
 
 
 class EventCreation(CreateView):
     model = Event
     template_name = "events/creation.html"
-    fields = ["name", "category", "address", "description", "start_date", "end_date", "participants", "is_visible", "is_finished"]
+    form_class = EventForm
+
+    def get_success_url(self):
+        return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.instance.created_by = request.user
+            form.instance.updated_by = request.user
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 class EventEdition(UpdateView):
     model = Event
     template_name = "events/edition.html"
-    fields = ["name", "category", "address", "description", "start_date", "end_date", "participants", "is_visible", "is_finished"]
+    form_class = EventForm
+
+    def get_success_url(self):
+        return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
 
 
 class EventDeletion(DeleteView):
     model = Event
-    success_url = reverse_lazy("list")
+    success_url = reverse_lazy("event_list")
 
 
 class EventListing(ListView):

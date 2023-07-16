@@ -1,37 +1,45 @@
 {% extends 'events/base.html' %}
 {% load static %}
-{# Display a form #}
 
 
 {% block css %}
-<link href="{% static 'css/list.css' %}" rel="stylesheet">
+    <link href="{% static 'css/list.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<main>
-    <div class="album py-5 bg-body-tertiary">
+    <main class="pt-md-5">
         <div class="container">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-                {% for event in object_list %}
-                <div class="col">
-                    <div class="card shadow-sm">
-                         <img src="/media/{{ event.image }}" alt="image alt text" />
-                        <div class="card-body">
-                            <h4 class="card-text"> {{ event.name }}</h4>
-                            <p class="card-text">{{ event.description }}</p>
-                            <a href="{% url 'event_detail' event.id %}" class="stretched-link"></a>
-                        </div>
-                        <div class="card-footer d-flex justify-content-between align-items-center">
-                                <small class="text-body-secondary">Start date: {{ event.start_date }}</small>
-                                <small class="text-body-secondary">End date: {{ event.end_date }}</small>
+            {#        <div class="container-fluid"> #}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row gy-3">
+                        {% for event in object_list %}
+                            {% if forloop.counter0|divisibleby:4 and not forloop.first %}
+                                </div>
+                                <div class="row gy-3 pt-md-3">
+                            {% endif %}
+                            <div class="col-md-3">
+                                <div class="card h-100">
+                                    <img src="/media/{{ event.image }}" alt="Event Image" class="card-img-top"/>
+                                    <div class="card-body">
+                                        <h4 class="card-title"> {{ event.name }}</h4>
+                                        <p class="card-text">{{ event.description }}</p>
+                                        <a href="{% url 'event_detail' event.id %}" class="stretched-link"></a>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between align-items-center">
+                                        <small class="text-body-secondary">Start date: {{ event.start_date }}</small>
+                                        <small class="text-body-secondary">End date: {{ event.end_date }}</small>
+                                    </div>
+                                </div>
                             </div>
-                    </div>
+                        {% empty %}
+                            <div class="col-md-12">
+                                <h2>No events yet.</h2>
+                            </div>
+                        {% endfor %}
+                        </div>
                 </div>
-                {% empty %}
-                <li>No events yet.</li>
-                {% endfor %}
             </div>
         </div>
-    </div>
-</main>
+    </main>
 {% endblock %}

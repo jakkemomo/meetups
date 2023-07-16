@@ -3,39 +3,44 @@
 {# Display a form #}
 
 {% block css %}
-<link href="{% static 'css/detail.css' %}" rel="stylesheet">
+    <link href="{% static 'css/detail.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<main>
-    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-start bg-body-tertiary">
-        <div class="col-md-6 p-lg-5 mx-auto my-5">
-            <h1 class="display-3 fw-bold">{{ object.id }}. {{ object.name }}</h1>
-            <h3 class="fw-normal text-muted mb-3">{{ object.description }}</h3>
-            <div class="d-flex gap-3 justify-content-center lead fw-normal">
+    <main>
+        <div class="card">
+            <div class="card-header">
+                <img src="/media/{{ event.image }}" class="w-25" alt="Beautiful Event">
             </div>
-            <p>Address: {{ object.address }}</p>
-            <p>Start date: {{ object.start_date }}</p>
-            <p>End date: {{ object.end_date }}</p>
-            <a href="{% url 'event_creation' object.id %}" class="btn btn-warning">Edit</a>
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ object.name }}</h5>
+                <div class="card-text">
+                    <p>{{ object.description }}</p>
+                    <p>Address: {{ object.address }}</p>
+                    <p>Start date: {{ object.start_date }}</p>
+                    <p>End date: {{ object.end_date }}</p>
+                </div>
 
-            {% if request.user.is_authenticated %}
-            {% if request.user in object.participants.all %}
-            <form action="{% url 'leave_from_event' object.id %}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="Leave">
-            </form>
-            {% else %}
-            <form action="{% url 'register_to_event' object.id %}" method="post">
-                {% csrf_token %}
-                <input type="submit" value="Register">
-            </form>
-            {% endif %}
-            {% endif %}
+                {% if request.user in object.participants.all %}
+                    <form action="{% url 'leave_from_event' object.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Leave</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'register_to_event' object.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Register</button>
+                    </form>
+                {% endif %}
 
+                <br/>
+
+                {% if request.user == object.created_by %}
+                    <a href="{% url 'event_creation' object.id %}" class="btn btn-info">Edit</a>
+                    <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a>
+                {% endif %}
+            </div>
         </div>
-        <div class="product-device shadow-sm d-none d-md-block"></div>
-        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
-    </div>
-</main>
+    </main>
+
 {% endblock %}

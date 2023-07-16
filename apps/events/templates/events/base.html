@@ -31,9 +31,9 @@
             <a class="nav-link" href=''><h2 class="float-md-start mb-0">meetups</h2></a>
             <nav class="nav nav-masthead justify-content-center float-md-end">
                 <a class="nav-link fw-bold py-1 px-0 {% if 'map' in request.path %} active {% endif %}"
-                   aria-current="page" href="{% url 'events_map' %}"><h5>Map</h5></a>
+                   aria-current="page" href="{% url 'event_map' %}"><h5>Map</h5></a>
                 <a class="nav-link fw-bold py-1 px-0 {% if 'list' in request.path %} active {% endif %}"
-                   href="{% url 'events_list' %}"><h5>List</h5></a>
+                   href="{% url 'event_list' %}"><h5>List</h5></a>
                 <div class="nav-item px-5 dropdown text-end">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none" data-bs-toggle="dropdown"
                        aria-expanded="false">

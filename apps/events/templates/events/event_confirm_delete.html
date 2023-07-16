@@ -1,0 +1,17 @@
+{% extends 'events/base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="card">
+        <h1 class="card-title">Confirm event deletion</h1>
+        <div class="card-body">
+            <form method="post">{% csrf_token %}
+                <p>Are you sure you want to delete "{{ object }}"?</p>
+                {{ form }}
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
