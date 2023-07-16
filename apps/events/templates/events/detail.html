@@ -22,25 +22,22 @@
                 </div>
                 <a href="{% url 'event_creation' object.id %}" class="btn btn-warning">Edit</a>
                 <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a></div>
+
+            {% if request.user.is_authenticated %}
+                {% if request.user in object.participants.all %}
+                    <form action="{% url 'leave_from_event' object.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Leave">
+                    </form>
+                {% else %}
+                    <form action="{% url 'register_to_event' object.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Register">
+                    </form>
+                {% endif %}
+            {% endif %}
+            <div class="product-device shadow-sm d-none d-md-block"></div>
+            <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
         </div>
-        {#    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-start bg-body-tertiary">#}
-        {#        <div class="h-100 d-flex align-items-center justify-content-center">#}
-        {#            <div class=" d-flex card w-25">#}
-        {#                <img src="/media/{{ event.image }}" alt="image alt text"/>#}
-        {#            </div>#}
-        {#            <di#}
-        {#            <h1 class="display-3 fw-bold">{{ object.name }}</h1>#}
-        {#            <h3 class="fw-normal text-muted mb-3">{{ object.description }}</h3>#}
-        {#            <div class="d-flex gap-3 justify-content-center lead fw-normal">#}
-        {#            </div>#}
-        {#            <p>Address: {{ object.address }}</p>#}
-        {#            <p>Start date: {{ object.start_date }}</p>#}
-        {#            <p>End date: {{ object.end_date }}</p>#}
-        {#            <a href="{% url 'event_creation' object.id %}" class="btn btn-warning">Edit</a>#}
-        {#            <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a>#}
-        {#        </div>#}
-        {#        <div class="product-device shadow-sm d-none d-md-block"></div>#}
-        {#        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>#}
-        {#    </div>#}
     </main>
 {% endblock %}
