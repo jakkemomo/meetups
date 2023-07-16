@@ -6,7 +6,7 @@ from .models import Categories, Event
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "category", "address", "description", "start_date", "end_date"]
+    list_display = ["id", "name", "category", "address", "description", "start_date", "end_date", "place", "location"]
     list_filter = ["name", "category"]
     search_fields = ["name", "category"]
     ordering = ["start_date", "name"]

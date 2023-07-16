@@ -1,0 +1,18 @@
+version: '3'
+services:
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: Dockerfile-db
+    restart: always
+    env_file:
+      - ../.env
+    ports:
+      - "5555:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+      - database_volume:/var/lib/postgresql/data
+
+volumes:
+  database_volume:

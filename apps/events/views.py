@@ -13,14 +13,19 @@ class EventCreation(CreateView):
     template_name = "events/creation.html"
     form_class = EventForm
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.object = None
+
     def get_success_url(self):
         return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            form.instance.created_by = request.user
-            form.instance.updated_by = request.user
+            if request.user.is_authenticated:
+                form.instance.created_by = request.user
+                form.instance.updated_by = request.user
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

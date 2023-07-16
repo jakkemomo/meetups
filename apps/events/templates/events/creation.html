@@ -3,56 +3,24 @@
 {% load bootstrap4 %}
 {% load widget_tweaks %}
 
+{% block head %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    {{form.media}}
+{%  endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <h1>New meetup</h1>
-            <form method="post" class="form" enctype='multipart/form-data'>
-                {% csrf_token %}
-                <div class="form-group">
-                    {{ form.name.label_tag }}
-                    {{ form.name|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.image.label_tag }}
-                    {{ form.image|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.category.label_tag }}
-                    {{ form.category|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.address.label_tag }}
-                    {{ form.address|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.description.label_tag }}
-                    {{ form.description|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.start_date.label_tag }}
-                    {{ form.start_date|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.end_date.label_tag }}
-                    {{ form.end_date|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.participants.label_tag }}
-                    {{ form.participants|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    {{ form.is_finished.label_tag }}
-                    {{ form.is_finished }}
-                </div>
-                <div class="form-group">
-                    {{ form.is_visible.label_tag }}
-                    {{ form.is_visible }}
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h1>New meetup</h1>
+                <form method="post" enctype='multipart/form-data' {% if layout != 'vertical' %}class="form-{{ layout }}"{% endif %}>
+                    {% csrf_token %}
+                    {% bootstrap_form form layout=layout %}
+                    {% bootstrap_form_errors form type='non_fields' %}
+                    {% buttons submit='Save' reset="Cancel" %}{% endbuttons %}
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

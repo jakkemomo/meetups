@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os.path
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,11 +43,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "bootstrap4",
+    "django.contrib.gis",
     "apps.core.apps.CoreConfig",
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
-    'widget_tweaks',
+    "location_field.apps.DefaultConfig",
+    "widget_tweaks",
+    "bootstrap4",
 ]
 
 MIDDLEWARE = [
@@ -85,8 +89,17 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
-
+# DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+DATABASES = {
+    'default': {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '5555',
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -136,4 +149,32 @@ BOOTSTRAP4 = {
     "required_css_class": "bootstrap4-required",
     "javascript_in_head": True,
     "include_jquery": True,
+}
+
+LOCATION_FIELD_PATH = STATIC_URL + "location_field"
+
+LOCATION_FIELD = {
+    "map.provider": "google",
+    "map.zoom": 13,
+    "search.provider": "yandex",
+    "search.suffix": "",
+    # Yandex
+    "provider.yandex.api_key": os.getenv('YANDEX_MAPS_API_KEY'),
+    # Google
+    "provider.google.api": "//maps.google.com/maps/api/js",
+    "provider.google.api_key": os.getenv('GOOGLE_MAPS_API_KEY'),
+    "provider.google.map_type": "ROADMAP",
+    # Mapbox
+    "provider.mapbox.access_token": "",
+    "provider.mapbox.max_zoom": 18,
+    "provider.mapbox.id": "mapbox.streets",
+    # OpenStreetMap
+    "provider.openstreetmap.max_zoom": 18,
+    # misc
+    "resources.root_path": LOCATION_FIELD_PATH,
+    "resources.media": {
+        "js": [
+            LOCATION_FIELD_PATH + "/js/form.js",
+        ],
+    },
 }

@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.db import models
 from django.db.models import fields
+from location_field.models.spatial import LocationField
 
 from apps.core.models import AbstractBaseModel
 from apps.events.utils import events_image_upload_path
@@ -32,6 +34,9 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     is_visible = fields.BooleanField(null=False, blank=False, default=True)
 
     participants = models.ManyToManyField(user_model, blank=True)
+
+    place = models.CharField(max_length=255, default='Minsk')
+    location = LocationField(based_fields=['place'], zoom=13, default=Point(27.5537109375, 53.904338156274704))
 
     class Meta:
         ordering = ["start_date"]
