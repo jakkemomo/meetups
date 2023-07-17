@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.db import models
 from django.db.models import fields
+from django.utils import timezone
 from location_field.models.spatial import LocationField
 
 from apps.core.models import AbstractBaseModel
@@ -25,9 +26,13 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True)
     description = fields.TextField(max_length=250, null=True, blank=True)
-    image = models.ImageField(upload_to=events_image_upload_path, null=True, blank=True,
-                              default='events/image/default-event.jpeg')
-    start_date = fields.DateTimeField(null=True, blank=True)
+    image = models.ImageField(
+        upload_to=events_image_upload_path,
+        null=True,
+        blank=True,
+        default="events/image/default-event.jpeg",
+    )
+    start_date = fields.DateTimeField(null=True, blank=True, default=timezone.now)
     end_date = fields.DateTimeField(null=True, blank=True)
 
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
@@ -35,8 +40,8 @@ class Event(AbstractBaseModel, ResizeImageMixin):
 
     participants = models.ManyToManyField(user_model, blank=True)
 
-    place = models.CharField(max_length=255, default='Minsk')
-    location = LocationField(based_fields=['place'], zoom=13, default=Point(27.5537109375, 53.904338156274704))
+    place = models.CharField(max_length=255, default="Minsk")
+    location = LocationField(based_fields=["place"], zoom=13, default=Point(27.561831, 53.902284))
 
     class Meta:
         ordering = ["start_date"]

@@ -13,6 +13,7 @@ import os.path
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -91,13 +92,13 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 DATABASES = {
-    'default': {
+    "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5555',
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5555"),
     }
 }
 # Password validation
@@ -125,13 +126,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    BASE_DIR / 'static',
-)
+STATIC_URL = "/static/"
+STATICFILES_DIRS = (BASE_DIR / "static",)
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -159,10 +158,10 @@ LOCATION_FIELD = {
     "search.provider": "yandex",
     "search.suffix": "",
     # Yandex
-    "provider.yandex.api_key": os.getenv('YANDEX_MAPS_API_KEY'),
+    "provider.yandex.api_key": os.getenv("YANDEX_MAPS_API_KEY"),
     # Google
     "provider.google.api": "//maps.google.com/maps/api/js",
-    "provider.google.api_key": os.getenv('GOOGLE_MAPS_API_KEY'),
+    "provider.google.api_key": os.getenv("GOOGLE_MAPS_API_KEY"),
     "provider.google.map_type": "ROADMAP",
     # Mapbox
     "provider.mapbox.access_token": "",
@@ -172,9 +171,5 @@ LOCATION_FIELD = {
     "provider.openstreetmap.max_zoom": 18,
     # misc
     "resources.root_path": LOCATION_FIELD_PATH,
-    "resources.media": {
-        "js": [
-            LOCATION_FIELD_PATH + "/js/form.js",
-        ],
-    },
+    "resources.media": {"js": [LOCATION_FIELD_PATH + "/js/form.js"]},
 }

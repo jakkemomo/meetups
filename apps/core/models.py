@@ -16,7 +16,7 @@ class AbstractBaseModel(models.Model):
     )
 
     created_at = models.DateTimeField(
-        verbose_name=_("Created at"), auto_now_add=True, editable=False,
+        verbose_name=_("Created at"), auto_now_add=True, editable=False
     )
 
     updated_by = models.ForeignKey(

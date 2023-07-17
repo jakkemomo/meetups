@@ -18,7 +18,10 @@ class EventCreation(CreateView):
         self.object = None
 
     def get_success_url(self):
-        return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
+        if self.object:
+            return reverse_lazy("event_detail", kwargs={"pk": self.object.pk})
+        else:
+            return reverse_lazy("event_list")
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -37,7 +40,10 @@ class EventEdition(UpdateView):
     form_class = EventForm
 
     def get_success_url(self):
-        return reverse_lazy('event_detail', kwargs={'pk': self.object.pk})
+        if self.object:
+            return reverse_lazy("event_detail", kwargs={"pk": self.object.pk})
+        else:
+            return reverse_lazy("event_list")
 
 
 class EventDeletion(DeleteView):
@@ -47,7 +53,7 @@ class EventDeletion(DeleteView):
 
 class EventListing(ListView):
     model = Event
-    template_name = 'events/list.html'
+    template_name = "events/list.html"
     paginate_by = 20
 
     def get_queryset(self):
@@ -57,23 +63,23 @@ class EventListing(ListView):
 
 class EventDetail(DetailView):
     model = Event
-    template_name = 'events/detail.html'
+    template_name = "events/detail.html"
 
 
 class EventMap(ListView):
     model = Event
-    template_name = 'events/map.html'
+    template_name = "events/map.html"
 
 
 class RegisterToEvent(LoginRequiredMixin, View):
     def post(self, request, event_id):
         event = get_object_or_404(Event, id=event_id)
         event.participants.add(request.user)
-        return redirect('event_detail', pk=event_id)
+        return redirect("event_detail", pk=event_id)
 
 
 class LeaveFromEvent(LoginRequiredMixin, View):
     def post(self, request, event_id):
         event = get_object_or_404(Event, id=event_id)
         event.participants.remove(request.user)
-        return redirect('event_detail', pk=event_id)
+        return redirect("event_detail", pk=event_id)

@@ -5,15 +5,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('events', '0006_event_is_finished_event_is_visible'),
-    ]
+    dependencies = [("events", "0006_event_is_finished_event_is_visible")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='image',
-            field=models.ImageField(blank=True, default='events/image/default-event.jpeg', null=True, upload_to=apps.events.utils.events_image_upload_path),
-        ),
+            model_name="event",
+            name="image",
+            field=models.ImageField(
+                blank=True,
+                default="events/image/default-event.jpeg",
+                null=True,
+                upload_to=apps.events.utils.events_image_upload_path,
+            ),
+        )
     ]
