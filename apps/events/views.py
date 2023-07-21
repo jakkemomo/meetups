@@ -1,8 +1,20 @@
+import json
+from datetime import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.serializers import serialize
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView, View
+from django.views.generic import (
+    CreateView,
+    ListView,
+    DetailView,
+    UpdateView,
+    DeleteView,
+    View,
+    TemplateView,
+)
 
 from apps.events.forms import EventForm
 from apps.events.models.events import Event, Categories
@@ -104,9 +116,37 @@ class EventDetail(DetailView):
     template_name = "events/detail.html"
 
 
-class EventMap(ListView):
+class EventMap(TemplateView):
     model = Event
     template_name = "events/map.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        events = Event.objects.filter(is_visible=True, is_finished=False)
+        geo_events = json.loads(serialize("geojson", events))
+        for event in geo_events["features"]:
+            attrs = event["properties"]
+            event_name = attrs["name"]
+            event_start = datetime.strptime(attrs["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime(
+                "%-d %B %H:%M"
+            )
+            attrs.update(
+                {
+                    "balloonContentHeader": f"<center>{event_name}</center></br><center>{event_start}</center>",
+                    "balloonContent": f'<center><a href="/events/{attrs["pk"]}">'
+                    + f'<img class="img-responsive" src="/media/{attrs["image"]}"'
+                    + ' width="250px" height="250px"></a></center>',
+                    "clusterCaption": f"Событие: {event_name}",
+                    "hintContent": event_name,
+                }
+            )
+            event["options"] = {
+                "preset": "islands#violetCircleIcon",
+                "hideIconOnBalloonOpen": False,
+            }
+            event["geometry"]["coordinates"].reverse()
+        context["events"] = geo_events
+        return context
 
 
 class RegisterToEvent(LoginRequiredMixin, View):
@@ -121,3 +161,15 @@ class LeaveFromEvent(LoginRequiredMixin, View):
         event = get_object_or_404(Event, id=event_id)
         event.participants.remove(request.user)
         return redirect("event_detail", pk=event_id)
+
+
+# Finding events within radius
+# from django.contrib.gis.geos import Point
+# from django.contrib.gis.measure import Distance
+#
+#
+# lat = 52.5
+# lng = 1.0
+# radius = 10
+# point = Point(lng, lat)
+# Event.objects.filter(location__distance_lt=(point, Distance(km=radius)))
