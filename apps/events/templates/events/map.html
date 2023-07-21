@@ -4,10 +4,46 @@
 {% block css %}
 {% endblock %}
 
+{% block head %}
+
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU&amp;apikey=fedfef84-a218-4898-94f6-8cef08c81514" type="text/javascript"></script>
+    <script src="https://yandex.st/jquery/2.2.3/jquery.min.js" type="text/javascript"></script>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+
+    <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
+{% endblock %}
+
 {% block content %}
-<div class="map">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d70220.08418282871!2d27.555399563637966!3d53.9047647206764!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sru!2sby!4v1688920793636!5m2!1sru!2sby"
-            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"></iframe>
-</div>
+{#    <div class="map">#}
+{#        <iframe src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d70220.08418282871!2d27.555399563637966!3d53.9047647206764!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sru!2sby!4v1688920793636!5m2!1sru!2sby"#}
+{#                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"#}
+{#                referrerpolicy="no-referrer-when-downgrade"></iframe>#}
+{##}
+{#    </div>#}
+    {{ events|json_script:"events-data" }}
+
+    <div id="map"></div>
+
+<script id="events-data" type="application/json">
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties":  {"name": "Monte  Amaro 2793", "pk": 1}
+            "geometry": {
+                "type": "Point",
+                "coordinates": [14.0873373838, 42.091199112]
+            }
+        }
+    ]
+}
+</script>
 {% endblock %}
