@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView, View
 
 from apps.events.forms import EventForm
-from apps.events.models.events import Event
+from apps.events.models.events import Event, Categories
 
 
 class EventCreation(CreateView):
@@ -59,6 +59,44 @@ class EventListing(ListView):
     def get_queryset(self):
         self.queryset = self.model.objects.filter(Q(is_visible=True) & Q(is_finished=False))
         return super().get_queryset()
+
+    def post(self, request):
+        searched = request.POST["searched"]
+        category = request.POST["category"]
+        start_date = request.POST["start_date"]
+        end_date = request.POST["end_date"]
+
+        self.object_list = self.get_queryset()
+
+        object_list = Event.objects.filter(
+            (Q(name__icontains=searched) |
+             Q(address__icontains=searched) |
+             Q(description__icontains=searched) |
+             Q(category__name__icontains=searched))
+        )
+
+        if category:
+            object_list = object_list.filter(category__name=category)
+        if start_date:
+            object_list = object_list.filter(start_date__gte=start_date)
+        if end_date:
+            object_list = object_list.filter(end_date__lte=end_date)
+
+        context = self.get_context_data()
+        context.update({
+            "searched": searched,
+            "object_list": object_list,
+            "category": category,
+            "start_date": start_date,
+            "end_date": end_date
+        })
+
+        return render(request, self.template_name, context)
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context["categories"] = Categories.objects.all()
+        return context
 
 
 class EventDetail(DetailView):

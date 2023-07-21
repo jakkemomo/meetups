@@ -138,7 +138,8 @@ header {
 }
 
 /* TO LIST.CSS */
-.col:hover h4.card-text {
-        color: #FF6666;
+.card:hover {
+        border-color: #FF6666;
         transition: all 0.1s ease-in-out;
 }
+
