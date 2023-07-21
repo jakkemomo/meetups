@@ -7,7 +7,7 @@ from apps.events.models import Event
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ["name", "image", "category", "address", "description", "start_date", "end_date", "participants",
+        fields = ["name", "image", "category", "tags", "address", "description", "start_date", "end_date", "participants",
                   "is_visible", "is_finished"]
         widgets = {
             'start_date': SelectDateWidget(),

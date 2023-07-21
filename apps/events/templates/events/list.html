@@ -23,6 +23,9 @@
                                     <img src="/media/{{ event.image }}" alt="Event Image" class="card-img-top"/>
                                     <div class="card-body">
                                         <h4 class="card-title"> {{ event.name }}</h4>
+                                        {% if event.tags.all %}
+                                            <p>Tags: {{ event.tags.all|join:", " }}.</p>
+                                        {% endif %}
                                         <p class="card-text">{{ event.description }}</p>
                                         <a href="{% url 'event_detail' event.id %}" class="stretched-link"></a>
                                     </div>
