@@ -15,6 +15,9 @@
             padding: 0;
             margin: 0;
         }
+        [class*="ymaps-2"][class*="-ground-pane"] {
+            -webkit-filter: hue-rotate(320deg);
+        }
     </style>
 
     <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
@@ -30,7 +33,6 @@
     {{ events|json_script:"events-data" }}
 
     <div id="map"></div>
-
 <script id="events-data" type="application/json">
 {
     "type": "FeatureCollection",
