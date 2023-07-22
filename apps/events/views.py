@@ -17,7 +17,8 @@ from django.views.generic import (
 )
 
 from apps.events.forms import EventForm
-from apps.events.models.events import Event, Categories
+from apps.events.models.events import Event
+from apps.events.models.categories import Category
 from config import settings
 
 
@@ -112,7 +113,7 @@ class EventListing(ListView):
 
     def get_context_data(self):
         context = super().get_context_data()
-        context["categories"] = Categories.objects.all()
+        context["categories"] = Category.objects.all()
         return context
 
 

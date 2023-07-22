@@ -6,23 +6,19 @@ from django.utils import timezone
 from location_field.models.spatial import LocationField
 
 from apps.core.models import AbstractBaseModel
+from apps.events.models.categories import Category
+from apps.events.models.tags import Tag
 from apps.events.utils import events_image_upload_path
 from common.mixins import ResizeImageMixin
 
 user_model = settings.AUTH_USER_MODEL
 
 
-class Categories(AbstractBaseModel):
-    name = fields.CharField(max_length=250)
-
-    def __str__(self):
-        return self.name
-
-
 class Event(AbstractBaseModel, ResizeImageMixin):
     category = models.ForeignKey(
-        Categories, on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
+        Category, on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
     )
+    tags = models.ManyToManyField(to=Tag, related_name="events", null=True, blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True)
     description = fields.TextField(max_length=250, null=True, blank=True)
@@ -45,6 +41,8 @@ class Event(AbstractBaseModel, ResizeImageMixin):
 
     class Meta:
         ordering = ["start_date"]
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
 
     def __str__(self):
         return self.name
