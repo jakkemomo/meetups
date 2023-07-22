@@ -13,3 +13,6 @@ This will install postgres db in docker, install geo dependencies, create superu
 ### Creating an App
 1. Create a folder with the app name in `apps`. For example: `poll`
 2. Run `python manage.py startapp poll apps/poll` from the root directory of the project
+
+### Second and folowing runs
+1. git stash && git checkout main && git pull && pip install -r requirements/common.txt && python manage.py migrate && git stash pop
