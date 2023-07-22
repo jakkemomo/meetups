@@ -1,4 +1,4 @@
-{% extends 'events/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 
@@ -22,7 +22,7 @@
             {% endif %}
             {% endif %}
 
-            <form class="d-flex" method="POST" action="{% url 'event_list' %}">
+            <form class="d-flex" method="POST" action="{% url 'events:event_list' %}">
                 {% csrf_token %}
                 <input class="form-control me-2" type="search" name="searched" placeholder="Search" aria-label="Search"
                        value="{{ searched }}">
@@ -62,7 +62,7 @@
                                     <div class="card-text">
                                         <p>{{ event.description }}</p>
                                     </div>
-                                    <a href="{% url 'event_detail' event.id %}" class="stretched-link"></a>
+                                    <a href="{% url 'events:event_detail' event.id %}" class="stretched-link"></a>
                                 </div>
                             </div>
                         </div>

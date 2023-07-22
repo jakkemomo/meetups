@@ -31,17 +31,10 @@
         <div>
             <a class="nav-link" href=''><h2 class="float-md-start mb-0">meetups</h2></a>
             <nav class="nav nav-masthead justify-content-center float-md-end">
-<!--                <div class="mx-5">-->
-<!--                    <form class="d-flex" method="POST" action="{% url 'event_list' %}">-->
-<!--                        {% csrf_token %}-->
-<!--                        <input class="form-control me-2" type="search" name="searched" placeholder="Search" aria-label="Search">-->
-<!--                        <button class="btn btn-outline-success" type="submit">Search</button>-->
-<!--                    </form>-->
-<!--                </div>-->
                 <a class="nav-link fw-bold py-1 px-0 {% if 'map' in request.path %} active {% endif %}"
-                   aria-current="page" href="{% url 'event_map' %}"><h5>Map</h5></a>
+                   aria-current="page" href="{% url 'events:event_map' %}"><h5>Map</h5></a>
                 <a class="nav-link fw-bold py-1 px-0 {% if 'list' in request.path %} active {% endif %}"
-                   href="{% url 'event_list' %}"><h5>List</h5></a>
+                   href="{% url 'events:event_list' %}"><h5>List</h5></a>
                 <div class="nav-item px-5 dropdown text-end">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none" data-bs-toggle="dropdown"
                        aria-expanded="false">
@@ -49,7 +42,7 @@
                              width="32" height="32" class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu text-small">
-                        <li><a class="dropdown-item" href="{% url 'event_creation' %}">New meetup...</a></li>
+                        <li><a class="dropdown-item" href="{% url 'events:event_creation' %}">New meetup...</a></li>
                         <li><a class="dropdown-item" href="#">Settings</a></li>
                         <li><a class="dropdown-item" href="#">Profile</a></li>
                         <li>

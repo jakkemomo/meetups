@@ -1,25 +1,18 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends "base.html" %}
 {% load bootstrap4 %}
-{% load widget_tweaks %}
+{% block title %}Sign Up{% endblock %}
 
-{% block head %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript jquery='full' %}
-    {{form.media}}
-{%  endblock %}
 
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <h3>New meetup</h3>
+                <h3>Registration</h3>
                 <form method="post" enctype='multipart/form-data' class="form-vertical">
                     {% csrf_token %}
                     {% bootstrap_form form layout="vertical" %}
                     {% bootstrap_form_errors form type='non_fields' %}
-                    <button type="submit" class="btn btn-success">Save</button>
-                    <a href="{{ view.get_success_url }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Sign Up</button>
                 </form>
             </div>
         </div>

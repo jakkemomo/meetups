@@ -1,4 +1,4 @@
-{% extends 'events/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block css %}
@@ -26,20 +26,20 @@
                 {% if request.user.is_authenticated %}
                     {% if request.user != object.created_by %}
                         {% if request.user in object.participants.all %}
-                            <form action="{% url 'leave_from_event' object.id %}" method="post">
+                            <form action="{% url 'events:leave_from_event' object.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-secondary">Leave</button>
                             </form>
                         {% else %}
-                            <form action="{% url 'register_to_event' object.id %}" method="post">
+                            <form action="{% url 'events:register_to_event' object.id %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-success">Register</button>
                             </form>
                         {% endif %}
                     {% else %}
                         <br/>
-                        <a href="{% url 'event_creation' object.id %}" class="btn btn-info">Edit</a>
-                        <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a>
+                        <a href="{% url 'events:event_creation' object.id %}" class="btn btn-info">Edit</a>
+                        <a href="{% url 'events:event_deletion' object.id %}" class="btn btn-danger">Delete</a>
                     {% endif %}
                 {% endif %}
 

@@ -3,6 +3,8 @@ from django.urls import path
 from .views import EventCreation, EventDetail, EventEdition, EventListing, EventMap, EventDeletion
 from .views import RegisterToEvent, LeaveFromEvent
 
+app_name = "events"
+
 urlpatterns = [
     path("map/", EventMap.as_view(), name="event_map"),
     path("list/", EventListing.as_view(), name="event_list"),

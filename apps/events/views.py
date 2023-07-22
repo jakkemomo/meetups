@@ -33,9 +33,9 @@ class EventCreation(CreateView):
 
     def get_success_url(self):
         if self.object:
-            return reverse_lazy("event_detail", kwargs={"pk": self.object.pk})
+            return reverse_lazy("events:event_detail", kwargs={"pk": self.object.pk})
         else:
-            return reverse_lazy("event_list")
+            return reverse_lazy("events:event_list")
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -55,14 +55,14 @@ class EventEdition(UpdateView):
 
     def get_success_url(self):
         if self.object:
-            return reverse_lazy("event_detail", kwargs={"pk": self.object.pk})
+            return reverse_lazy("events:event_detail", kwargs={"pk": self.object.pk})
         else:
-            return reverse_lazy("event_list")
+            return reverse_lazy("events:event_list")
 
 
 class EventDeletion(DeleteView):
     model = Event
-    success_url = reverse_lazy("event_list")
+    success_url = reverse_lazy("events:event_list")
 
 
 class EventListing(ListView):
@@ -162,14 +162,14 @@ class RegisterToEvent(LoginRequiredMixin, View):
     def post(self, request, event_id):
         event = get_object_or_404(Event, id=event_id)
         event.participants.add(request.user)
-        return redirect("event_detail", pk=event_id)
+        return redirect("events:event_detail", pk=event_id)
 
 
 class LeaveFromEvent(LoginRequiredMixin, View):
     def post(self, request, event_id):
         event = get_object_or_404(Event, id=event_id)
         event.participants.remove(request.user)
-        return redirect("event_detail", pk=event_id)
+        return redirect("events:event_detail", pk=event_id)
 
 
 # Finding events within radius
