@@ -1,6 +1,5 @@
 {% extends 'events/base.html' %}
 {% load static %}
-{# Display a form #}
 
 {% block css %}
     <link href="{% static 'css/detail.css' %}" rel="stylesheet">
@@ -21,24 +20,26 @@
                     <p>End date: {{ object.end_date }}</p>
                 </div>
 
-                {% if request.user in object.participants.all %}
-                    <form action="{% url 'leave_from_event' object.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-secondary">Leave</button>
-                    </form>
-                {% else %}
-                    <form action="{% url 'register_to_event' object.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success">Register</button>
-                    </form>
+                {% if request.user.is_authenticated %}
+                    {% if request.user != object.created_by %}
+                        {% if request.user in object.participants.all %}
+                            <form action="{% url 'leave_from_event' object.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary">Leave</button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'register_to_event' object.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">Register</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <br/>
+                        <a href="{% url 'event_creation' object.id %}" class="btn btn-info">Edit</a>
+                        <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
                 {% endif %}
 
-                <br/>
-
-                {% if request.user == object.created_by %}
-                    <a href="{% url 'event_creation' object.id %}" class="btn btn-info">Edit</a>
-                    <a href="{% url 'event_deletion' object.id %}" class="btn btn-danger">Delete</a>
-                {% endif %}
             </div>
         </div>
     </main>

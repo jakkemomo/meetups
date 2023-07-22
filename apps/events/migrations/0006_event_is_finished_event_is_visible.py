@@ -4,20 +4,13 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('events', '0005_remove_categories_uid_remove_event_uid_and_more'),
-    ]
+    dependencies = [("events", "0005_remove_categories_uid_remove_event_uid_and_more")]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='is_finished',
-            field=models.BooleanField(default=False),
+            model_name="event", name="is_finished", field=models.BooleanField(default=False)
         ),
         migrations.AddField(
-            model_name='event',
-            name='is_visible',
-            field=models.BooleanField(default=True),
+            model_name="event", name="is_visible", field=models.BooleanField(default=True)
         ),
     ]

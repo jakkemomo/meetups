@@ -6,43 +6,35 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('events', '0004_alter_event_name'),
+        ("events", "0004_alter_event_name"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='categories',
-            name='uid',
-        ),
-        migrations.RemoveField(
-            model_name='event',
-            name='uid',
-        ),
-        migrations.RemoveField(
-            model_name='event',
-            name='users',
+        migrations.RemoveField(model_name="categories", name="uid"),
+        migrations.RemoveField(model_name="event", name="uid"),
+        migrations.RemoveField(model_name="event", name="users"),
+        migrations.AddField(
+            model_name="event",
+            name="image",
+            field=models.ImageField(
+                blank=True, null=True, upload_to=apps.events.utils.events_image_upload_path
+            ),
         ),
         migrations.AddField(
-            model_name='event',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to=apps.events.utils.events_image_upload_path),
-        ),
-        migrations.AddField(
-            model_name='event',
-            name='participants',
+            model_name="event",
+            name="participants",
             field=models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
-            model_name='categories',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, verbose_name='Created at'),
+            model_name="categories",
+            name="created_at",
+            field=models.DateTimeField(auto_now_add=True, verbose_name="Created at"),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, verbose_name='Created at'),
+            model_name="event",
+            name="created_at",
+            field=models.DateTimeField(auto_now_add=True, verbose_name="Created at"),
         ),
     ]

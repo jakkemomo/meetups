@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import SelectDateWidget
+from django.forms import DateTimeInput
 
 from apps.events.models import Event
 
@@ -7,9 +7,20 @@ from apps.events.models import Event
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ["name", "image", "category", "address", "description", "start_date", "end_date", "participants",
-                  "is_visible", "is_finished"]
+        fields = [
+            "name",
+            "image",
+            "category",
+            "address",
+            "description",
+            "start_date",
+            "end_date",
+            "place",
+            "location",
+        ]
         widgets = {
-            'start_date': SelectDateWidget(),
-            'end_date': SelectDateWidget()
+            "start_date": DateTimeInput(
+                format=("%Y-%m-%dT%H:%M"), attrs={"type": "datetime-local"}
+            ),
+            "end_date": DateTimeInput(format=("%Y-%m-%dT%H:%M"), attrs={"type": "datetime-local"}),
         }

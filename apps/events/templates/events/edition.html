@@ -1,56 +1,25 @@
 {% extends 'events/base.html' %}
-{% load static %}
 {% load bootstrap4 %}
+{% load static %}
 {% load widget_tweaks %}
+
+{% block head %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    {{form.media}}
+{%  endblock %}
 
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <h1>Edit meetup</h1>
-                <form method="post" class="form" enctype='multipart/form-data'>
+                <h3>Edit meetup</h3>
+                <form method="post" enctype='multipart/form-data' class="form-vertical">
                     {% csrf_token %}
-                    <div class="form-group">
-                        {{ form.name.label_tag }}
-                        {{ form.name|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.image.label_tag }}
-                        {{ form.image|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.category.label_tag }}
-                        {{ form.category|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.address.label_tag }}
-                        {{ form.address|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.description.label_tag }}
-                        {{ form.description|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.start_date.label_tag }}
-                        {{ form.start_date|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.end_date.label_tag }}
-                        {{ form.end_date|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.participants.label_tag }}
-                        {{ form.participants|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.is_finished.label_tag }}
-                        {{ form.is_finished }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.is_visible.label_tag }}
-                        {{ form.is_visible }}
-                    </div>
+                    {% bootstrap_form form layout="vertical" %}
+                    {% bootstrap_form_errors form type='non_fields' %}
                     <button type="submit" class="btn btn-success">Save</button>
+                    <a href="{{ view.get_success_url }}" class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>

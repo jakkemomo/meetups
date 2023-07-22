@@ -1,19 +1,22 @@
 .card {
-    height: 500px;
-    overflow: hidden;
-}
-
-.card-text {
-  text-align: start;
-}
-
-.col {
+    text-align: left;
     transition: all 0.1s ease-in-out;
 }
 
-.col:hover {
-    transform: scale(1.03);
-    transition: all 0.1s ease-in-out;
+.card-img {
+    object-fit: cover;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    aspect-ratio: 1/1;
 }
 
+.card h5 {
+    text-transform: uppercase;
+    color: rgb(177, 177, 177);
+    font-size: .7rem;
+}
 
+.card-body {
+    height: 200px;
+    overflow-y: auto;
+}
