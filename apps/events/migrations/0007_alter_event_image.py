@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             name="image",
             field=models.ImageField(
                 blank=True,
-                default="events/image/default-event.jpeg",
+                default="events/image/default-event.jpg",
                 null=True,
                 upload_to=apps.events.utils.events_image_upload_path,
             ),

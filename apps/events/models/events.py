@@ -30,7 +30,7 @@ class Event(AbstractBaseModel, ResizeImageMixin):
         upload_to=events_image_upload_path,
         null=True,
         blank=True,
-        default="events/image/default-event.jpeg",
+        default="events/image/default-event.jpg",
     )
     start_date = fields.DateTimeField(null=True, blank=True, default=timezone.now)
     end_date = fields.DateTimeField(null=True, blank=True)
