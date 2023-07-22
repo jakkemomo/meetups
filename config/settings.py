@@ -152,16 +152,18 @@ BOOTSTRAP4 = {
 
 LOCATION_FIELD_PATH = STATIC_URL + "location_field"
 
+YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 LOCATION_FIELD = {
     "map.provider": "google",
     "map.zoom": 13,
     "search.provider": "yandex",
     "search.suffix": "",
     # Yandex
-    "provider.yandex.api_key": os.getenv("YANDEX_MAPS_API_KEY"),
+    "provider.yandex.api_key": YANDEX_API_KEY,
     # Google
     "provider.google.api": "//maps.google.com/maps/api/js",
-    "provider.google.api_key": os.getenv("GOOGLE_MAPS_API_KEY"),
+    "provider.google.api_key": GOOGLE_API_KEY,
     "provider.google.map_type": "ROADMAP",
     # Mapbox
     "provider.mapbox.access_token": "",
