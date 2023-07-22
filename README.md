@@ -14,5 +14,18 @@ This will install postgres db in docker, install geo dependencies, create superu
 1. Create a folder with the app name in `apps`. For example: `poll`
 2. Run `python manage.py startapp poll apps/poll` from the root directory of the project
 
-### Second and folowing runs
+### Second and following runs
 1. git stash && git checkout main && git pull && pip install -r requirements/common.txt && python manage.py migrate && git stash pop
+
+### How to make pull request on a new branch:
+1. git checkout -b new_branch
+2. git status
+3. git add name_of_changed_file
+4. git status
+5. git commit -m "change log_description"
+6. git push -u origin new_branch
+7. Go to the Github page for the repository (e.g., https://github.com/jakkemomo/meetups)
+8. Click on 'Pull requests' tab
+9. Click on 'New pull request'
+10. Choose your branch (new_branch) to compare with the main branch
+11. Click on 'Create pull request' button
