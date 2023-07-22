@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Categories, Event
+from .models import Category, Event, Tag
 
 
 # Register your models here.
@@ -23,8 +23,16 @@ class EventAdmin(admin.ModelAdmin):
     ordering = ["start_date", "name"]
 
 
-@admin.register(Categories)
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    list_display = ["id", "name"]
+    list_filter = ["name"]
+    search_fields = ["name"]
+    ordering = ["name"]
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
     list_display = ["id", "name"]
     list_filter = ["name"]
     search_fields = ["name"]

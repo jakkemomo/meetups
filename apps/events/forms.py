@@ -11,6 +11,7 @@ class EventForm(forms.ModelForm):
             "name",
             "image",
             "category",
+            "tags",
             "address",
             "description",
             "start_date",

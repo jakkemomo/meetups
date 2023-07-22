@@ -56,6 +56,9 @@
                                 <div class="h-100">
                                     <h5 class="card-title text-muted">{{ event.category }}</h5>
                                     <h4 class="card-title">{{ event.name }}</h4>
+                                    {% if event.tags.all %}
+                                            <p>Tags: {{ event.tags.all|join:", " }}.</p>
+                                    {% endif %}
                                     <div class="card-text">
                                         <p>{{ event.description }}</p>
                                     </div>
