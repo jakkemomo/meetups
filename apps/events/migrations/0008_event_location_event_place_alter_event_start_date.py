@@ -7,25 +7,24 @@ import location_field.models.spatial
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('events', '0007_alter_event_image'),
-    ]
+    dependencies = [("events", "0007_alter_event_image")]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='location',
-            field=location_field.models.spatial.LocationField(default=django.contrib.gis.geos.point.Point(27.561831, 53.902284), srid=4326),
+            model_name="event",
+            name="location",
+            field=location_field.models.spatial.LocationField(
+                default=django.contrib.gis.geos.point.Point(27.561831, 53.902284), srid=4326
+            ),
         ),
         migrations.AddField(
-            model_name='event',
-            name='place',
-            field=models.CharField(default='Minsk', max_length=255),
+            model_name="event",
+            name="place",
+            field=models.CharField(default="Minsk", max_length=255),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='start_date',
+            model_name="event",
+            name="start_date",
             field=models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True),
         ),
     ]
