@@ -18,6 +18,7 @@ from django.views.generic import (
 
 from apps.events.forms import EventForm
 from apps.events.models.events import Event, Categories
+from config import settings
 
 
 class EventCreation(CreateView):
@@ -146,6 +147,7 @@ class EventMap(TemplateView):
             }
             event["geometry"]["coordinates"].reverse()
         context["events"] = geo_events
+        context["yandex_api_key"] = settings.YANDEX_API_KEY
         return context
 
 
