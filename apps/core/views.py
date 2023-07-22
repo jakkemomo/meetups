@@ -13,8 +13,9 @@ class CoreSignUpView(generic.CreateView):
 
     def form_valid(self, form):
         """Security check complete. Log the user in."""
-        auth_login(self.request, self.request.user)
-        return super(CoreSignUpView, self).form_valid(form)
+        result = super(CoreSignUpView, self).form_valid(form)
+        auth_login(self.request, self.object)
+        return result
 
 
 class CoreLoginView(LoginView):
