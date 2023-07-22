@@ -82,10 +82,12 @@ class EventListing(ListView):
         self.object_list = self.get_queryset()
 
         object_list = Event.objects.filter(
-            (Q(name__icontains=searched) |
-             Q(address__icontains=searched) |
-             Q(description__icontains=searched) |
-             Q(category__name__icontains=searched))
+            (
+                Q(name__icontains=searched)
+                | Q(address__icontains=searched)
+                | Q(description__icontains=searched)
+                | Q(category__name__icontains=searched)
+            )
         )
 
         if category:
@@ -96,13 +98,15 @@ class EventListing(ListView):
             object_list = object_list.filter(end_date__lte=end_date)
 
         context = self.get_context_data()
-        context.update({
-            "searched": searched,
-            "object_list": object_list,
-            "category": category,
-            "start_date": start_date,
-            "end_date": end_date
-        })
+        context.update(
+            {
+                "searched": searched,
+                "object_list": object_list,
+                "category": category,
+                "start_date": start_date,
+                "end_date": end_date,
+            }
+        )
 
         return render(request, self.template_name, context)
 
@@ -148,6 +152,8 @@ class EventMap(TemplateView):
             event["geometry"]["coordinates"].reverse()
         context["events"] = geo_events
         context["yandex_api_key"] = settings.YANDEX_API_KEY
+        context["google_api_key"] = settings.GOOGLE_API_KEY
+        context["map_provider"] = settings.MAP_PROVIDER
         return context
 
 

@@ -9,13 +9,14 @@ function init() {
             center: [53.90228, 27.561831],
             zoom: 12
         });
-        res.geoObjects.options.set('preset', 'islands#blueCircleIcon');
-        map.geoObjects.add(res.geoObjects);
+        // adds blue current location
+        // res.geoObjects.options.set('preset', 'islands#blueCircleIcon');
+        // map.geoObjects.add(res.geoObjects);
     }, function (e) {
         // Если местоположение невозможно получить, то просто создаем карту.
         createMap({
             center: [53.90228, 27.561831],
-            zoom: 2
+            zoom: 12
         });
     });
 
