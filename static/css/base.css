@@ -136,9 +136,3 @@ header {
   left:0;
   z-index:1;
 }
-
-/* TO LIST.CSS */
-.card:hover {
-        border-color: #FF6666;
-        transition: all 0.1s ease-in-out;
-}

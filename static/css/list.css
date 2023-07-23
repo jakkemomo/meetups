@@ -20,3 +20,8 @@
     height: 200px;
     overflow-y: auto;
 }
+
+.card:hover {
+        border-color: #FF6666;
+        transition: all 0.1s ease-in-out;
+}

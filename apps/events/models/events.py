@@ -7,6 +7,7 @@ from location_field.models.spatial import LocationField
 
 from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
+from apps.events.models.rating import Rating
 from apps.events.models.tags import Tag
 from apps.events.utils import events_image_upload_path
 from common.mixins import ResizeImageMixin
@@ -34,7 +35,8 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
     is_visible = fields.BooleanField(null=False, blank=False, default=True)
 
-    participants = models.ManyToManyField(user_model, blank=True)
+    participants = models.ManyToManyField(user_model, blank=True, related_name='event_participants')
+    ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
 
     place = models.CharField(max_length=255, default="Minsk")
     location = LocationField(based_fields=["place"], zoom=13, default=Point(27.561831, 53.902284))
