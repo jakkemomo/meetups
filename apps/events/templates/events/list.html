@@ -54,7 +54,11 @@
                         <div class="col-6 col-md-7">
                             <div class="card-body d-flex flex-column">
                                 <div class="h-100">
-                                    <h5 class="card-title text-muted">{{ event.category }}</h5>
+                                    {% if event.category %}
+                                        <h5 class="card-title text-muted">{{ event.category }}</h5>
+                                    {% else %}
+                                        <h5 class="card-title text-muted">Uncategorized</h5>
+                                    {% endif %}
                                     <h4 class="card-title">{{ event.name }}</h4>
                                     {% if event.tags.all %}
                                         <p>Tags: {{ event.tags.all|join:", " }}.</p>
