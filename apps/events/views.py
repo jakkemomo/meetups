@@ -124,11 +124,9 @@ class EventDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            rating_object = Rating.objects.filter(event=self.object, user=self.request.user).first()
-            context["rating_object"] = rating_object
-        finally:
-            return context
+        rating_object = Rating.objects.filter(event=self.object, user=self.request.user).first()
+        context["rating_object"] = rating_object
+        return context
 
 
 class EventMap(TemplateView):
@@ -184,29 +182,19 @@ class LeaveFromEvent(LoginRequiredMixin, View):
 class RateEvent(LoginRequiredMixin, View):
     model = Rating
 
-    def post(self, request, event_id, value):
+    def post(self, request, event_id, value=None):
         event = get_object_or_404(Event, id=event_id)
         rating_object, created = Rating.objects.get_or_create(
             event=event, user=request.user
         )
-        rating_object.value = value
-        rating_object.save()
+
+        if value:
+            rating_object.value = value
+            rating_object.save()
+        else:
+            rating_object.delete()
 
         return redirect("events:event_detail", pk=event_id)
-
-
-class RemoveRating(LoginRequiredMixin, View):
-    model = Rating
-
-    def post(self, request, event_id):
-        event = get_object_or_404(Event, id=event_id)
-        rating_object = Rating.objects.filter(
-            event=event, user=request.user
-        ).first()
-        rating_object.delete()
-
-        return redirect("events:event_detail", pk=event_id)
-
 
 
 # Finding events within radius

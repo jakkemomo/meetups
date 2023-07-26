@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import EventCreation, EventDetail, EventEdition, EventListing, EventMap, EventDeletion
-from .views import RegisterToEvent, LeaveFromEvent, RateEvent, RemoveRating
+from .views import RegisterToEvent, LeaveFromEvent, RateEvent
 
 app_name = "events"
 
@@ -18,5 +18,5 @@ urlpatterns = [
     path("events/<int:event_id>/leave/", LeaveFromEvent.as_view(), name="leave_from_event"),
 
     path("events/<int:event_id>/rate/<int:value>", RateEvent.as_view(), name="rate_an_event"),
-    path("events/<int:event_id>/remove_rating/", RemoveRating.as_view(), name="remove_rating"),
+    path("events/<int:event_id>/remove_rating/", RateEvent.as_view(), name="remove_rating"),
 ]
