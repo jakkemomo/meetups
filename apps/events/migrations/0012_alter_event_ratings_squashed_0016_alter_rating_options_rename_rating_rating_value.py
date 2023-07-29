@@ -5,46 +5,38 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('events', '0012_alter_event_ratings'), ('events', '0013_alter_event_ratings_alter_rating_rating'), ('events', '0014_alter_rating_unique_together'), ('events', '0015_alter_rating_rating'), ('events', '0016_alter_rating_options_rename_rating_rating_value')]
-
     dependencies = [
-        ('events', '0011_alter_category_options_alter_event_options_and_more'),
+        ("events", "0011_alter_category_options_alter_event_options_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='ratings',
-            field=models.ManyToManyField(blank=True, through='events.Rating', to=settings.AUTH_USER_MODEL),
+            model_name="event",
+            name="ratings",
+            field=models.ManyToManyField(
+                blank=True, through="events.Rating", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='ratings',
-            field=models.ManyToManyField(through='events.Rating', to=settings.AUTH_USER_MODEL),
+            model_name="event",
+            name="ratings",
+            field=models.ManyToManyField(through="events.Rating", to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
-            model_name='rating',
-            name='rating',
-            field=models.SmallIntegerField(),
+            model_name="rating", name="rating", field=models.SmallIntegerField()
         ),
-        migrations.AlterUniqueTogether(
-            name='rating',
-            unique_together={('event', 'user')},
-        ),
+        migrations.AlterUniqueTogether(name="rating", unique_together={("event", "user")}),
         migrations.AlterField(
-            model_name='rating',
-            name='rating',
-            field=models.SmallIntegerField(null=True),
+            model_name="rating", name="rating", field=models.SmallIntegerField(null=True)
         ),
         migrations.AlterModelOptions(
-            name='rating',
-            options={'ordering': ['value'], 'verbose_name': 'Rating', 'verbose_name_plural': 'Ratings'},
+            name="rating",
+            options={
+                "ordering": ["value"],
+                "verbose_name": "Rating",
+                "verbose_name_plural": "Ratings",
+            },
         ),
-        migrations.RenameField(
-            model_name='rating',
-            old_name='rating',
-            new_name='value',
-        ),
+        migrations.RenameField(model_name="rating", old_name="rating", new_name="value"),
     ]
