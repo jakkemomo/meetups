@@ -3,7 +3,7 @@ from django.contrib.gis.geos import Point
 from django.db import models
 from django.db.models import fields
 from django.utils import timezone
-from location_field.models.spatial import LocationField
+from apps.location_field.models.spatial import LocationField
 
 from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
@@ -21,7 +21,17 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     )
     tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
-    address = fields.CharField(max_length=250, null=True, blank=True)
+    address = fields.CharField(max_length=250, null=True, blank=True, default="Minsk")
+    location = LocationField(
+        based_fields=["address"], zoom=13, default=Point(27.561831, 53.902284)
+    )
+    type = fields.CharField(
+        max_length=10,
+        choices=(("open", "Open"), ("private", "Private")),
+        default="open",
+        null=False,
+        blank=False,
+    )
     description = fields.TextField(max_length=250, null=True, blank=True)
     image = models.ImageField(
         upload_to=events_image_upload_path,
@@ -35,11 +45,10 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
     is_visible = fields.BooleanField(null=False, blank=False, default=True)
 
-    participants = models.ManyToManyField(user_model, blank=True, related_name='event_participants')
+    participants = models.ManyToManyField(
+        user_model, blank=True, related_name="event_participants"
+    )
     ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
-
-    place = models.CharField(max_length=255, default="Minsk")
-    location = LocationField(based_fields=["place"], zoom=13, default=Point(27.561831, 53.902284))
 
     class Meta:
         ordering = ["start_date"]

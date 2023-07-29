@@ -10,14 +10,15 @@ class EventForm(forms.ModelForm):
         fields = [
             "name",
             "image",
+            "type",
             "category",
             "tags",
             "address",
+            "location",
             "description",
+            "participants",
             "start_date",
             "end_date",
-            "place",
-            "location",
         ]
         widgets = {
             "start_date": DateTimeInput(

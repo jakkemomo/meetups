@@ -13,16 +13,13 @@ class EventAdmin(admin.ModelAdmin):
         "name",
         "category",
         "address",
+        "location",
         "description",
         "start_date",
         "end_date",
-        "place",
-        "location",
     ]
-    inlines = [
-        RatingInline,
-    ]
-    exclude = ('ratings',)
+    inlines = [RatingInline]
+    exclude = ("ratings",)
     list_filter = ["name", "category"]
     search_fields = ["name", "category"]
     ordering = ["start_date", "name"]
