@@ -48,6 +48,8 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     participants = models.ManyToManyField(
         user_model, blank=True, related_name="event_participants"
     )
+    current_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
+    desired_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
     ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
 
     class Meta:
