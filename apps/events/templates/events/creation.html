@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load bootstrap4 %}
-{% load widget_tweaks %}
 
 {% block head %}
-    {% bootstrap_css %}
+    {% load static %}
+    {% load bootstrap4 %}
+    {% load widget_tweaks %}
     {% bootstrap_javascript jquery='full' %}
     {{form.media}}
 {%  endblock %}
