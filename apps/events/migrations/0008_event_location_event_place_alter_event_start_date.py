@@ -3,7 +3,7 @@
 import django.contrib.gis.geos.point
 from django.db import migrations, models
 import django.utils.timezone
-import location_field.models.spatial
+import apps.location_field.models.spatial
 
 
 class Migration(migrations.Migration):
@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="event",
             name="location",
-            field=location_field.models.spatial.LocationField(
+            field=apps.location_field.models.spatial.LocationField(
                 default=django.contrib.gis.geos.point.Point(27.561831, 53.902284), srid=4326
             ),
         ),

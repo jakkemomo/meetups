@@ -44,6 +44,8 @@ class EventCreation(CreateView):
             if request.user.is_authenticated:
                 form.instance.created_by = request.user
                 form.instance.updated_by = request.user
+            if form.instance.type == "private":
+                form.instance.is_visible = False
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -60,6 +62,18 @@ class EventEdition(UpdateView):
         else:
             return reverse_lazy("events:event_list")
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            if form.instance.type == "private":
+                form.instance.is_visible = False
+            else:
+                form.instance.is_visible = True
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
 
 class EventDeletion(DeleteView):
     model = Event
@@ -72,7 +86,12 @@ class EventListing(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        self.queryset = self.model.objects.filter(Q(is_visible=True) & Q(is_finished=False))
+        if self.request.user.id:
+            self.queryset = self.model.objects.filter(
+                Q(is_visible=True) & Q(is_finished=False) | Q(participants__in=[self.request.user])
+            )
+        else:
+            self.queryset = self.model.objects.filter(Q(is_visible=True) & Q(is_finished=False))
         return super().get_queryset()
 
     def post(self, request):
@@ -185,9 +204,7 @@ class RateEvent(LoginRequiredMixin, View):
 
     def post(self, request, event_id, value=None):
         event = get_object_or_404(Event, id=event_id)
-        rating_object, created = Rating.objects.get_or_create(
-            event=event, user=request.user
-        )
+        rating_object, created = Rating.objects.get_or_create(event=event, user=request.user)
 
         if value:
             rating_object.value = value

@@ -9,7 +9,7 @@
 {% block content %}
 <main class="pt-md-5">
     <div class="container">
-        <div class="row g-3 justify-content-evently">
+        <div class="row g-3 justify-content-evenly">
             {% if searched %}
             {% if object_list %}
             <div class="col-md-12">
@@ -40,7 +40,7 @@
             </form>
 
             {% for event in object_list %}
-            {% if forloop.counter0|divisibleby:4 and not forloop.first %}
+            {% if forloop.counter0|divisibleby:3 and not forloop.first %}
         </div>
         <div class="row gy-3 pt-md-3">
             {% endif %}

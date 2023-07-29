@@ -36,8 +36,8 @@ if BOOTSTRAP4_FOLDER not in sys.path:
     sys.path.insert(0, BOOTSTRAP4_FOLDER)
 
 # GDAL-GEOS_PATH
-GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
-GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = os.environ.get("GDAL_LIBRARY_PATH")
+GEOS_LIBRARY_PATH = os.environ.get("GEOS_LIBRARY_PATH")
 
 # Application definition
 
@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
-    "location_field.apps.DefaultConfig",
+    "apps.location_field.apps.DefaultConfig",
     "widget_tweaks",
     "bootstrap4",
 ]

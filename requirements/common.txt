@@ -3,6 +3,5 @@ Pillow==10.0.0
 django-bootstrap4==23.2
 django-widget-tweaks==1.4.12
 python-dotenv
-django-location-field==2.7.1
 psycopg2==2.9.6
 six
