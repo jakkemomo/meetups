@@ -18,7 +18,7 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
     )
-    tags = models.ManyToManyField(to=Tag, related_name="events", null=True, blank=True)
+    tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True)
     description = fields.TextField(max_length=250, null=True, blank=True)
