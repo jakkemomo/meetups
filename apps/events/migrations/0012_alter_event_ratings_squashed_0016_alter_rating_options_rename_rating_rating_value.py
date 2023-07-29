@@ -6,8 +6,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('events', '0012_alter_event_ratings'), ('events', '0013_alter_event_ratings_alter_rating_rating'), ('events', '0014_alter_rating_unique_together'), ('events', '0015_alter_rating_rating'), ('events', '0016_alter_rating_options_rename_rating_rating_value')]
-
     dependencies = [
         ('events', '0011_alter_category_options_alter_event_options_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
