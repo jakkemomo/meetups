@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Category, Event, Tag
+from .models import Category, Event, Tag, Rating
 
 
-# Register your models here.
+class RatingInline(admin.TabularInline):
+    model = Event.ratings.through
 
 
 @admin.register(Event)
@@ -18,6 +19,10 @@ class EventAdmin(admin.ModelAdmin):
         "place",
         "location",
     ]
+    inlines = [
+        RatingInline,
+    ]
+    exclude = ('ratings',)
     list_filter = ["name", "category"]
     search_fields = ["name", "category"]
     ordering = ["start_date", "name"]
@@ -37,3 +42,11 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ["name"]
     search_fields = ["name"]
     ordering = ["name"]
+
+
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ["value", "user", "event"]
+    list_filter = ["value", "user", "event"]
+    search_fields = ["value", "user", "event"]
+    ordering = ["value"]

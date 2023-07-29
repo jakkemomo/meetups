@@ -2,49 +2,96 @@
 {% load static %}
 
 {% block css %}
-    <link href="{% static 'css/detail.css' %}" rel="stylesheet">
+<link href="{% static 'css/detail.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-    <main>
-        <div class="card">
-            <div class="card-header">
-                <img src="/media/{{ event.image }}" class="w-25" alt="Beautiful Event">
-            </div>
-            <div class="card-body">
-                <h5 class="card-title fw-bold">{{ object.name }}</h5>
-                <div class="card-text">
-                    {% if object.tags.all %}
-                    <p>Tags: {{ object.tags.all|join:", " }}.</p>
-                    {% endif %}
-                    <p>{{ object.description }}</p>
-                    <p>Address: {{ object.address }}</p>
-                    <p>Start date: {{ object.start_date }}</p>
-                    <p>End date: {{ object.end_date }}</p>
-                </div>
-
-                {% if request.user.is_authenticated %}
-                    {% if request.user != object.created_by %}
-                        {% if request.user in object.participants.all %}
-                            <form action="{% url 'events:leave_from_event' object.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-secondary">Leave</button>
-                            </form>
-                        {% else %}
-                            <form action="{% url 'events:register_to_event' object.id %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-success">Register</button>
-                            </form>
-                        {% endif %}
-                    {% else %}
-                        <br/>
-                        <a href="{% url 'events:event_creation' object.id %}" class="btn btn-info">Edit</a>
-                        <a href="{% url 'events:event_deletion' object.id %}" class="btn btn-danger">Delete</a>
-                    {% endif %}
-                {% endif %}
-
-            </div>
+<main>
+    <div class="card">
+        <div class="card-header">
+            <img src="/media/{{ event.image }}" class="w-25" alt="Beautiful Event">
         </div>
-    </main>
+        <div class="card-body">
+            <h5 class="card-title fw-bold">{{ object.name }}</h5>
+            <div class="card-text">
+                {% if object.tags.all %}
+                <p>Tags: {{ object.tags.all|join:", " }}.</p>
+                {% endif %}
+                <p>{{ object.description }}</p>
+                <p>Address: {{ object.address }}</p>
+                <p>Start date: {{ object.start_date }}</p>
+                <p>End date: {{ object.end_date }}</p>
+            </div>
 
+            {% if request.user.is_authenticated %}
+            {% if request.user != object.created_by %}
+            {% if request.user in object.participants.all %}
+            <div class="btn-group" role="group" aria-label="Rating">
+                {% for i in '0123456789'|make_list %}
+                <form action="{% url 'events:rate_an_event' object.id i|add:1 %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="value" value="{{ i|add:1 }}"/>
+                    <label class="star {% if rating_object.value >= i|add:1 %} selected active {% endif %}"
+                           data-rating="{{ i|add:1 }}">
+                        <i class="ion-ios-star"></i>
+                        <input type="submit" hidden/>
+                    </label>
+                </form>
+                {% endfor %}
+            </div>
+
+            {% if rating_object %}
+            <form action="{% url 'events:remove_rating' object.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Remove my rating</button>
+            </form>
+            {% endif %}
+            <form action="{% url 'events:leave_from_event' object.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Leave</button>
+            </form>
+            {% else %}
+            <form action="{% url 'events:register_to_event' object.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Register</button>
+            </form>
+            {% endif %}
+            {% else %}
+            <br/>
+            <a href="{% url 'events:event_creation' object.id %}" class="btn btn-info">Edit</a>
+            <a href="{% url 'events:event_deletion' object.id %}" class="btn btn-danger">Delete</a>
+            {% endif %}
+            {% endif %}
+
+        </div>
+    </div>
+</main>
+
+<script>
+    const stars = document.querySelectorAll('.star');
+
+stars.forEach((star, index) => {
+  star.addEventListener('mouseover', () => {
+    for (let i = 0; i <= index; i++) {
+      stars[i].classList.add('active');
+    }
+  });
+  star.addEventListener('mouseout', () => {
+    for (let i = 0; i < stars.length; i++) {
+      if (!stars[i].classList.contains('selected')) {
+        stars[i].classList.remove('active');
+      }
+    }
+  });
+  star.addEventListener('click', () => {
+    for (let i = 0; i < stars.length; i++) {
+      stars[i].classList.remove('selected');
+    }
+    for (let i = 0; i <= index; i++) {
+      stars[i].classList.add('selected');
+    }
+  });
+});
+
+</script>
 {% endblock %}

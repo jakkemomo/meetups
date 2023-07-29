@@ -36,8 +36,8 @@ if BOOTSTRAP4_FOLDER not in sys.path:
     sys.path.insert(0, BOOTSTRAP4_FOLDER)
 
 # GDAL-GEOS_PATH
-GDAL_LIBRARY_PATH = os.environ.get("GDAL_LIBRARY_PATH")
-GEOS_LIBRARY_PATH = os.environ.get("GEOS_LIBRARY_PATH")
+GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
+GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
 
 # Application definition
 
@@ -153,7 +153,7 @@ LOCATION_FIELD_PATH = STATIC_URL + "location_field"
 
 YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-MAP_PROVIDER = "google"
+MAP_PROVIDER = "yandex"
 LOCATION_FIELD = {
     "map.provider": "google",
     "map.zoom": 13,
