@@ -136,6 +136,7 @@ class EventMap(TemplateView):
             event_start = datetime.strptime(attrs["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime(
                 "%-d %B %H:%M"
             )
+            attrs["start_date"] = event_start
             attrs.update(
                 {
                     "balloonContentHeader": f"<center>{event_name}</center></br><center>{event_start}</center>",
