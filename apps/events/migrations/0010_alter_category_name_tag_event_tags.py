@@ -58,8 +58,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="event",
             name="tags",
-            field=models.ManyToManyField(
-                blank=True, null=True, related_name="events", to="events.tag"
-            ),
+            field=models.ManyToManyField(blank=True, related_name="events", to="events.tag"),
         ),
     ]
