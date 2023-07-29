@@ -13,14 +13,37 @@
         </div>
         <div class="card-body">
             <h5 class="card-title fw-bold">{{ object.name }}</h5>
-            <div class="card-text">
+            <div class="card-text justify-content-center">
                 {% if object.tags.all %}
                 <p>Tags: {{ object.tags.all|join:", " }}.</p>
                 {% endif %}
                 <p>{{ object.description }}</p>
-                <p>Address: {{ object.address }}</p>
-                <p>Start date: {{ object.start_date }}</p>
-                <p>End date: {{ object.end_date }}</p>
+                <p><b>Address:</b> {{ object.address }}</p>
+                <p><b>Start date:</b> {{ object.start_date }}</p>
+                {% if object.end_date %}
+                    <p><b>End date:</b> {{ object.end_date }}</p>
+                {% endif %}
+                <p><b>Participants:</b>
+                    {% if object.desired_participants_number > 1 %}
+                        {{ object.current_participants_number }}/{{ object.desired_participants_number }}
+                    {% endif %}
+                </p>
+                <table class="table table-bordered table-hover" style="width:50%;margin: 0 auto;">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in object.participants.all %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <th scope="row">{{ row }}</th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             {% if request.user.is_authenticated %}

@@ -15,6 +15,7 @@ class EventForm(forms.ModelForm):
             "tags",
             "address",
             "location",
+            "desired_participants_number",
             "description",
             "participants",
             "start_date",
