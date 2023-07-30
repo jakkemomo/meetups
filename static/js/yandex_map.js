@@ -4,20 +4,9 @@ function init() {
     var map;
     var objectManager = new ymaps.ObjectManager();
 
-    ymaps.geolocation.get().then(function (res) {
-        createMap({
-            center: [53.90228, 27.561831],
-            zoom: 12
-        });
-        // adds blue current location
-        // res.geoObjects.options.set('preset', 'islands#blueCircleIcon');
-        // map.geoObjects.add(res.geoObjects);
-    }, function (e) {
-        // Если местоположение невозможно получить, то просто создаем карту.
-        createMap({
-            center: [53.90228, 27.561831],
-            zoom: 12
-        });
+    createMap({
+        center: [53.90228, 27.561831],
+        zoom: 12
     });
 
     function createMap(state) {
