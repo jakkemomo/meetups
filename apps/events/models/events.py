@@ -67,3 +67,4 @@ class Event(AbstractBaseModel, ResizeImageMixin):
         if self.pk is None or Event.objects.get(pk=self.pk).image != self.image:
             self.resize(self.image, (400, 500))
         super().save(*args, **kwargs)
+        self.participants.add(self.created_by)
