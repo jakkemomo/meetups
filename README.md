@@ -2,7 +2,7 @@
 
 ## First run
 1. Create `.env` file in the root dir with fields from `.env.example`
-2. Optionally (to use maps) [get and set](https://yandex.ru/dev/jsapi-v2-1/doc/ru/#get-api-key) yandex maps api key in the `.env` file
+2. Optionally (to use maps) [get and set](https://yandex.ru/dev/jsapi-v2-1/doc/ru/#get-api-key) yandex maps api key or, even better, [google maps api key](https://developers.google.com/maps/documentation/javascript/get-api-key) in the `.env` file
 3. Install docker-compose
 4. `chmod +x entrypoint.sh && ./entrypoint.sh` (You can also use entrypoint-mac.sh if you are using mac)
 
