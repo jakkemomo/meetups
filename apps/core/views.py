@@ -2,8 +2,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views import generic
+from django.contrib.auth import login as auth_login, get_user_model
+from django.conf import settings
 
-from django.contrib.auth import login as auth_login
+
+User = get_user_model()
 
 
 class CoreSignUpView(generic.CreateView):

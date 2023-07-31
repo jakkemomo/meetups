@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
-    "apps.location_field.apps.DefaultConfig",
+    "apps.profiles.apps.ProfilesConfig",
+    "location_field.apps.DefaultConfig",
     "widget_tweaks",
     "bootstrap4",
 ]
@@ -105,6 +106,10 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "5555"),
     }
 }
+
+# Users
+AUTH_USER_MODEL = 'profiles.User'
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

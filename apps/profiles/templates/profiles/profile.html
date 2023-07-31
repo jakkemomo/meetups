@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    <main class="px-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <img src="{{ object.avatar.url }}" class="card-img-top" alt="user-avatar">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ object.username }}</h4>
+                            <h5 class="card-title">{{ object.first_name }} {{ object.last_name }}</h5>
+                            <p class="card-text">Email: {{ object.email }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <!-- Delete the card with the About section -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}
