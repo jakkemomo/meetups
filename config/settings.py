@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
     "apps.profiles.apps.ProfilesConfig",
-    "location_field.apps.DefaultConfig",
+    "apps.location_field.apps.DefaultConfig",
     "widget_tweaks",
     "bootstrap4",
 ]
@@ -108,7 +108,7 @@ DATABASES = {
 }
 
 # Users
-AUTH_USER_MODEL = 'profiles.User'
+AUTH_USER_MODEL = "profiles.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

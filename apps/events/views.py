@@ -147,6 +147,7 @@ class EventDetail(DetailView):
             event=self.object, user=self.request.user if self.request.user.id else None
         ).first()
         context["rating_object"] = rating_object
+        EventMap.serialize_events_for_map(context, [self.object])
         return context
 
 
@@ -157,6 +158,11 @@ class EventMap(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         events = Event.objects.filter(is_visible=True, is_finished=False)
+        self.serialize_events_for_map(context, events)
+        return context
+
+    @staticmethod
+    def serialize_events_for_map(context, events):
         geo_events = json.loads(serialize("geojson", events))
         for event in geo_events["features"]:
             attrs = event["properties"]
