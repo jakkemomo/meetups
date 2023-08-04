@@ -158,7 +158,7 @@ LOCATION_FIELD_PATH = STATIC_URL + "location_field"
 
 YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-MAP_PROVIDER = "yandex"
+MAP_PROVIDER = "google"
 LOCATION_FIELD = {
     "map.provider": "google",
     "map.zoom": 13,

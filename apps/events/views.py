@@ -88,8 +88,9 @@ class EventListing(ListView):
     def get_queryset(self):
         if self.request.user.id:
             self.queryset = self.model.objects.filter(
-                Q(is_visible=True) & Q(is_finished=False) | Q(participants__in=[self.request.user])
-            )
+                Q(is_visible=True) & Q(is_finished=False) |
+                Q(participants__in=[self.request.user]) & Q(is_finished=False)
+            ).distinct()
         else:
             self.queryset = self.model.objects.filter(Q(is_visible=True) & Q(is_finished=False))
         return super().get_queryset()
