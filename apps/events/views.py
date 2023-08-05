@@ -23,7 +23,7 @@ from apps.events.models.rating import Rating
 from config import settings
 
 
-class EventCreation(CreateView):
+class EventCreation(LoginRequiredMixin, CreateView):
     model = Event
     template_name = "events/creation.html"
     form_class = EventForm
@@ -51,7 +51,7 @@ class EventCreation(CreateView):
             return self.form_invalid(form)
 
 
-class EventEdition(UpdateView):
+class EventEdition(LoginRequiredMixin, UpdateView):
     model = Event
     template_name = "events/edition.html"
     form_class = EventForm
@@ -75,7 +75,7 @@ class EventEdition(UpdateView):
             return self.form_invalid(form)
 
 
-class EventDeletion(DeleteView):
+class EventDeletion(LoginRequiredMixin, DeleteView):
     model = Event
     success_url = reverse_lazy("events:event_list")
 
@@ -88,8 +88,8 @@ class EventListing(ListView):
     def get_queryset(self):
         if self.request.user.id:
             self.queryset = self.model.objects.filter(
-                Q(is_visible=True) & Q(is_finished=False) |
-                Q(participants__in=[self.request.user]) & Q(is_finished=False)
+                Q(is_visible=True) & Q(is_finished=False)
+                | Q(participants__in=[self.request.user]) & Q(is_finished=False)
             ).distinct()
         else:
             self.queryset = self.model.objects.filter(Q(is_visible=True) & Q(is_finished=False))
