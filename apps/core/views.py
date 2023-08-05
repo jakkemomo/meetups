@@ -1,13 +1,12 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views import generic
-
 from django.contrib.auth import login as auth_login
+from apps.core.forms import CustomUserCreationForm
 
 
 class CoreSignUpView(generic.CreateView):
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     success_url = reverse_lazy("events:event_map")
     template_name = "registration/signup.html"
 

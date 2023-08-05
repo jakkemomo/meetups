@@ -8,7 +8,7 @@
     <title>meetups</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/cover/">
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}" >
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}">
 
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,17 +38,22 @@
                 <div class="nav-item px-5 dropdown text-end">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none" data-bs-toggle="dropdown"
                        aria-expanded="false">
-                        <img src="https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg" alt="mdo"
+                        <img src="{% if request.user.is_authenticated %} {{ request.user.avatar.url }}
+                        {% else %} https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg {% endif %}"
+                             alt="mdo"
                              width="32" height="32" class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu text-small">
                         <li><a class="dropdown-item" href="{% url 'events:event_creation' %}">New meetup...</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        {% if request.user.is_authenticated %}
+                        <li><a class="dropdown-item" href="{% url 'profiles:profile' user.id %}">Profile</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:logout' %}">Log out</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="{% url 'core:login' %}">Log in</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </nav>

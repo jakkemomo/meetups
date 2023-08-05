@@ -26,4 +26,5 @@ class EventForm(forms.ModelForm):
                 format=("%Y-%m-%dT%H:%M"), attrs={"type": "datetime-local"}
             ),
             "end_date": DateTimeInput(format=("%Y-%m-%dT%H:%M"), attrs={"type": "datetime-local"}),
+            "tags": forms.CheckboxSelectMultiple,
         }

@@ -6,8 +6,21 @@ async function initMap() {
         "marker"
     );
 
+    let center_lat = 53.90228;
+    let center_lng = 27.561831;
+
+    let center_lat_element = document.getElementById('center_lat');
+    let center_lng_element = document.getElementById('center_lng');
+
+    if (center_lat_element){
+        center_lat = JSON.parse(center_lat_element.textContent);
+    }
+    if (center_lng_element){
+        center_lng = JSON.parse(center_lng_element.textContent);
+    }
+
     map = new Map(document.getElementById("map"), {
-        center: {lat: 53.90228, lng: 27.561831},
+        center: {lat: center_lat, lng: center_lng},
         zoom: 12,
         mapId: "eca99e8abfe1a0d8",
         styles: stylesArray

@@ -4,17 +4,18 @@
 
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <h3>Registration</h3>
-                <form method="post" enctype='multipart/form-data' class="form-vertical">
-                    {% csrf_token %}
-                    {% bootstrap_form form layout="vertical" %}
-                    {% bootstrap_form_errors form type='non_fields' %}
-                    <button type="submit" class="btn btn-success">Sign Up</button>
-                </form>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h3>Registration</h3>
+            <form method="post" enctype='multipart/form-data' class="form-vertical">
+                {% csrf_token %}
+                {% bootstrap_form form layout="vertical" %}
+                {% bootstrap_form_errors form type='non_fields' %}
+                <button type="submit" class="btn btn-success">Sign Up</button>
+            </form>
+            <a href="{% url 'core:login' %}">Already have an account? Log in!</a>
         </div>
     </div>
+</div>
 {% endblock %}

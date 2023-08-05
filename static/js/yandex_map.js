@@ -4,20 +4,22 @@ function init() {
     var map;
     var objectManager = new ymaps.ObjectManager();
 
-    ymaps.geolocation.get().then(function (res) {
-        createMap({
-            center: [53.90228, 27.561831],
-            zoom: 12
-        });
-        // adds blue current location
-        // res.geoObjects.options.set('preset', 'islands#blueCircleIcon');
-        // map.geoObjects.add(res.geoObjects);
-    }, function (e) {
-        // Если местоположение невозможно получить, то просто создаем карту.
-        createMap({
-            center: [53.90228, 27.561831],
-            zoom: 12
-        });
+    let center_lat = 53.90228;
+    let center_lng = 27.561831;
+
+    let center_lat_element = document.getElementById('center_lat');
+    let center_lng_element = document.getElementById('center_lng');
+
+    if (center_lat_element){
+        center_lat = JSON.parse(center_lat_element.textContent);
+    }
+    if (center_lng_element){
+        center_lng = JSON.parse(center_lng_element.textContent);
+    }
+
+    createMap({
+        center: [center_lat, center_lng],
+        zoom: 12
     });
 
     function createMap(state) {

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
+    "apps.profiles.apps.ProfilesConfig",
     "apps.location_field.apps.DefaultConfig",
     "widget_tweaks",
     "bootstrap4",
@@ -105,6 +106,10 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "5555"),
     }
 }
+
+# Users
+AUTH_USER_MODEL = "profiles.User"
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -153,7 +158,7 @@ LOCATION_FIELD_PATH = STATIC_URL + "location_field"
 
 YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-MAP_PROVIDER = "yandex"
+MAP_PROVIDER = "google"
 LOCATION_FIELD = {
     "map.provider": "google",
     "map.zoom": 13,
