@@ -15,8 +15,8 @@
                 <h3>New meetup</h3>
                 <form method="post" enctype='multipart/form-data' class="form-vertical">
                     {% csrf_token %}
+                    {% bootstrap_form_errors form type='all' %}
                     {% bootstrap_form form layout="vertical" %}
-                    {% bootstrap_form_errors form type='non_fields' %}
                     <button type="submit" class="btn btn-success">Save</button>
                     <a href="{{ view.get_success_url }}" class="btn btn-secondary">Cancel</a>
                 </form>

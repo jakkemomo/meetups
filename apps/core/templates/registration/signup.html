@@ -11,7 +11,7 @@
             <form method="post" enctype='multipart/form-data' class="form-vertical">
                 {% csrf_token %}
                 {% bootstrap_form form layout="vertical" %}
-                {% bootstrap_form_errors form type='non_fields' %}
+                {% bootstrap_form_errors form type='all' %}
                 <button type="submit" class="btn btn-success">Sign Up</button>
             </form>
             <a href="{% url 'core:login' %}">Already have an account? Log in!</a>

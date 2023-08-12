@@ -90,7 +90,7 @@
                                     </form>
                                 {% endif %}
                             {% else %}
-                                <form class="m-auto" action="{% url 'events:event_creation' object.id %}" method="post">
+                                <form class="m-auto" action="{% url 'events:event_edition' object.id %}" method="get">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-success">Edit</button>
                                 </form>
