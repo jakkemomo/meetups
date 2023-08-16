@@ -2,8 +2,10 @@ import json
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.search import TrigramSimilarity, TrigramWordSimilarity
 from django.core.serializers import serialize
 from django.db.models import Q
+from django.db.models.functions import Greatest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -96,44 +98,27 @@ class EventListing(ListView):
         return super().get_queryset()
 
     def post(self, request):
-        searched = request.POST["searched"]
+        search_request = request.POST["searched"]
         category = request.POST["category"]
-        start_date = request.POST["start_date"]
-        end_date = request.POST["end_date"]
 
-        self.object_list = self.get_queryset()
-
-        object_list = Event.objects.filter(
-            (
-                Q(name__icontains=searched)
-                | Q(address__icontains=searched)
-                | Q(description__icontains=searched)
-                | Q(category__name__icontains=searched)
+        object_list = Event.objects.annotate(
+            similarity=Greatest(
+                TrigramWordSimilarity(search_request, "name"),
+                TrigramWordSimilarity(search_request, "description"),
+                TrigramWordSimilarity(search_request, "address"),
             )
-        )
+        ).filter(similarity__gt=0.5).order_by("-similarity") if search_request else self.get_queryset()
 
         if category:
             object_list = object_list.filter(category__name=category)
-        if start_date:
-            object_list = object_list.filter(start_date__gte=start_date)
-        if end_date:
-            object_list = object_list.filter(end_date__lte=end_date)
 
-        context = self.get_context_data()
-        context.update(
-            {
-                "searched": searched,
-                "object_list": object_list,
-                "category": category,
-                "start_date": start_date,
-                "end_date": end_date,
-            }
-        )
+        context = self.get_context_data(object_list=object_list if object_list else self.get_queryset())
+        context.update({"searched": search_request, "object_list": object_list, "category": category})
 
         return render(request, self.template_name, context)
 
-    def get_context_data(self):
-        context = super().get_context_data()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
         return context
 
