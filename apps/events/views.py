@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import TrigramSimilarity, TrigramWordSimilarity
+from django.contrib.postgres.search import TrigramWordSimilarity
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.db.models.functions import Greatest
