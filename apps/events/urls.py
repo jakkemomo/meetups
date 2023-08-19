@@ -1,9 +1,15 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 
 from .views import EventCreation, EventDetail, EventEdition, EventListing, EventMap, EventDeletion
 from .views import RegisterToEvent, LeaveFromEvent, RateEvent
+from .viewset import EventViewSet
 
 app_name = "events"
+
+router = routers.SimpleRouter()
+router.register("events", EventViewSet)
+
 
 urlpatterns = [
     path("map/", EventMap.as_view(), name="event_map"),
@@ -16,4 +22,5 @@ urlpatterns = [
     path("events/<int:event_id>/leave/", LeaveFromEvent.as_view(), name="leave_from_event"),
     path("events/<int:event_id>/rate/<int:value>", RateEvent.as_view(), name="rate_an_event"),
     path("events/<int:event_id>/remove_rating/", RateEvent.as_view(), name="remove_rating"),
+    path("api/v1/", include(router.urls)),
 ]
