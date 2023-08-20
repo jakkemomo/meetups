@@ -7,6 +7,7 @@ from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
     EventCreateSerializer,
+    EventUpdateSerializer,
 )
 
 
@@ -43,3 +44,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventListSerializer
             case "create":
                 return EventCreateSerializer
+            case "update":
+                return EventUpdateSerializer
+            case "partial_update":
+                return EventUpdateSerializer

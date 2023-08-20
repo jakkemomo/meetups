@@ -6,8 +6,8 @@ from apps.profiles.models import User
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
-    current_participants_number = serializers.IntegerField(min_value=0, max_value=10000)
-    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000)
+    current_participants_number = serializers.IntegerField(min_value=0, max_value=10000, default=0)
+    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000, default=1)
     location = serializers.ListField(
         child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2
     )
@@ -25,17 +25,40 @@ class EventCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop("tags")
         event = Event(**validated_data)
         event.save()
-        event.tags.set([tag.id for tag in tags])
+        if tags:
+            event.tags.set([tag.id for tag in tags])
         return event
-
-    def update(self, instance, validated_data):
-        if validated_data.get("location"):
-            instance.location = Point(validated_data.pop("location"))
-        return instance
 
     def to_representation(self, instance):
         instance.location = instance.location.geojson
         instance = super().to_representation(instance)
+        return instance
+
+
+class EventUpdateSerializer(EventCreateSerializer):
+    current_participants_number = serializers.IntegerField(
+        min_value=0, max_value=10000, allow_null=True, required=False
+    )
+    desired_participants_number = serializers.IntegerField(
+        min_value=0, max_value=10000, allow_null=True, required=False
+    )
+    location = serializers.ListField(
+        child=serializers.DecimalField(max_digits=7, decimal_places=5),
+        max_length=2,
+        min_length=2,
+        required=False,
+    )
+
+    def update(self, instance, validated_data):
+        location = validated_data.pop("location", None)
+        if location:
+            instance.location = Point(location)
+        tags = validated_data.pop("tags", None)
+        if tags:
+            instance.tags.set([tag.id for tag in tags])
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
         return instance
 
 
