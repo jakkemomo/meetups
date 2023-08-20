@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
+    {% block meta %}
+    {% endblock %}
     <title>meetups</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/cover/">
@@ -19,6 +21,7 @@
 
     <link href="{% static 'bootstrap-5.3.0-dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="https://vk.com/js/api/share.js?93" charset="windows-1251"></script>
 
     {% block css %}
     {% endblock %}
