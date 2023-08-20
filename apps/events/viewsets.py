@@ -1,6 +1,9 @@
 from django.db.models import Q
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
 from apps.events.models import Event
 from apps.events.serializers import (
@@ -48,3 +51,31 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
+
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=[IsAuthenticatedOrReadOnly],
+        url_path="register",
+        url_name="event_register",
+    )
+    def register_for_event(self, request, pk: int):
+        event = get_object_or_404(Event, id=pk)
+        event.participants.add(request.user.id)
+        event.current_participants_number += 1
+        event.save()
+        return Response(status=status.HTTP_200_OK)
+
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=[IsAuthenticatedOrReadOnly],
+        url_path="leave",
+        url_name="event_leave",
+    )
+    def leave_from_event(self, request, pk=None):
+        event = get_object_or_404(Event, id=pk)
+        event.participants.remove(request.user.id)
+        event.current_participants_number -= 1
+        event.save()
+        return Response(status=status.HTTP_200_OK)
