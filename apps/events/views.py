@@ -148,6 +148,7 @@ class EventDetail(DetailView):
             event=self.object, user=self.request.user if self.request.user.id else None
         ).first()
         context["rating_object"] = rating_object
+        context['image_url'] = self.request.build_absolute_uri(self.object.image.url)
         EventMap.serialize_events_for_map(context, [self.object])
         return context
 
