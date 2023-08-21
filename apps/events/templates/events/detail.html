@@ -2,14 +2,10 @@
 {% load static %}
 
 {% block meta %}
-    <meta property="og:image" content="{{ request.build_absolute_uri|add:event.image.url }}">
-    <meta property="og:description" content="{{ object.description }}">
-
-    <meta property="og:title" content="{{ object.name }}" />
-    <meta property="og:description" content="{{ request.build_absolute_uri|add:event.image.url }}"/>
-    <meta property="og:image" content="{{ request.build_absolute_uri|add:event.image.url }}" />
-    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
-
+    <meta property="og:title" content="{{ object.name }}"/>
+    <meta property="og:description" content="{{ object.description }}"/>
+    <meta property="og:image" content="{{ request.build_absolute_uri|add:event.image.url }}"/>
+    <meta property="og:url" content="{{ request.build_absolute_uri }}"/>
 {% endblock %}
 
 {% block css %}
