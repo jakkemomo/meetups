@@ -42,7 +42,7 @@
                     <a href="#" class="d-block link-body-emphasis text-decoration-none" data-bs-toggle="dropdown"
                        aria-expanded="false">
                         <img src="{% if request.user.is_authenticated %} {{ request.user.avatar.url }}
-                        {% else %} https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg {% endif %}"
+                        {% else %} /media/users/image/default-user.jpeg {% endif %}"
                              alt="mdo"
                              width="32" height="32" class="rounded-circle">
                     </a>
@@ -53,9 +53,9 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="{% url 'core:logout' %}">Log out</a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:logout' %}?next={{ request.path }}">Log out</a></li>
                         {% else %}
-                        <li><a class="dropdown-item" href="{% url 'core:login' %}">Log in</a></li>
+                        <li><a class="dropdown-item" href="{% url 'core:login' %}?next={{ request.path }}">Log in</a></li>
                         {% endif %}
                     </ul>
                 </div>
