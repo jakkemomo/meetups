@@ -2,6 +2,11 @@ ymaps.ready(init);
 
 function init() {
     var map;
+    const [country_code, country] = getCountryInfo();
+    const city = getState()
+    const lang = getLang()
+    const separator = ', '
+    const loc_request = 'Cafe Toucan'
     var objectManager = new ymaps.ObjectManager();
 
     let center_lat = 53.90228;
@@ -10,10 +15,10 @@ function init() {
     let center_lat_element = document.getElementById('center_lat');
     let center_lng_element = document.getElementById('center_lng');
 
-    if (center_lat_element){
+    if (center_lat_element) {
         center_lat = JSON.parse(center_lat_element.textContent);
     }
-    if (center_lng_element){
+    if (center_lng_element) {
         center_lng = JSON.parse(center_lng_element.textContent);
     }
 
@@ -23,10 +28,11 @@ function init() {
     });
 
     function createMap(state) {
-        map = new ymaps.Map('map', state);
+        map = new ymaps.Map('map', state, {
+            searchControlProvider: 'yandex#search'
+        });
         map.geoObjects.add(objectManager);
         let data = JSON.parse(document.getElementById('events-data').textContent)
-        console.log(data);
         objectManager.add(data);
     }
 
