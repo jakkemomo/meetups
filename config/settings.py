@@ -155,6 +155,8 @@ BOOTSTRAP4 = {
     "include_jquery": True,
 }
 
+SIMILARITY_RATIO = 0.5
+
 LOCATION_FIELD_PATH = STATIC_URL + "location_field"
 
 YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")

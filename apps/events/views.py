@@ -101,18 +101,23 @@ class EventListing(ListView):
         search_request = request.POST["searched"]
         category = request.POST["category"]
 
-        object_list = Event.objects.annotate(
-            similarity=Greatest(
-                TrigramWordSimilarity(search_request, "name"),
-                TrigramWordSimilarity(search_request, "description"),
-                TrigramWordSimilarity(search_request, "address"),
-            )
-        ).filter(similarity__gt=0.5).order_by("-similarity") if search_request else self.get_queryset()
+        self.object_list = self.get_queryset()
+
+        object_list = self.object_list
+
+        if search_request:
+            object_list = self.object_list.annotate(
+                similarity=Greatest(
+                    TrigramWordSimilarity(search_request, "name"),
+                    TrigramWordSimilarity(search_request, "description"),
+                    TrigramWordSimilarity(search_request, "address"),
+                )
+            ).filter(similarity__gt=settings.SIMILARITY_RATIO).order_by("-similarity")
 
         if category:
             object_list = object_list.filter(category__name=category)
 
-        context = self.get_context_data(object_list=object_list if object_list else self.get_queryset())
+        context = self.get_context_data(object_list=object_list)
         context.update({"searched": search_request, "object_list": object_list, "category": category})
 
         return render(request, self.template_name, context)
