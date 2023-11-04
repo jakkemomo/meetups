@@ -92,10 +92,14 @@ class BaseEventSerializer(serializers.ModelSerializer):
 
 class EventListSerializer(BaseEventSerializer):
     tags = EventTagSerializer(many=True)
+    category = EventCategorySerializer(many=False)
 
     class Meta:
         model = Event
-        fields = ["id", "name", "rating", "image", "description", "start_date", "end_date", "tags"]
+        fields = [
+            "id", "name", "rating", "image", "description",
+            "start_date", "end_date", "tags", "address", "category"
+        ]
 
 
 class EventRetrieveSerializer(BaseEventSerializer):

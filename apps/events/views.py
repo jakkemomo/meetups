@@ -34,9 +34,9 @@ class EventCreation(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         if self.object:
-            return reverse_lazy("events:event_detail", kwargs={"pk": self.object.pk})
+            return reverse_lazy("events:Events-detail", kwargs={"pk": self.object.pk})
         else:
-            return reverse_lazy("events:event_list")
+            return reverse_lazy("events:Events-list")
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -58,9 +58,9 @@ class EventEdition(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         if self.object:
-            return reverse_lazy("events:event_detail", kwargs={"pk": self.object.pk})
+            return reverse_lazy("events:Events-detail", kwargs={"pk": self.object.pk})
         else:
-            return reverse_lazy("events:event_list")
+            return reverse_lazy("events:Events-list")
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -77,7 +77,7 @@ class EventEdition(LoginRequiredMixin, UpdateView):
 
 class EventDeletion(LoginRequiredMixin, DeleteView):
     model = Event
-    success_url = reverse_lazy("events:event_list")
+    success_url = reverse_lazy("events:Events-list")
 
 
 class EventListing(ListView):
@@ -179,7 +179,7 @@ class EventMap(TemplateView):
                 {
                     "balloonContentHeader": f"<center>{event_name}</center>"
                     f"</br><center>{event_start}</center>",
-                    "balloonContent": f'<center><a href="/events/{attrs["pk"]}">'
+                    "balloonContent": f'<center><a href="/events/api/v1/{attrs["pk"]}">'
                     + f'<img class="img-responsive" src="/media/{attrs["image"]}"'
                     + ' width="250px" height="250px"></a></center>',
                     "clusterCaption": f"Событие: {event_name}",
@@ -204,7 +204,7 @@ class RegisterToEvent(LoginRequiredMixin, View):
         event.participants.add(request.user)
         event.current_participants_number += 1
         event.save()
-        return redirect("events:event_detail", pk=event_id)
+        return redirect("events:Events-detail", pk=event_id)
 
 
 class LeaveFromEvent(LoginRequiredMixin, View):
@@ -213,7 +213,7 @@ class LeaveFromEvent(LoginRequiredMixin, View):
         event.participants.remove(request.user)
         event.current_participants_number -= 1
         event.save()
-        return redirect("events:event_detail", pk=event_id)
+        return redirect("events:Events-detail", pk=event_id)
 
 
 class RateEvent(LoginRequiredMixin, View):
@@ -229,7 +229,7 @@ class RateEvent(LoginRequiredMixin, View):
         else:
             rating_object.delete()
 
-        return redirect("events:event_detail", pk=event_id)
+        return redirect("events:Events-detail", pk=event_id)
 
 
 # Finding events within radius

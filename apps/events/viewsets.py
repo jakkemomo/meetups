@@ -1,8 +1,10 @@
 from django.db.models import Q
+from django.urls import reverse_lazy
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from apps.events.models import Event
@@ -22,6 +24,26 @@ class EventViewSet(viewsets.ModelViewSet):
     model = Event
     # queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
     permission_classes = [IsAuthenticatedOrReadOnly]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+
+    def get_template_names(self):
+        match self.action:
+            case "retrieve":
+                return ['events/detail.html']
+            case "list":
+                return ['events/list.html']
+            case "create":
+                return ['events/creation.html']
+            case "update":
+                return ['events/edition.html']
+            case "partial_update":
+                return ['events/edition.html']
+            case "destroy":
+                return ['events/event_confirm_delete.html']
+            case "register_for_event":
+                return ['events/detail.html']
+            case "leave_from_event":
+                return ['events/detail.html']
 
     def get_queryset(self):
         match self.action:
@@ -64,7 +86,9 @@ class EventViewSet(viewsets.ModelViewSet):
         event.participants.add(request.user.id)
         event.current_participants_number += 1
         event.save()
-        return Response(status=status.HTTP_200_OK)
+        # todo: remove when we have proper frontend
+        # return reverse_lazy("events:Event-retrieve", kwargs={"pk": self.object.pk})
+        return Response(data=EventRetrieveSerializer(event).data, status=status.HTTP_200_OK)
 
     @action(
         methods=["post"],
@@ -78,4 +102,4 @@ class EventViewSet(viewsets.ModelViewSet):
         event.participants.remove(request.user.id)
         event.current_participants_number -= 1
         event.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response(data=EventRetrieveSerializer(event).data, status=status.HTTP_200_OK)

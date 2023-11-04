@@ -51,7 +51,7 @@ async function initMap() {
         let marker = new AdvancedMarkerElement({
             position: pos,
             map,
-            title: `<a href="/events/${event_pk}">${event_name}<a/><br/><span>${start_date}</span><br/><a href="/events/${event_pk}"><img className="img-responsive" src="/media/${event_image}" width="250px" height="250px"></a>`,
+            title: `<a href="/api/v1/events/${event_pk}">${event_name}<a/><br/><span>${start_date}</span><br/><a href="/api/v1/events/${event_pk}"><img className="img-responsive" src="/media/${event_image}" width="250px" height="250px"></a>`,
             content: faPin.element,
         });
 

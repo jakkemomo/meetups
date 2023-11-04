@@ -1,51 +1,85 @@
-from django.contrib.auth import login as auth_login
-from django.contrib.auth.views import LoginView, LogoutView as DjangoLogoutView
-from django.urls import reverse_lazy
-from django.views import generic
+# from django.contrib.auth.views import LoginView, LogoutView as DjangoLogoutView
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers, status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.views import (
     TokenBlacklistView,
-    TokenObtainPairView,
-    TokenRefreshView,
     TokenVerifyView,
 )
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
-from apps.core.forms import CustomUserCreationForm
-
-
-class CoreSignUpView(generic.CreateView):
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy("events:event_map")
-    template_name = "registration/signup.html"
-
-    def form_valid(self, form):
-        """Security check complete. Log the user in."""
-        result = super(CoreSignUpView, self).form_valid(form)
-        auth_login(self.request, self.object)
-        return result
+from config import settings
 
 
-class CoreLoginView(LoginView):
-    def get_success_url(self):
-        url = self.get_redirect_url()
-        if url:
-            return url
+class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+    refresh = None
+
+    def validate(self, attrs):
+        attrs['refresh'] = self.context['request'].COOKIES.get('refresh_token')
+        if attrs['refresh']:
+            return super().validate(attrs)
         else:
-            return reverse_lazy("events:event_map")
+            raise InvalidToken('No valid token found in cookie \'refresh_token\'')
 
 
-class CoreLogoutView(DjangoLogoutView):
-    def get_success_url(self):
-        url = self.get_redirect_url()
-        if url:
-            return url
-        else:
-            return reverse_lazy("events:event_map")
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def finalize_response(self, request, response, *args, **kwargs):
+        if response.data.get('refresh'):
+            cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+            response.set_cookie('refresh_token', response.data['refresh'], max_age=cookie_max_age, httponly=True)
+            response.set_cookie(
+                key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+                value=response.data.get('access'),
+                expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            )
+            del response.data['refresh']
+
+        return super().finalize_response(request, response, *args, **kwargs)
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def finalize_response(self, request, response, *args, **kwargs):
+        if response.data.get('refresh'):
+            cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+            response.set_cookie('refresh_token', response.data['refresh'], max_age=cookie_max_age, httponly=True)
+            del response.data['refresh']
+        return super().finalize_response(request, response, *args, **kwargs)
+
+    serializer_class = CookieTokenRefreshSerializer
+
+
+# class CoreSignUpView(generic.CreateView):
+#     form_class = CustomUserCreationForm
+#     success_url = reverse_lazy("events:event_map")
+#     template_name = "registration/signup.html"
+#
+#     def form_valid(self, form):
+#         """Security check complete. Log the user in."""
+#         result = super(CoreSignUpView, self).form_valid(form)
+#         auth_login(self.request, self.object)
+#         return result
+#
+#
+# class CoreLoginView(LoginView):
+#     def get_success_url(self):
+#         url = self.get_redirect_url()
+#         if url:
+#             return url
+#         else:
+#             return reverse_lazy("events:event_map")
+#
+#
+# class CoreLogoutView(DjangoLogoutView):
+#     def get_success_url(self):
+#         url = self.get_redirect_url()
+#         if url:
+#             return url
+#         else:
+#             return reverse_lazy("events:event_map")
 
 
 class TokenObtainPairResponseSerializer(serializers.Serializer):

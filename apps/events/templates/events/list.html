@@ -11,18 +11,18 @@
     <div class="container">
         <div class="row g-3 justify-content-evenly">
             {% if searched %}
-            {% if object_list %}
-            <div class="col-md-12">
-                <h2>Results for "{{ searched }}" {% if category %} in {{ category }} {% endif %}</h2>
-            </div>
-            {% else %}
-            <div class="col-md-12">
-                <h2>Can't find "{{ searched }}"</h2>
-            </div>
-            {% endif %}
+                {% if results %}
+                    <div class="col-md-12">
+                        <h2>Results for "{{ searched }}" {% if category %} in {{ category }} {% endif %}</h2>
+                    </div>
+                    {% else %}
+                    <div class="col-md-12">
+                        <h2>Can't find "{{ searched }}"</h2>
+                    </div>
+                {% endif %}
             {% endif %}
 
-            <form class="d-flex" method="POST" action="{% url 'events:event_list' %}">
+            <form class="d-flex" method="POST" action="{% url 'events:Events-list' %}">
                 {% csrf_token %}
                 <input class="form-control me-2" type="search" name="searched" placeholder="Search" aria-label="Search"
                        value="{{ searched }}">
@@ -38,8 +38,7 @@
                 <button class="btn btn-outline-success" type="submit">Search</button>
                 <input class="btn btn-outline-secondary" type="reset" value="Clear">
             </form>
-
-            {% for event in object_list %}
+        {% for event in results %}
             {% if forloop.counter0|divisibleby:3 and not forloop.first %}
         </div>
         <div class="row gy-3 pt-md-3">
@@ -48,25 +47,30 @@
                 <div class="card h-100">
                     <div class="row g-0">
                         <div class="col-6 col-md-5">
-                            <img src="/media/{{ event.image }}" alt="Event Image"
+                            <img src="{{ event.image}}" alt="Event Image"
                                  class="card-img img-fluid rounded-start"/>
                         </div>
                         <div class="col-6 col-md-7">
                             <div class="card-body d-flex flex-column">
                                 <div class="h-100">
                                     {% if event.category %}
-                                        <h5 class="card-title text-muted">{{ event.category }}</h5>
+                                        <h5 class="card-title text-muted">{{ event.category.name }}</h5>
                                     {% else %}
                                         <h5 class="card-title text-muted">Uncategorized</h5>
                                     {% endif %}
                                     <h4 class="card-title">{{ event.name }}</h4>
-                                    {% if event.tags.all %}
-                                        <p>Tags: {{ event.tags.all|join:", " }}.</p>
+                                    <p class="card-text">Location: {{ event.address }}</p>
+                                    {% if event.tags %}
+                                        <p>Tags:
+                                            {% for tag in event.tags %}
+                                                <span class="badge rounded-pill bg-warning">{{ tag.name }}</span>
+                                            {% endfor %}
+                                        </p>
                                     {% endif %}
                                     <div class="card-text">
                                         <p>{{ event.description }}</p>
                                     </div>
-                                    <a href="{% url 'events:event_detail' event.id %}" class="stretched-link"></a>
+                                    <a href="{% url 'events:Events-detail' event.id %}" class="stretched-link"></a>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +79,7 @@
                         <small class="text-body-secondary">{{ event.start_date }} – {{ event.end_date }}</small></div>
                 </div>
             </div>
-            {% endfor %}
+        {% endfor %}
         </div>
     </div>
 </main>

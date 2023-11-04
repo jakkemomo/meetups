@@ -61,7 +61,7 @@ class Event(AbstractBaseModel, ResizeImageMixin):
         return self.name
 
     def get_absolute_url(self):
-        return f"/events/{self.id}/"
+        return f"/events/api/v1/{self.id}/"
 
     def save(self, *args, **kwargs):
         if self.pk is None or Event.objects.get(pk=self.pk).image != self.image:
