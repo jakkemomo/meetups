@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block meta %}
+    <meta property="og:title" content="{{ object.name }}"/>
+    <meta property="og:description" content="{{ object.description }}"/>
+    <meta property="og:image" content="{{ image_url }}"/>
+    <meta property="og:url" content="{{ request.build_absolute_uri }}"/>
+{% endblock %}
+
 {% block css %}
     <link href="{% static 'css/detail.css' %}" rel="stylesheet">
 {% endblock %}
@@ -99,7 +106,42 @@
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             {% endif %}
+                        {% else %}
+                            <form class="m-auto" action="{% url 'core:login' %}?next={{ request.path }}&event_id={{ object.id }}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Register</button>
+                            </form>
                         {% endif %}
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary" onclick="copyToClipboard()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-files" viewBox="0 0 16 16">
+                                    <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-share" viewBox="0 0 16 16">
+                                    <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"></path>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item"
+                                       href="https://t.me/share/url?url={{ request.build_absolute_uri }}">Telegram</a>
+                                </li>
+                                <li><a class="dropdown-item"
+                                       href="https://vk.com/share.php?url={{ request.build_absolute_uri }}">VK</a></li>
+                                <li><a class="dropdown-item"
+                                       href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}">Facebook</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}">
+                                        X</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -131,6 +173,20 @@
                 }
             });
         });
+
+        function copyToClipboard() {
+            // Create a temporary input element to hold the URL
+            var tempInput = document.createElement("input");
+            tempInput.value = window.location.href;
+            document.body.appendChild(tempInput);
+
+            // Select the URL and copy it to the clipboard
+            tempInput.select();
+            document.execCommand("copy");
+
+            // Remove the temporary input element
+            document.body.removeChild(tempInput);
+        }
 
     </script>
 {% endblock %}

@@ -16,6 +16,13 @@ class CoreSignUpView(generic.CreateView):
         auth_login(self.request, self.object)
         return result
 
+    def get_success_url(self):
+        url = self.request.GET.get('next')
+        if url:
+            return url
+        else:
+            return reverse_lazy("events:event_map")
+
 
 class CoreLoginView(LoginView):
     def get_success_url(self):

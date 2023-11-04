@@ -14,7 +14,7 @@
                 {% bootstrap_form_errors form type='all' %}
                 <button type="submit" class="btn btn-success">Sign Up</button>
             </form>
-            <a href="{% url 'core:login' %}">Already have an account? Log in!</a>
+            <a href="{% url 'core:login' %}?next={{ request.GET.next }}">Already have an account? Log in!</a>
         </div>
     </div>
 </div>
