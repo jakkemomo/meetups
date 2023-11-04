@@ -21,12 +21,12 @@ urlpatterns = [
     path("events/<int:event_id>/register/", RegisterToEvent.as_view(), name="register_to_event"),
     path("events/<int:event_id>/leave/", LeaveFromEvent.as_view(), name="leave_from_event"),
     path(
-        "events/<str:pk>/create_rating/<int:value>",
+        "events/<str:pk>/create_rating/",
         RateEvent.as_view(),
         name="rating_creation",
     ),
     path(
-        "events/<str:pk>/update_rating/<int:value>",
+        "events/<str:pk>/update_rating/",
         RateEvent.as_view(),
         name="rating_edition",
     ),
