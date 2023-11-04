@@ -111,12 +111,13 @@ class EventViewSet(viewsets.ModelViewSet):
         url_path="create_rating",
         url_name="rating_creation",
     )
-    def create_rating_of_event(self, request, value, pk=None):
+    def create_rating_of_event(self, request, pk=None):
         event = get_object_or_404(Event, id=pk)
+        value = request.data.get("value")
         rating_object = Rating.objects.create(
             event=event,
             user=request.user,
-            value=value,
+            value=value
         )
         rating_object.save()
 
@@ -129,8 +130,9 @@ class EventViewSet(viewsets.ModelViewSet):
         url_path="update_rating",
         url_name="rating_edition",
     )
-    def update_rating_of_event(self, request, value, pk=None):
+    def update_rating_of_event(self, request, pk=None):
         event = get_object_or_404(Event, id=pk)
+        value = request.data.get("value")
         rating_object = get_object_or_404(
             Rating,
             event=event,

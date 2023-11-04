@@ -22,6 +22,23 @@ urlpatterns = [
     # path("events/<int:event_id>/leave/", LeaveFromEvent.as_view(), name="leave_from_event"),
     # path("events/<int:event_id>/rate/<int:value>", RateEvent.as_view(), name="rate_an_event"),
     # path("events/<int:event_id>/remove_rating/", RateEvent.as_view(), name="remove_rating"),
+    path("events/<int:event_id>/register/", RegisterToEvent.as_view(), name="register_to_event"),
+    path("events/<int:event_id>/leave/", LeaveFromEvent.as_view(), name="leave_from_event"),
+    path(
+        "events/<str:pk>/create_rating/",
+        RateEvent.as_view(),
+        name="rating_creation",
+    ),
+    path(
+        "events/<str:pk>/update_rating/",
+        RateEvent.as_view(),
+        name="rating_edition",
+    ),
+    path(
+        "events/<str:pk>/delete_rating/",
+        RateEvent.as_view(),
+        name="rating_deletion",
+    ),
     # rest
     path("api/v1/", include(router.urls)),
 ]
