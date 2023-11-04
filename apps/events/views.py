@@ -168,13 +168,17 @@ class EventMap(TemplateView):
         for event in geo_events["features"]:
             attrs = event["properties"]
             event_name = attrs["name"]
-            event_start = datetime.strptime(attrs["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime(
+            with_millis = "%Y-%m-%dT%H:%M:%S.%fZ"
+            without_millis = "%Y-%m-%dT%H:%M:%SZ"
+            time_format = with_millis if "." in attrs["start_date"] else without_millis
+            event_start = datetime.strptime(attrs["start_date"], time_format).strftime(
                 "%-d %B %H:%M"
             )
             attrs["start_date"] = event_start
             attrs.update(
                 {
-                    "balloonContentHeader": f"<center>{event_name}</center></br><center>{event_start}</center>",
+                    "balloonContentHeader": f"<center>{event_name}</center>"
+                    f"</br><center>{event_start}</center>",
                     "balloonContent": f'<center><a href="/events/{attrs["pk"]}">'
                     + f'<img class="img-responsive" src="/media/{attrs["image"]}"'
                     + ' width="250px" height="250px"></a></center>',
