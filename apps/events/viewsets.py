@@ -13,6 +13,10 @@ from apps.events.serializers import (
     EventRetrieveSerializer,
     EventCreateSerializer,
     EventUpdateSerializer,
+    RatingCreateSerializer,
+    RatingRetrieveSerializer,
+    RatingUpdateSerializer,
+    RatingListSerializer,
 )
 
 
@@ -25,6 +29,7 @@ class EventViewSet(viewsets.ModelViewSet):
     # queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
     permission_classes = [IsAuthenticatedOrReadOnly]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    lookup_url_kwarg = "event_id"
 
     def get_template_names(self):
         match self.action:
@@ -104,116 +109,42 @@ class EventViewSet(viewsets.ModelViewSet):
         event.save()
         return Response(data=EventRetrieveSerializer(event).data, status=status.HTTP_200_OK)
 
-    @action(
-        methods=["post"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="create_rating",
-        url_name="rating_creation",
-    )
-    def create_rating_of_event(self, request, pk=None):
-        event = get_object_or_404(Event, id=pk)
-        value = request.data.get("value")
-        rating_object = Rating.objects.create(
+
+class RatingViewSet(viewsets.ModelViewSet):
+    """
+        A simple ViewSet for viewing and editing event ratings.
+    """
+
+    model = Rating
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    lookup_url_kwarg = "rating_id"
+    http_method_names = ["post", "get", "put", "delete", ]
+
+    def get_queryset(self):
+        event = get_object_or_404(Event, id=self.kwargs.get('event_id'))
+        self.queryset = Rating.objects.filter(
             event=event,
-            user=request.user,
-            value=value
+            user=self.request.user,
         )
-        rating_object.save()
+        return self.queryset.all()
 
-        return Response(status=status.HTTP_200_OK)
+    def get_serializer_class(self):
+        match self.action:
+            case "retrieve":
+                return RatingRetrieveSerializer
+            case "create":
+                return RatingCreateSerializer
+            case "update":
+                return RatingUpdateSerializer
 
-    @action(
-        methods=["patch"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="update_rating",
-        url_name="rating_edition",
-    )
-    def update_rating_of_event(self, request, pk=None):
-        event = get_object_or_404(Event, id=pk)
-        value = request.data.get("value")
-        rating_object = get_object_or_404(
-            Rating,
-            event=event,
-            user=request.user
+    def list(self, request, *args, **kwargs):
+        event = get_object_or_404(Event, id=kwargs.get("event_id"))
+        queryset = Rating.objects.filter(event=event)
+        serializer = RatingListSerializer(
+            queryset,
+            many=True,
+            context={'request': request}
         )
-        rating_object.value = value
-        rating_object.save()
 
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        methods=["delete"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="delete_rating",
-        url_name="rating_deletion",
-    )
-    def delete_rating_of_event(self, request, pk=None):
-        event = get_object_or_404(Event, id=pk)
-        rating_object = get_object_or_404(
-            Rating,
-            event=event,
-            user=request.user
-        )
-        rating_object.delete()
-
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        methods=["post"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="create_rating",
-        url_name="rating_creation",
-    )
-    def create_rating_of_event(self, request, pk=None):
-        event = get_object_or_404(Event, id=pk)
-        value = request.data.get("value")
-        rating_object = Rating.objects.create(
-            event=event,
-            user=request.user,
-            value=value
-        )
-        rating_object.save()
-
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        methods=["patch"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="update_rating",
-        url_name="rating_edition",
-    )
-    def update_rating_of_event(self, request, pk=None):
-        event = get_object_or_404(Event, id=pk)
-        value = request.data.get("value")
-        rating_object = get_object_or_404(
-            Rating,
-            event=event,
-            user=request.user
-        )
-        rating_object.value = value
-        rating_object.save()
-
-        return Response(status=status.HTTP_200_OK)
-
-    @action(
-        methods=["delete"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="delete_rating",
-        url_name="rating_deletion",
-    )
-    def delete_rating_of_event(self, request, pk=None):
-        event = get_object_or_404(Event, id=pk)
-        rating_object = get_object_or_404(
-            Rating,
-            event=event,
-            user=request.user
-        )
-        rating_object.delete()
-
-        return Response(status=status.HTTP_200_OK)
+        return Response(serializer.data)
