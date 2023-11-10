@@ -80,6 +80,8 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
+            case _:
+                return EventListSerializer
 
     @action(
         methods=["post"],
@@ -136,6 +138,10 @@ class RatingViewSet(viewsets.ModelViewSet):
                 return RatingCreateSerializer
             case "update":
                 return RatingUpdateSerializer
+            case "list":
+                return RatingListSerializer
+            case _:
+                return RatingListSerializer
 
     def list(self, request, *args, **kwargs):
         event = get_object_or_404(Event, id=kwargs.get("event_id"))
@@ -170,13 +176,5 @@ class TagViewSet(viewsets.ModelViewSet):
                 return TagUpdateSerializer
             case "list":
                 return TagListSerializer
-
-    # def list(self, request, *args, **kwargs):
-    #     queryset = Tag.objects.all()
-    #     serializer = TagListSerializer(
-    #         queryset,
-    #         many=True,
-    #         context={'request': request}
-    #     )
-    #
-    #     return Response(serializer.data)
+            case _:
+                return TagListSerializer
