@@ -28,9 +28,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+DEBUG_PROPAGATE_EXCEPTIONS = True
 
-ALLOWED_HOSTS: list[str] = []
+# if not DEBUG:
+#     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# SECURITY WARNING: It's recommended that you use this when
+# running in production. The URL will be known once you first deploy
+# to Cloud Run. This code takes the URL and converts it to both these settings formats.
+CLOUDRUN_SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
+if CLOUDRUN_SERVICE_URL:
+    from urllib.parse import urlparse
+
+    ALLOWED_HOSTS = [urlparse(CLOUDRUN_SERVICE_URL).netloc]
+    CSRF_TRUSTED_ORIGINS = [CLOUDRUN_SERVICE_URL]
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+else:
+    ALLOWED_HOSTS = ['*']
 
 # Include BOOTSTRAP4_FOLDER in path
 BOOTSTRAP4_FOLDER = os.path.abspath(os.path.join(BASE_DIR, "..", "bootstrap4"))
@@ -66,6 +83,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -133,12 +151,13 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 LOGIN_URL = "/api/v1/login"
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
@@ -147,11 +166,6 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-STATICFILES_FINDERS = (
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-)
 
 # Settings for django-bootstrap4
 BOOTSTRAP4 = {
@@ -218,3 +232,5 @@ SIMPLE_JWT = {
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
 }
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

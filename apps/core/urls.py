@@ -2,7 +2,8 @@ from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from .views import CookieTokenObtainPairView, CookieTokenRefreshView, TokenBlacklistView
+from .views import CookieTokenObtainPairView, CookieTokenRefreshView, TokenBlacklistView, RegisterView
+
 app_name = "core"
 
 schema_view = get_schema_view(
@@ -19,12 +20,10 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # path("signup/", CoreSignUpView.as_view(), name="signup"),
-    # path("login/", CoreLoginView.as_view(), name="login"),
-    # path("logout/", CoreLogoutView.as_view(), name="logout"),
     path("swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+    path("api/v1/signup/", RegisterView.as_view(), name="signup"),
     path("api/v1/login/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/v1/login/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
     path("api/v1/logout/", TokenBlacklistView.as_view(), name="api_logout"),

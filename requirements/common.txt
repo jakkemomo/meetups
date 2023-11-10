@@ -6,5 +6,5 @@ djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.7
 python-dotenv
-psycopg2==2.9.6
+psycopg2-binary==2.9.9
 six

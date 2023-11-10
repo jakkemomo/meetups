@@ -51,19 +51,18 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ['events/detail.html']
 
     def get_queryset(self):
-        match self.action:
-            case "retrieve":
-                self.queryset = Event.objects.filter(id=self.kwargs["pk"])
-            case _:
-                if self.request.user.id:
-                    self.queryset = self.model.objects.filter(
-                        Q(is_visible=True) & Q(is_finished=False)
-                        | Q(participants__in=[self.request.user.id]) & Q(is_finished=False)
-                    ).distinct()
-                else:
-                    self.queryset = self.model.objects.filter(
-                        Q(is_visible=True) & Q(is_finished=False)
-                    )
+        if self.kwargs.get("pk"):
+            self.queryset = Event.objects.filter(id=self.kwargs["pk"])
+        else:
+            if self.request.user.id:
+                self.queryset = self.model.objects.filter(
+                    Q(is_visible=True) & Q(is_finished=False)
+                    | Q(participants__in=[self.request.user.id]) & Q(is_finished=False)
+                ).distinct()
+            else:
+                self.queryset = self.model.objects.filter(
+                    Q(is_visible=True) & Q(is_finished=False)
+                )
         return self.queryset.all()
 
     def get_serializer_class(self):
@@ -78,6 +77,12 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
+            case "destroy":
+                return EventRetrieveSerializer
+            case "register_for_event":
+                return EventRetrieveSerializer
+            case "leave_from_event":
+                return EventRetrieveSerializer
 
     @action(
         methods=["post"],
