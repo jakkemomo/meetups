@@ -4,14 +4,10 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('profiles', '0002_user_avatar'),
-    ]
+    dependencies = [("profiles", "0002_user_avatar")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='user',
-            options={'verbose_name': 'User', 'verbose_name_plural': 'Users'},
-        ),
+            name="user", options={"verbose_name": "User", "verbose_name_plural": "Users"}
+        )
     ]

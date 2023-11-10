@@ -1,8 +1,7 @@
 from django.contrib.gis.geos import Point
-from rest_framework.generics import get_object_or_404
 from rest_framework import serializers
 
-from apps.events.models import Event, Tag, Category, Rating
+from apps.events.models import Event, Tag, Category
 from apps.profiles.models import User
 
 
@@ -98,8 +97,16 @@ class EventListSerializer(BaseEventSerializer):
     class Meta:
         model = Event
         fields = [
-            "id", "name", "rating", "image", "description",
-            "start_date", "end_date", "tags", "address", "category"
+            "id",
+            "name",
+            "rating",
+            "image",
+            "description",
+            "start_date",
+            "end_date",
+            "tags",
+            "address",
+            "category",
         ]
 
 
@@ -118,53 +125,3 @@ class EventRetrieveSerializer(BaseEventSerializer):
     class Meta:
         model = Event
         exclude = ["ratings", "updated_by"]
-
-
-class RatingCreateSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(min_value=0, max_value=10, default=10)
-
-    class Meta:
-        model = Rating
-        fields = ["value", "user"]
-
-    def create(self, validated_data):
-        event = get_object_or_404(
-            Event,
-            id=self.context["view"].kwargs["event_id"]
-        )
-        user = self.context["request"].user
-        value = validated_data.pop("value")
-        rating_object = Rating.objects.create(
-            event=event,
-            user=user,
-            value=value
-        )
-
-        return rating_object
-
-
-class RatingRetrieveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = ["value", "user"]
-
-
-class RatingUpdateSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(min_value=0, max_value=10, default=10)
-
-    class Meta:
-        model = Rating
-        fields = ["value", "user"]
-
-    def update(self, instance, validated_data):
-        value = validated_data.pop("value")
-        instance.value = value
-        instance.save()
-
-        return instance
-
-
-class RatingListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Rating
-        fields = ['value', 'user', 'event']

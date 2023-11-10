@@ -5,7 +5,7 @@ from apps.profiles.utils import users_image_upload_path
 
 class User(AbstractUser):
     class Meta:
-        db_table = 'auth_user'
+        db_table = "auth_user"
         verbose_name = "User"
         verbose_name_plural = "Users"
 

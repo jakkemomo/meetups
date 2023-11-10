@@ -5,15 +5,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('profiles', '0001_initial'),
-    ]
+    dependencies = [("profiles", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, default='users/image/default-user.jpeg', null=True, upload_to=apps.profiles.utils.users_image_upload_path),
-        ),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                blank=True,
+                default="users/image/default-user.jpeg",
+                null=True,
+                upload_to=apps.profiles.utils.users_image_upload_path,
+            ),
+        )
     ]
