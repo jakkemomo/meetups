@@ -43,7 +43,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
-    list_display = ["value", "user", "event"]
+    list_display = ["id", "value", "user", "event"]
     list_filter = ["value", "user", "event"]
     search_fields = ["value", "user", "event"]
     ordering = ["value"]
