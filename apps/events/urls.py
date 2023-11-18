@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from .views import EventCreation, EventEdition, EventMap, EventDeletion
-from .viewsets import EventViewSet, RatingViewSet, TagViewSet
+from .viewsets import EventViewSet, RatingViewSet, TagViewSet, MarkerViewSet
 
 app_name = "events"
 
@@ -11,6 +11,7 @@ router.register("events", EventViewSet, basename="Events")
 router.register("events/(?P<event_id>[^/.]+)/ratings", RatingViewSet, basename="Events rating")
 
 router.register("tags", TagViewSet, basename="Tags")
+router.register("markers", MarkerViewSet, basename="Markers")
 
 urlpatterns = [
     path("events/map/", EventMap.as_view(), name="event_map"),
