@@ -25,14 +25,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = True
-
-# if not DEBUG:
-#     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # SECURITY WARNING: It's recommended that you use this when
 # running in production. The URL will be known once you first deploy
@@ -83,7 +80,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -153,14 +149,33 @@ USE_TZ = True
 
 
 LOGIN_URL = "/api/v1/login"
+if DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATIC_URL = "/static/"
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+    MEDIA_URL = "/media/"
+else:
+    from google.oauth2 import service_account
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static'),
+    ]
+    # Set "static" folder
+    STATICFILES_STORAGE = 'config.gcsUtils.Static'
 
+    # Set "media" folder
+    DEFAULT_FILE_STORAGE = 'config.gcsUtils.Media'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
+    GS_BUCKET_NAME = 'meetups-dev'
+
+    # Add an unique ID to a file name if same file name exists
+    GS_FILE_OVERWRITE = False
+
+    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+        os.path.join(BASE_DIR, 'gcpCredentials.json'),
+    )
+    STATIC_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -230,5 +245,3 @@ SIMPLE_JWT = {
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
 }
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

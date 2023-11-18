@@ -62,4 +62,4 @@ RUN chown -R app:app $APP_HOME
 
 # change to the app user
 USER app
-CMD ["sh", "-c", "python manage.py collectstatic --no-input; python manage.py migrate --noinput; gunicorn config.wsgi -b 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate --noinput; gunicorn config.wsgi -b 0.0.0.0:8000"]

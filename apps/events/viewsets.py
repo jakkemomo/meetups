@@ -1,4 +1,5 @@
 from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -80,9 +81,8 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
-            case _:
-                return EventListSerializer
 
+    @swagger_auto_schema(auto_schema=None)
     @action(
         methods=["post"],
         detail=True,
@@ -91,14 +91,15 @@ class EventViewSet(viewsets.ModelViewSet):
         url_name="event_register",
     )
     def register_for_event(self, request, event_id: int):
+        # resp = services.Events(register, event_id, request.user.id)
+        # return resp
         event = get_object_or_404(Event, id=event_id)
         event.participants.add(request.user.id)
         event.current_participants_number += 1
         event.save()
-        # todo: remove when we have proper frontend
-        # return reverse_lazy("events:Event-retrieve", kwargs={"pk": self.object.pk})
         return Response(data=EventRetrieveSerializer(event).data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(auto_schema=None)
     @action(
         methods=["post"],
         detail=True,
@@ -140,8 +141,6 @@ class RatingViewSet(viewsets.ModelViewSet):
                 return RatingUpdateSerializer
             case "list":
                 return RatingListSerializer
-            case _:
-                return RatingListSerializer
 
     def list(self, request, *args, **kwargs):
         event = get_object_or_404(Event, id=kwargs.get("event_id"))
@@ -162,10 +161,6 @@ class TagViewSet(viewsets.ModelViewSet):
     lookup_url_kwarg = "tag_id"
     http_method_names = ["post", "get", "put", "delete"]
 
-    def get_queryset(self):
-        self.queryset = Tag.objects
-        return self.queryset.all()
-
     def get_serializer_class(self):
         match self.action:
             case "retrieve":
@@ -175,6 +170,4 @@ class TagViewSet(viewsets.ModelViewSet):
             case "update":
                 return TagUpdateSerializer
             case "list":
-                return TagListSerializer
-            case _:
                 return TagListSerializer

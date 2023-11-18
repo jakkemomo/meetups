@@ -49,6 +49,8 @@ class EventUpdateSerializer(EventCreateSerializer):
         required=False,
     )
 
+    # todo: move serializer logic to services
+
     def update(self, instance, validated_data):
         location = validated_data.pop("location", None)
         if location:
@@ -125,3 +127,8 @@ class EventRetrieveSerializer(BaseEventSerializer):
     class Meta:
         model = Event
         exclude = ["ratings", "updated_by"]
+
+
+class EventRegisterSerializer(BaseEventSerializer):
+    class Meta:
+        model = Event
