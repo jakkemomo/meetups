@@ -9,5 +9,5 @@ app_name = "upload"
 # router.register("image", UploadViewSet, basename="upload_image")
 
 urlpatterns = [
-    path("upload", UploadViewSet.as_view()),
+    path("api/v1/upload", UploadViewSet.as_view()),
 ]

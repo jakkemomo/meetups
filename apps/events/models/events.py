@@ -9,7 +9,6 @@ from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
 from apps.events.models.rating import Rating
 from apps.events.models.tags import Tag
-from apps.events.utils import events_image_upload_path
 from common.mixins import ResizeImageMixin
 
 user_model = settings.AUTH_USER_MODEL
@@ -33,7 +32,7 @@ class Event(AbstractBaseModel, ResizeImageMixin):
         blank=False,
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
-    image = models.URLField(max_length=250, null=True, blank=True)
+    image_url = models.URLField(max_length=250, null=True, blank=True)
     start_date = fields.DateTimeField(null=True, blank=True, default=timezone.now)
     end_date = fields.DateTimeField(null=True, blank=True)
 
@@ -54,8 +53,3 @@ class Event(AbstractBaseModel, ResizeImageMixin):
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        if self.pk is None or Event.objects.get(pk=self.pk).image != self.image:
-            self.resize(self.image, (400, 500))
-        return super().save(*args, **kwargs)

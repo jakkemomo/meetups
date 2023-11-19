@@ -102,7 +102,7 @@ class EventListSerializer(BaseEventSerializer):
             "id",
             "name",
             "rating",
-            "image",
+            "image_url",
             "description",
             "start_date",
             "end_date",

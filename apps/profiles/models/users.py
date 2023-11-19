@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from apps.profiles.utils import users_image_upload_path
 
 
 class User(AbstractUser):
@@ -9,5 +8,5 @@ class User(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
 
-    avatar = models.URLField(max_length=250, null=True, blank=True)
+    avatar_url = models.URLField(max_length=250, null=True, blank=True)
 

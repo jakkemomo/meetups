@@ -8,12 +8,10 @@ class UploadSerializer(serializers.Serializer):
     def validate(self, data):
         validators = [
             FileExtensionValidator(
-                allowed_extensions=['png', 'jpeg', 'jpg', 'svg']),
+                allowed_extensions=['png', 'jpeg', 'jpg', 'svg']
+            ),
         ]
         for validator in validators:
-            validator(data.file.name)
+            validator(data["file"])
 
-    class Meta:
-        fields = [
-            "file",
-        ]
+        return data
