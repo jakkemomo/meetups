@@ -8,5 +8,5 @@ class User(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
 
-    avatar_url = models.URLField(max_length=250, null=True, blank=True)
+    avatar_url = models.CharField(max_length=250, null=True, blank=True)
 

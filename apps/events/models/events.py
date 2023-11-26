@@ -32,7 +32,7 @@ class Event(AbstractBaseModel, ResizeImageMixin):
         blank=False,
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
-    image_url = models.URLField(max_length=250, null=True, blank=True)
+    image_url = models.CharField(max_length=250, null=True, blank=True)
     start_date = fields.DateTimeField(null=True, blank=True, default=timezone.now)
     end_date = fields.DateTimeField(null=True, blank=True)
 

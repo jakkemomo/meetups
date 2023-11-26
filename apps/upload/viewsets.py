@@ -7,11 +7,19 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from django.core.files.storage import default_storage
+
+import logging
+
+from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from apps.upload.serializers import (
     UploadSerializer,
 )
 from .utils import upload_image
+
+
+logger = logging.getLogger("upload_app")
 
 
 class UploadViewSet(CreateAPIView):
@@ -23,15 +31,29 @@ class UploadViewSet(CreateAPIView):
 
     @swagger_auto_schema(operation_description='Upload file...')
     @action(detail=False, methods=["post", ])
-    def post(self, request):
-        file = request.FILES.get('file')
+    def create(self, request):
+        file = request.data.get("file")
         serializer = self.serializer_class(data={"file": file})
 
-        if serializer.is_valid():
-            url = upload_image(file)
-            return Response(status=201, data={"url": url})
+        if serializer.is_valid(raise_exception=False):
+            file = serializer.validated_data["file"]
+            rel_url = upload_image(file)
+            if rel_url:
+                return Response(
+                    status=201,
+                    data={"url": default_storage.url(rel_url)},
+                )
+            else:
+                return Response(
+                    status=500,
+                    data={"Error": "Internal server error"},
+                )
         else:
             return Response(
-                status=400,
-                data={"Error": f"{file.content_type} files are not supported"}
+                status=415,
+                data={
+                    "Error":
+                        f"{file.content_type} extension is not supported. "
+                        f"Supported extensions are: {serializer.allowed_extensions}"
+                },
             )

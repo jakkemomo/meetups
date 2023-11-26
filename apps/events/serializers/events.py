@@ -67,7 +67,7 @@ class EventUpdateSerializer(EventCreateSerializer):
 class ParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "avatar"]
+        fields = ["id", "username", "avatar_url"]
 
 
 class EventTagSerializer(serializers.ModelSerializer):

@@ -149,9 +149,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-LOGIN_URL = "/api/v1/login"
+LOGIN_URL = os.getenv("LOGIN_URL")
 
-GS_BUCKET_NAME = 'meetups-dev'
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
 GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 
 if DEBUG:
@@ -249,4 +249,30 @@ SIMPLE_JWT = {
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'upload_app': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
 }

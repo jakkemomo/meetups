@@ -8,3 +8,11 @@ drf-yasg==1.21.7
 python-dotenv
 psycopg2-binary==2.9.9
 six
+django-storages[google]==1.14.2
+google-api-core==2.14.0
+google-auth==2.23.4
+google-cloud-core==2.3.3
+google-cloud-storage==2.13.0
+google-crc32c==1.5.0
+google-resumable-media==2.6.0
+googleapis-common-protos==1.61.0
