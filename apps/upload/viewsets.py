@@ -1,4 +1,3 @@
-from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -11,13 +10,10 @@ from django.core.files.storage import default_storage
 
 import logging
 
-from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
-
 from apps.upload.serializers import (
     UploadSerializer,
 )
 from .utils import upload_image
-
 
 logger = logging.getLogger("upload_app")
 
@@ -35,20 +31,7 @@ class UploadViewSet(CreateAPIView):
         file = request.data.get("file")
         serializer = self.serializer_class(data={"file": file})
 
-        if serializer.is_valid(raise_exception=False):
-            file = serializer.validated_data["file"]
-            rel_url = upload_image(file)
-            if rel_url:
-                return Response(
-                    status=201,
-                    data={"url": default_storage.url(rel_url)},
-                )
-            else:
-                return Response(
-                    status=500,
-                    data={"Error": "Internal server error"},
-                )
-        else:
+        if not serializer.is_valid(raise_exception=False):
             return Response(
                 status=415,
                 data={
@@ -57,3 +40,17 @@ class UploadViewSet(CreateAPIView):
                         f"Supported extensions are: {serializer.allowed_extensions}"
                 },
             )
+
+        file = serializer.validated_data["file"]
+        rel_url = upload_image(file)
+
+        if not rel_url:
+            return Response(
+                status=500,
+                data={"Error": "Internal server error"},
+            )
+
+        return Response(
+            status=201,
+            data={"url": default_storage.url(rel_url)},
+        )
