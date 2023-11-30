@@ -13,6 +13,7 @@ def send_verification_email(user):
         'emails/email_verification.html',
         {
             'link': verification_link,
+            'base_url': settings.APP_URL,
         }
     )
     email = EmailMessage(subject, message, to=[user.email])
