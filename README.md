@@ -27,10 +27,3 @@ This will install postgres db in docker, install geo dependencies, create superu
 7. Click on 'New pull request'
 8. Choose your branch (new_branch) to compare with the main branch
 9. Click on 'Create pull request' button
-
-### How to run (temporary, to be new main branch) rest-api branch (the same applies to any other branches)
-1. switch branches in PyCharm (top left corner)
-2. File/Invalidate cache (to relaunch PyCharm)
-3. find requirements -type f -name '*.txt' -exec pip install -r {} \;
-4. python manage.py migrate
-5. python manage.py runserver 
