@@ -1,6 +1,9 @@
+import json
+
+from django.core.serializers import serialize
 from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -171,3 +174,16 @@ class TagViewSet(viewsets.ModelViewSet):
                 return TagUpdateSerializer
             case "list":
                 return TagListSerializer
+
+
+class MarkerViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
+
+    def list(self, request, *args, **kwargs):
+        geo_events = json.loads(
+            serialize(
+                "geojson", self.queryset.all(),
+                geometry_field="location",
+                fields=["id", "name", "start_date", "end_date", "description", "address"])
+        )
+        return Response(geo_events, status=status.HTTP_200_OK)
