@@ -1,23 +1,27 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Q
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from apps.core import helpers
 from apps.profiles.models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
+        required=True, min_length=4, max_length=15, validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    email = serializers.EmailField(
         required=True, validators=[UniqueValidator(queryset=User.objects.all())]
     )
-
-    password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password]
-    )
-    password2 = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
     class Meta:
         model = User
-        fields = ("username", "password", "password2")
+        fields = ("username", "email", "password", "password2")
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
@@ -26,9 +30,83 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = User.objects.create(username=validated_data["username"])
+        user = User.objects.create(
+            username=validated_data["username"],
+            email=validated_data["email"],
+        )
+        try:
+            helpers.send_verification_email(user)
+        except Exception as e:
+            user.delete()
+            raise e
 
         user.set_password(validated_data["password"])
         user.save()
-
         return user
+
+
+class RegisterResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("username", "email")
+
+
+class ReverifyEmailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
+    class Meta:
+        model = User
+        fields = ("email",)
+
+
+class TokenObtainPairResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError()
+
+
+class TokenRefreshResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError()
+
+
+class TokenVerifyResponseSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError()
+
+
+class TokenBlacklistResponseSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError()
+
+
+class TokenPairSerializer(TokenObtainPairSerializer):
+
+    def validate(self, attrs):
+        username = attrs["username"]
+        user_model = get_user_model()
+        try:
+            user = user_model.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
+            attrs['username'] = user.username
+        except user_model.DoesNotExist:
+            return None
+        data = super(TokenPairSerializer, self).validate(attrs)
+        return data

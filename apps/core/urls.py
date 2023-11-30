@@ -2,12 +2,9 @@ from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from .views import (
-    CookieTokenObtainPairView,
-    CookieTokenRefreshView,
-    TokenBlacklistView,
-    RegisterView,
-)
+
+from .views import (DecoratedTokenObtainPairView, DecoratedTokenBlacklistView, DecoratedTokenVerifyView, \
+                    DecoratedTokenRefreshView, RegisterView, VerifyEmailView, ReverifyEmailView)
 
 app_name = "core"
 
@@ -29,7 +26,10 @@ urlpatterns = [
     path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("api/v1/signup/", RegisterView.as_view(), name="signup"),
-    path("api/v1/login/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/v1/login/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
-    path("api/v1/logout/", TokenBlacklistView.as_view(), name="api_logout"),
+    path("api/v1/login/", DecoratedTokenObtainPairView.as_view(), name="login"),
+    path("api/v1/logout/", DecoratedTokenBlacklistView.as_view(), name="logout"),
+    path("api/v1/verify/email", VerifyEmailView.as_view(), name="verify-email"),
+    path("api/v1/reverify/email", ReverifyEmailView.as_view(), name="reverify-email"),
+    path("api/v1/token/refresh/", DecoratedTokenRefreshView.as_view(), name="token-refresh"),
+    path("api/v1/token/verify/", DecoratedTokenVerifyView.as_view(), name="token-verify"),
 ]

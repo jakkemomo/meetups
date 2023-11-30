@@ -148,11 +148,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
 
-LOGIN_URL = os.getenv("LOGIN_URL")
-
-GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
 GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
+
+APP_URL = os.getenv("APP_URL", "http://localhost:8000")
+VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{APP_URL}/api/v1/verify/email")
 
 if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -180,7 +182,6 @@ else:
     )
 
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -228,7 +229,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": ["apps.core.authenticate.CustomAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication',],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
 }
@@ -245,6 +246,8 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
     "AUTH_COOKIE_SAMESITE": "Lax",  # Whether to set the flag restricting cookie leaks on cross-site requests.
     # This can be 'Lax', 'Strict', or None to disable the flag.
+    "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
+    "UPDATE_LAST_LOGIN": True,
 }
 
 SWAGGER_SETTINGS = {
@@ -276,3 +279,11 @@ LOGGING = {
         },
     },
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "information.mevent@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")

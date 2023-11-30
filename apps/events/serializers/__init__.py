@@ -16,3 +16,4 @@ from .ratings import (
     RatingUpdateSerializer,
     RatingListSerializer,
 )
+from .map import GeoJsonSerializer
