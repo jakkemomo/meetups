@@ -45,6 +45,11 @@ class VerifyEmailView(APIView):
                            openapi.Parameter('confirmation_token', openapi.IN_QUERY,
                                              description="confirmation token",
                                              type=openapi.TYPE_STRING)],
+        responses={
+            status.HTTP_200_OK: 'Email successfully confirmed',
+            status.HTTP_400_BAD_REQUEST: 'Token is invalid or expired',
+            status.HTTP_404_NOT_FOUND: 'User not found',
+        },
     )
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')
@@ -56,6 +61,8 @@ class VerifyEmailView(APIView):
             user = None
         if user is None:
             return Response('User not found', status=status.HTTP_404_NOT_FOUND)
+        if user.is_email_verified:
+            return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
         if not default_token_generator.check_token(user, confirmation_token):
             return Response('Token is invalid or expired. Please request another confirmation email by signing in.',
                             status=status.HTTP_400_BAD_REQUEST)
