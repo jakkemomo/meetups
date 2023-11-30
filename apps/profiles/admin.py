@@ -13,7 +13,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ()
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        ("Personal info", {"fields": ("first_name", "last_name", "email", "avatar")}),
+        ("Personal info", {"fields": ("first_name", "last_name", "email", "avatar_url")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )

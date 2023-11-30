@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "apps.permissions.apps.PermissionsConfig",
     "apps.profiles.apps.ProfilesConfig",
     "apps.location_field.apps.DefaultConfig",
+    "apps.upload.apps.UploadConfig",
     "widget_tweaks",
     "bootstrap4",
     "rest_framework",
@@ -148,7 +149,11 @@ USE_I18N = True
 USE_TZ = True
 
 
-LOGIN_URL = "/api/v1/login"
+LOGIN_URL = os.getenv("LOGIN_URL")
+
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
+GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
+
 if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
     STATIC_URL = "/static/"
@@ -167,15 +172,15 @@ else:
     # Set "media" folder
     DEFAULT_FILE_STORAGE = 'config.gcsUtils.Media'
 
-    GS_BUCKET_NAME = 'meetups-dev'
-
     # Add an unique ID to a file name if same file name exists
     GS_FILE_OVERWRITE = False
 
     GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
         os.path.join(BASE_DIR, 'gcpCredentials.json'),
     )
-    STATIC_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/static/'
+
+    STATIC_URL = f'{GS_BUCKET_URL}/static/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -244,4 +249,30 @@ SIMPLE_JWT = {
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'upload_app': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
 }
