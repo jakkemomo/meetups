@@ -179,6 +179,8 @@ else:
     except FileNotFoundError:
         logging.warning('No gcpCredentials.json file found. Using default credentials.')
 
+    GS_QUERYSTRING_AUTH = False
+
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
 
 # Default primary key field type
