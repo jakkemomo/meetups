@@ -9,4 +9,4 @@ class User(AbstractUser):
         verbose_name_plural = "Users"
 
     avatar_url = models.CharField(max_length=250, null=True, blank=True)
-
+    is_email_verified = models.BooleanField(default=False)

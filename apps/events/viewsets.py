@@ -1,16 +1,17 @@
 import json
 
 from django.core.serializers import serialize
-from django.db.models import Q
+from django.db.models import Q, Count
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from apps.events.models import Event, Rating, Tag
+from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -24,6 +25,7 @@ from apps.events.serializers import (
     TagRetrieveSerializer,
     TagUpdateSerializer,
     TagListSerializer,
+    GeoJsonSerializer
 )
 
 
@@ -34,7 +36,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     model = Event
     # queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [EventPermissions]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     lookup_url_kwarg = "event_id"
 
@@ -70,7 +72,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False)
                 )
-        return self.queryset.all()
+        return self.queryset.all().annotate(participants_number=Count("participants"))
 
     def get_serializer_class(self):
         match self.action:
@@ -85,37 +87,31 @@ class EventViewSet(viewsets.ModelViewSet):
             case "partial_update":
                 return EventUpdateSerializer
 
-    @swagger_auto_schema(auto_schema=None)
     @action(
         methods=["post"],
         detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
+        permission_classes=[EventPermissions],
         url_path="register",
         url_name="event_register",
     )
     def register_for_event(self, request, event_id: int):
-        # resp = services.Events(register, event_id, request.user.id)
-        # return resp
-        event = get_object_or_404(Event, id=event_id)
+        event = self.get_object()
         event.participants.add(request.user.id)
-        event.current_participants_number += 1
         event.save()
-        return Response(data=EventRetrieveSerializer(event).data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(auto_schema=None)
     @action(
         methods=["post"],
         detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
+        permission_classes=[EventPermissions],
         url_path="leave",
         url_name="event_leave",
     )
     def leave_from_event(self, request, event_id: int):
-        event = get_object_or_404(Event, id=event_id)
+        event = self.get_object()
         event.participants.remove(request.user.id)
-        event.current_participants_number -= 1
         event.save()
-        return Response(data=EventRetrieveSerializer(event).data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
 
 class RatingViewSet(viewsets.ModelViewSet):
@@ -124,13 +120,13 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
 
     model = Rating
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [RatingPermissions]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     lookup_url_kwarg = "rating_id"
     http_method_names = ["post", "get", "put", "delete"]
 
     def get_queryset(self):
-        event = get_object_or_404(Event, id=self.kwargs.get("event_id"))
+        event = self.get_object()
         self.queryset = Rating.objects.filter(event=event, user=self.request.user)
         return self.queryset.all()
 
@@ -146,7 +142,7 @@ class RatingViewSet(viewsets.ModelViewSet):
                 return RatingListSerializer
 
     def list(self, request, *args, **kwargs):
-        event = get_object_or_404(Event, id=kwargs.get("event_id"))
+        event = self.get_object()
         queryset = Rating.objects.filter(event=event)
         serializer = RatingListSerializer(queryset, many=True, context={"request": request})
 
@@ -159,7 +155,7 @@ class TagViewSet(viewsets.ModelViewSet):
     """
 
     model = Tag
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [TagPermissions]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     lookup_url_kwarg = "tag_id"
     http_method_names = ["post", "get", "put", "delete"]
@@ -176,9 +172,15 @@ class TagViewSet(viewsets.ModelViewSet):
                 return TagListSerializer
 
 
-class MarkerViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class MarkerViewSet(mixins.ListModelMixin, GenericViewSet):
+    permission_classes = (AllowAny,)
     queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
+    serializer_class = GeoJsonSerializer
 
+    @swagger_auto_schema(
+        tags=['map'],
+        operation_description="Get all events in GeoJSON format",
+    )
     def list(self, request, *args, **kwargs):
         geo_events = json.loads(
             serialize(

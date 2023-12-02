@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
     "apps.profiles.apps.ProfilesConfig",
-    "apps.location_field.apps.DefaultConfig",
     "apps.upload.apps.UploadConfig",
     "widget_tweaks",
     "bootstrap4",
@@ -77,16 +76,22 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "drf_yasg",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -148,11 +153,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
 
-LOGIN_URL = os.getenv("LOGIN_URL")
-
-GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
 GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
+
+APP_URL = os.getenv("APP_URL", "http://localhost:8000")
+VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{APP_URL}/api/v1/verify/email")
 
 if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -181,7 +188,6 @@ else:
 
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -195,32 +201,8 @@ BOOTSTRAP4 = {
     "include_jquery": True,
 }
 
-LOCATION_FIELD_PATH = STATIC_URL + "location_field"
-
 YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-MAP_PROVIDER = "google"
-LOCATION_FIELD = {
-    "map.provider": "google",
-    "map.zoom": 13,
-    "search.provider": MAP_PROVIDER,
-    "search.suffix": "",
-    # Yandex
-    "provider.yandex.api_key": YANDEX_API_KEY,
-    # Google
-    "provider.google.api": "//maps.google.com/maps/api/js",
-    "provider.google.api_key": GOOGLE_API_KEY,
-    "provider.google.map_type": "ROADMAP",
-    # Mapbox
-    "provider.mapbox.access_token": "",
-    "provider.mapbox.max_zoom": 18,
-    "provider.mapbox.id": "mapbox.streets",
-    # OpenStreetMap
-    "provider.openstreetmap.max_zoom": 18,
-    # misc
-    "resources.root_path": LOCATION_FIELD_PATH,
-    "resources.media": {"js": [LOCATION_FIELD_PATH + "/js/form.js"]},
-}
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -228,7 +210,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": ["apps.core.authenticate.CustomAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication',],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
 }
@@ -245,6 +227,8 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
     "AUTH_COOKIE_SAMESITE": "Lax",  # Whether to set the flag restricting cookie leaks on cross-site requests.
     # This can be 'Lax', 'Strict', or None to disable the flag.
+    "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
+    "UPDATE_LAST_LOGIN": True,
 }
 
 SWAGGER_SETTINGS = {
@@ -276,3 +260,11 @@ LOGGING = {
         },
     },
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "information.mevent@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
