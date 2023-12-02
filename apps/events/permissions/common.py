@@ -30,4 +30,3 @@ def is_owner(request, obj):
 
 def is_verified(request):
     return request.user.is_authenticated and request.user.is_email_verified
-
