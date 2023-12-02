@@ -2,7 +2,7 @@ import json
 
 from django.core.serializers import serialize
 from django.db.models import Q, Count
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -25,7 +25,8 @@ from apps.events.serializers import (
     TagRetrieveSerializer,
     TagUpdateSerializer,
     TagListSerializer,
-    GeoJsonSerializer
+    GeoJsonSerializer,
+    EventRegisterSerializer
 )
 
 
@@ -86,7 +87,14 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
+            case "register_for_event":
+                return EventRegisterSerializer
+            case "leave_from_event":
+                return EventRegisterSerializer
 
+    @swagger_auto_schema(
+        request_body=no_body
+    )
     @action(
         methods=["post"],
         detail=True,
@@ -100,6 +108,9 @@ class EventViewSet(viewsets.ModelViewSet):
         event.save()
         return Response(status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        request_body=no_body
+    )
     @action(
         methods=["post"],
         detail=True,
