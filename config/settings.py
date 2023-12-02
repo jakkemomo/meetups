@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import logging
 import os.path
 import sys
 from datetime import timedelta
@@ -182,9 +183,16 @@ else:
     # Add an unique ID to a file name if same file name exists
     GS_FILE_OVERWRITE = False
 
-    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        os.path.join(BASE_DIR, 'gcpCredentials.json'),
-    )
+    try:
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+            os.path.join(BASE_DIR, 'gcpCredentials.json'),
+        )
+    except FileNotFoundError:
+        import google.auth
+
+        credentials, project = google.auth.default()
+        GS_CREDENTIALS = credentials
+        logging.warning('No gcpCredentials.json file found. Using default credentials.')
 
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
 
