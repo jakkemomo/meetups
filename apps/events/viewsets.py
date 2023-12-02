@@ -1,7 +1,7 @@
 import json
 
 from django.core.serializers import serialize
-from django.db.models import Q
+from django.db.models import Q, Count
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
@@ -72,7 +72,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False)
                 )
-        return self.queryset.all()
+        return self.queryset.all().annotate(participants_number=Count("participants"))
 
     def get_serializer_class(self):
         match self.action:
@@ -97,7 +97,6 @@ class EventViewSet(viewsets.ModelViewSet):
     def register_for_event(self, request, event_id: int):
         event = self.get_object()
         event.participants.add(request.user.id)
-        event.current_participants_number += 1
         event.save()
         return Response(status=status.HTTP_200_OK)
 
@@ -111,7 +110,6 @@ class EventViewSet(viewsets.ModelViewSet):
     def leave_from_event(self, request, event_id: int):
         event = self.get_object()
         event.participants.remove(request.user.id)
-        event.current_participants_number -= 1
         event.save()
         return Response(status=status.HTTP_200_OK)
 

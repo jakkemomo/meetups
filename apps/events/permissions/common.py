@@ -15,3 +15,19 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
         # Instance must have an attribute named `owner`.
         return obj.created_by == request.user
+
+
+def is_participant(request, obj):
+    return (
+            request.user != obj.created_by and
+            request.user in obj.participants.all()
+    )
+
+
+def is_owner(request, obj):
+    return request.user == obj.created_by or request.user.is_staff
+
+
+def is_verified(request):
+    return request.user.is_authenticated and request.user.is_email_verified
+

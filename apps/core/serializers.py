@@ -32,7 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create(
             username=validated_data["username"],
-            email=validated_data["email"],
+            email=validated_data["email"].lower(),
         )
         try:
             helpers.send_verification_email(user)
@@ -104,7 +104,7 @@ class TokenPairSerializer(TokenObtainPairSerializer):
         username = attrs["username"]
         user_model = get_user_model()
         try:
-            user = user_model.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
+            user = user_model.objects.get(Q(username=username) | Q(email=username.lower()))
             attrs['username'] = user.username
         except user_model.DoesNotExist:
             return None

@@ -6,8 +6,7 @@ from apps.profiles.models import User
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
-    current_participants_number = serializers.IntegerField(min_value=0, max_value=10000, default=0)
-    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000, default=1)
+    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=1)
     location = serializers.ListField(
         child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2
     )
@@ -36,11 +35,8 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
 
 class EventUpdateSerializer(EventCreateSerializer):
-    current_participants_number = serializers.IntegerField(
-        min_value=0, max_value=10000, allow_null=True, required=False
-    )
     desired_participants_number = serializers.IntegerField(
-        min_value=0, max_value=10000, allow_null=True, required=False
+        min_value=0, max_value=10000000, allow_null=True, required=False
     )
     location = serializers.ListField(
         child=serializers.DecimalField(max_digits=7, decimal_places=5),
@@ -95,6 +91,7 @@ class BaseEventSerializer(serializers.ModelSerializer):
 class EventListSerializer(BaseEventSerializer):
     tags = EventTagSerializer(many=True)
     category = EventCategorySerializer(many=False)
+    participants_number = serializers.IntegerField()
 
     class Meta:
         model = Event
@@ -109,6 +106,7 @@ class EventListSerializer(BaseEventSerializer):
             "tags",
             "address",
             "category",
+            "participants_number",
         ]
 
 
@@ -118,6 +116,7 @@ class EventRetrieveSerializer(BaseEventSerializer):
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
+    participants_number = serializers.IntegerField()
 
     def get_location(self, obj):
         if not obj.location:

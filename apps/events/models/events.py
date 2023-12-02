@@ -1,9 +1,9 @@
 from django.conf import settings
+from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.db import models
 from django.db.models import fields
 from django.utils import timezone
-from apps.location_field.models.spatial import LocationField
 
 from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
@@ -21,9 +21,7 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True, default="Minsk")
-    location = LocationField(
-        based_fields=["address"], zoom=13, default=Point(27.561831, 53.902284)
-    )
+    location = PointField(default=Point(27.561831, 53.902284))
     type = fields.CharField(
         max_length=10,
         choices=(("open", "Open"), ("private", "Private")),
@@ -42,7 +40,6 @@ class Event(AbstractBaseModel, ResizeImageMixin):
     participants = models.ManyToManyField(
         user_model, blank=True, related_name="event_participants"
     )
-    current_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
     desired_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
     ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
 

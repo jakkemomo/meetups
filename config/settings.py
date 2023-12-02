@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     "apps.events.apps.EventsConfig",
     "apps.permissions.apps.PermissionsConfig",
     "apps.profiles.apps.ProfilesConfig",
-    "apps.location_field.apps.DefaultConfig",
     "apps.upload.apps.UploadConfig",
     "widget_tweaks",
     "bootstrap4",
@@ -196,32 +195,8 @@ BOOTSTRAP4 = {
     "include_jquery": True,
 }
 
-LOCATION_FIELD_PATH = STATIC_URL + "location_field"
-
 YANDEX_API_KEY = os.getenv("YANDEX_MAPS_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-MAP_PROVIDER = "google"
-LOCATION_FIELD = {
-    "map.provider": "google",
-    "map.zoom": 13,
-    "search.provider": MAP_PROVIDER,
-    "search.suffix": "",
-    # Yandex
-    "provider.yandex.api_key": YANDEX_API_KEY,
-    # Google
-    "provider.google.api": "//maps.google.com/maps/api/js",
-    "provider.google.api_key": GOOGLE_API_KEY,
-    "provider.google.map_type": "ROADMAP",
-    # Mapbox
-    "provider.mapbox.access_token": "",
-    "provider.mapbox.max_zoom": 18,
-    "provider.mapbox.id": "mapbox.streets",
-    # OpenStreetMap
-    "provider.openstreetmap.max_zoom": 18,
-    # misc
-    "resources.root_path": LOCATION_FIELD_PATH,
-    "resources.media": {"js": [LOCATION_FIELD_PATH + "/js/form.js"]},
-}
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
