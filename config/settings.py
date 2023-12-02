@@ -177,10 +177,6 @@ else:
             os.path.join(BASE_DIR, 'gcpCredentials.json'),
         )
     except FileNotFoundError:
-        import google.auth
-
-        credentials, project = google.auth.default()
-        GS_CREDENTIALS = credentials
         logging.warning('No gcpCredentials.json file found. Using default credentials.')
 
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
