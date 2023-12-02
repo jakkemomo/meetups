@@ -23,7 +23,6 @@ COPY . /usr/src/app/
 #RUN flake8 --ignore=E501,F401 .
 
 # install python dependencies
-COPY ./requirements /usr/src/app/requirements
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements/production.txt
 
 
