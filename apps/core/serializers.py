@@ -34,14 +34,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data["email"].lower(),
         )
+        user.set_password(validated_data["password"])
+        user.save()
+
         try:
             helpers.send_verification_email(user)
         except Exception as e:
             user.delete()
             raise e
 
-        user.set_password(validated_data["password"])
-        user.save()
         return user
 
 
@@ -110,3 +111,57 @@ class TokenPairSerializer(TokenObtainPairSerializer):
             return None
         data = super(TokenPairSerializer, self).validate(attrs)
         return data
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ("email", )
+
+    def validate(self, attrs):
+        email = attrs["email"]
+        user_model = get_user_model()
+
+        try:
+            user = user_model.objects.get(email=email)
+            attrs["user"] = user
+        except user_model.DoesNotExist:
+            raise serializers.ValidationError(
+                {"email": "There are no users with that Email address!"}
+            )
+
+        if not user.is_email_verified:
+            raise serializers.ValidationError(
+                {"email": "Email is not verified!"}
+            )
+
+        return attrs
+
+
+class PasswordChangeSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
+
+    class Meta:
+        model = User
+        fields = ("password", "password2", )
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match"}
+            )
+
+        return attrs

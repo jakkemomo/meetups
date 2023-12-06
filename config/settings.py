@@ -153,6 +153,10 @@ GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 
 APP_URL = os.getenv("APP_URL", "http://localhost:8000")
 VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{APP_URL}/api/v1/verify/email")
+CONFIRM_PASSWORD_RESET_URL = os.getenv(
+    "CONFIRM_FORGOT_PASSWORD_URL",
+    f"{APP_URL}/api/v1/password/reset/confirm"
+)
 
 if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -248,7 +252,7 @@ LOGGING = {
     },
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'backends.email_backend.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
