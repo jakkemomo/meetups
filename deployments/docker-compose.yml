@@ -6,13 +6,15 @@ services:
       context: ../
       dockerfile: deployments/db/Dockerfile
     restart: always
-    env_file:
-      - ../.env
     ports:
       - "5555:5432"
     volumes:
       - ./db/scripts:/docker-entrypoint-initdb.d/
       - database_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: event
+      POSTGRES_PASSWORD: event
+      POSTGRES_DB: meetups
 
   app:
     container_name: app
@@ -32,10 +34,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    env_file:
-      - ../.env
-    expose:
-      - "8000"
     environment:
       DB_HOST: db
       DB_PORT: 5432
