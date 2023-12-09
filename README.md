@@ -9,13 +9,14 @@
 ## First run for local development (will install dependencies locally)
 1. Create `.env` file in the root dir with filled out fields from `.env.example`
 2. Install docker-compose for setting up local postgres db
-3. For linux: install geo dependencies via `sudo apt-get install binutils libproj-dev gdal-bin`
-4. For mac: install geo dependencies via `brew install binutils proj gdal`
-5. Run your postgres db via `docker-compose -f deployments/docker-compose-db.yml up -d`
+3. Run your postgres db via `docker-compose -f deployments/docker-compose-db.yml up -d`
+4. For linux: install geo dependencies via `sudo apt-get install binutils libproj-dev gdal-bin`
+5. For mac: install geo dependencies via `brew install binutils proj gdal`
 6. Setup your virtual environment and install requirements via `pip install -r requirements/local.txt`
-7. Run migrations via `python manage.py migrate`
-8. Run server via `python manage.py runserver`
-9. Go to `http://localhost:8000/swagger` and you should see the app running
+7. Install pre-commit hooks via `pre-commit install` for code formatting and linting before commit
+8. Run migrations via `python manage.py migrate`
+9. Run server via `python manage.py runserver`
+10. Go to `http://localhost:8000/swagger` and you should see the app running
 
 
 ### Creating an App
