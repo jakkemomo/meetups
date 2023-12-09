@@ -1,12 +1,14 @@
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.tokens import default_token_generator
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenVerifyView
@@ -19,7 +21,7 @@ from apps.core.serializers import RegisterSerializer, \
     TokenRefreshResponseSerializer, TokenObtainPairResponseSerializer, \
     RegisterResponseSerializer, \
     ReverifyEmailSerializer, PasswordResetSerializer, \
-    PasswordChangeSerializer
+    PasswordResetChangeSerializer, PasswordChangeSerializer
 from apps.profiles.models import User
 
 
@@ -234,10 +236,10 @@ class PasswordResetConfirmView(APIView):
         return Response({"reset_token": reset_token})
 
 
-class PasswordChangeView(APIView):
+class PasswordResetChangeView(APIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
-    serializer_class = PasswordChangeSerializer
+    serializer_class = PasswordResetChangeSerializer
 
     def get_serializer(self, *args, **kwargs):
         return self.serializer_class(self, *args, **kwargs)
@@ -282,6 +284,36 @@ class PasswordChangeView(APIView):
                      'Please request another password changing.',
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+
+        if not serializer.is_valid(raise_exception=True):
+            return Response(
+                {"detail": "Password is invalid"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(serializer.validated_data["password"])
+        user.save()
+
+        return Response('Your password has been changed')
+
+
+class PasswordChangeView(APIView):
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PasswordChangeSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        return self.serializer_class(self, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=['auth'],
+    )
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"user": user}
+        )
 
         if not serializer.is_valid(raise_exception=True):
             return Response(
