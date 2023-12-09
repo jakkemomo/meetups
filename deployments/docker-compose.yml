@@ -3,21 +3,45 @@ services:
   db:
     container_name: db
     build:
-      context: .
-      dockerfile: Dockerfile-db
+      context: ../
+      dockerfile: deployments/db/Dockerfile
     restart: always
     env_file:
       - ../.env
     ports:
       - "5555:5432"
     volumes:
-      - ./db:/docker-entrypoint-initdb.d/
+      - ./db/scripts:/docker-entrypoint-initdb.d/
       - database_volume:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+
+  app:
+    container_name: app
+    build:
+      context: ../
+      dockerfile: deployments/app/Dockerfile
+    restart: always
+    command: bash -c "
+        python manage.py migrate --noinput
+        && mkdir static
+        && python manage.py collectstatic --noinput
+        && python manage.py runserver 0.0.0.0:8000
+      "
+    volumes:
+        - ../:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ../.env
+    expose:
+      - "8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      POSTGRES_USER: event
+      POSTGRES_PASSWORD: event
+      POSTGRES_DB: meetups
 
 volumes:
   database_volume:
