@@ -39,8 +39,8 @@ Meetups and its subprojects are licensed under the Apache License, Version 2.0. 
 
 ## Contributing
 
-Anyone can contribute to the Matuups project - learn more at [CONTRIBUTING.md](https://github.com/jakkemomo/meetups/blob/main/CONTRIBUTING.md). All project management related documents can be found here.
+Anyone can contribute to the Matuups project - learn more at [CONTRIBUTING.md](https://github.com/jakkemomo/meetups/blob/main/docs/CONTRIBUTING.md). All project management related documents can be found here.
 
 ## List of participants
 
-[COMMITTERS.csv](https://github.com/jakkemomo/meetups/blob/main/COMMITTERS.csv)
+[COMMITTERS.csv](https://github.com/jakkemomo/meetups/blob/main/docs/COMMITTERS.csv)
