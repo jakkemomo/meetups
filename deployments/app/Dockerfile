@@ -44,6 +44,8 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 
 RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/staticfiles
+
 WORKDIR $APP_HOME
 
 # install dependencies

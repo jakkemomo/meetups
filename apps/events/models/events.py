@@ -9,12 +9,11 @@ from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
 from apps.events.models.rating import Rating
 from apps.events.models.tags import Tag
-from common.mixins import ResizeImageMixin
 
 user_model = settings.AUTH_USER_MODEL
 
 
-class Event(AbstractBaseModel, ResizeImageMixin):
+class Event(AbstractBaseModel):
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
     )
