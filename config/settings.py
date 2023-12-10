@@ -19,11 +19,13 @@ GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
 GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 GS_QUERYSTRING_AUTH = False
 
-SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL", "http://localhost:8000")
+SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
 
 if SERVICE_URL:
     DEBUG = False
     DEBUG_PROPAGATE_EXCEPTIONS = True
+else:
+    SERVICE_URL = "http://localhost:8000"
 
 if DOCKERIZED:
     # Settings for docker startup
