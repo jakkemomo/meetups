@@ -22,7 +22,7 @@ services:
     restart: always
     command: /home/app/web/deployments/app/scripts/run.sh
     volumes:
-        - ../:/home/app/web
+      - ../:/home/app/web
     ports:
       - "8000:8000"
     depends_on:
