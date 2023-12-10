@@ -6,7 +6,7 @@ from apps.events.permissions.common import is_verified, is_owner, is_participant
 class EventPermissions(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ('retrieve', 'list'):
+        if request.method in permissions.SAFE_METHODS:
             return True
         elif view.action == 'create':
             return is_verified(request)
