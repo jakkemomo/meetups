@@ -44,7 +44,8 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 
 RUN mkdir $APP_HOME
-RUN mkdir $APP_HOME/staticfiles
+RUN mkdir $HOME/staticfiles
+RUN mkdir $HOME/mediafiles
 
 WORKDIR $APP_HOME
 
@@ -60,6 +61,8 @@ COPY . $APP_HOME
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
+RUN chown app:app $HOME/staticfiles
+RUN chown app:app $HOME/mediafiles
 
 # change to the app user
 USER app
