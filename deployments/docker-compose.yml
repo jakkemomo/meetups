@@ -20,9 +20,9 @@ services:
       context: ../
       dockerfile: deployments/app/Dockerfile
     restart: always
-    command: /app/deployments/app/scripts/run.sh
+    command: /home/app/web/deployments/app/scripts/run.sh
     volumes:
-        - ../:/app
+        - ../:/home/app/web
     ports:
       - "8000:8000"
     depends_on:

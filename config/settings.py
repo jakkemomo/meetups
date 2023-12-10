@@ -48,9 +48,9 @@ else:
     DEBUG = True
     SERVICE_URL = "http://localhost:8000"
     ALLOWED_HOSTS = ['*']
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATIC_ROOT = "/home/app/staticfiles"
     STATIC_URL = "/static/"
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+    MEDIA_ROOT = "/home/app/mediafiles"
     MEDIA_URL = "/media/"
 
 CORS_ALLOWED_ORIGINS = [
