@@ -22,25 +22,27 @@ GS_QUERYSTRING_AUTH = False
 SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
 
 if SERVICE_URL:
+    from urllib.parse import urlparse
+    ALLOWED_HOSTS = [str(urlparse(SERVICE_URL).netloc)]
     DEBUG = False
     DEBUG_PROPAGATE_EXCEPTIONS = True
+    CSRF_TRUSTED_ORIGINS = [SERVICE_URL]
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 else:
     SERVICE_URL = "http://localhost:8000"
+    ALLOWED_HOSTS = ['*']
+
 
 if DOCKERIZED:
     # Settings for docker startup
-    ALLOWED_HOSTS = ['*']
     STATIC_ROOT = "/home/app/staticfiles"
     STATIC_URL = "/static/"
     MEDIA_ROOT = "/home/app/mediafiles"
     MEDIA_URL = "/media/"
 else:
     # Settings for local/prod startup to use GCS
-    from urllib.parse import urlparse
-    ALLOWED_HOSTS = [str(urlparse(SERVICE_URL).netloc)]
-    CSRF_TRUSTED_ORIGINS = [SERVICE_URL]
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     from google.oauth2 import service_account
 
     # Set "static" folder
