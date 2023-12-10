@@ -77,9 +77,8 @@ class EventEdition(LoginRequiredMixin, UpdateView):
                 form.instance.is_visible = True
 
             # Check if a new image for the event is uploaded
-            new_image_uploaded = "image" in request.FILES and request.FILES[
-                "image"
-            ] != form.initial.get("image")
+            if request.FILES["image"] and request.FILES["image"] != form.initial.get("image"):
+                new_image_uploaded = True
 
             # Check whether an image for the event exists
             old_image = form.initial.get("image")
@@ -444,17 +443,6 @@ class RateEvent(LoginRequiredMixin, View):
                 rating_object.delete()
 
             return redirect("events:event_detail", pk=event_id)
-
-    # Finding events within radius
-    # from django.contrib.gis.geos import Point
-    # from django.contrib.gis.measure import Distance
-    #
-    #
-    # lat = 52.5
-    # lng = 1.0
-    # radius = 10
-    # point = Point(lng, lat)
-    # Event.objects.filter(location__distance_lt=(point, Distance(km=radius)))
 
     def post(self, request, event_id, value=None):
         event = get_object_or_404(Event, id=event_id)
