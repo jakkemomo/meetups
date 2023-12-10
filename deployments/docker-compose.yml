@@ -32,6 +32,7 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 5432
+      DOCKERIZED: "true"
 
 volumes:
   database_volume:

@@ -12,16 +12,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv")
-DEBUG = False
-DEBUG_PROPAGATE_EXCEPTIONS = True
+DEBUG = True
+DOCKERIZED = os.environ.get("DOCKERIZED", False)
 
 GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
 GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 GS_QUERYSTRING_AUTH = False
-SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
+
+SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL", "http://localhost:8000")
+
 if SERVICE_URL:
+    DEBUG = False
+    DEBUG_PROPAGATE_EXCEPTIONS = True
+
+if DOCKERIZED:
+    # Settings for docker startup
+    ALLOWED_HOSTS = ['*']
+    STATIC_ROOT = "/home/app/staticfiles"
+    STATIC_URL = "/static/"
+    MEDIA_ROOT = "/home/app/mediafiles"
+    MEDIA_URL = "/media/"
+else:
+    # Settings for local/prod startup to use GCS
     from urllib.parse import urlparse
-    ALLOWED_HOSTS = [urlparse(SERVICE_URL).netloc]
+    ALLOWED_HOSTS = [str(urlparse(SERVICE_URL).netloc)]
     CSRF_TRUSTED_ORIGINS = [SERVICE_URL]
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -44,14 +58,7 @@ if SERVICE_URL:
         logging.warning('No gcpCredentials.json file found. Using default credentials.')
 
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
-else:
-    DEBUG = True
-    SERVICE_URL = "http://localhost:8000"
-    ALLOWED_HOSTS = ['*']
-    STATIC_ROOT = "/home/app/staticfiles"
-    STATIC_URL = "/static/"
-    MEDIA_ROOT = "/home/app/mediafiles"
-    MEDIA_URL = "/media/"
+
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
