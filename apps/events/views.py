@@ -2,7 +2,6 @@ import json
 import os
 from datetime import datetime
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,6 +15,8 @@ from django.views.generic import (
     View,
     TemplateView,
 )
+from django.core.files.storage import default_storage
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from apps.events.forms import EventForm
 from apps.events.models.events import Event
@@ -23,7 +24,6 @@ from apps.events.models.categories import Category
 from apps.events.models.rating import Rating
 from config import settings
 from apps.events.utils import events_image_upload_path
-from django.core.files.storage import default_storage
 
 
 class EventCreation(LoginRequiredMixin, CreateView):
@@ -70,39 +70,28 @@ class EventEdition(LoginRequiredMixin, UpdateView):
         self.object = self.get_object()
         form = self.get_form()
 
-        '''#1 Check if a new image for the event is uploaded
-        if 'image' in request.FILES and request.FILES['image'] != form.initial['image']:
-            new_image_uploaded = True
-        else:
-            new_image_uploaded = False
-
-        #2 Check whether images for the event exists
-        image_exists = form.initial['image'] is not None and form.initial['image'].name
-
-        #3 If a new image is uploaded and an old image exists, delete the old image
-        if new_image_uploaded and image_exists:
-            old_image_path = form.initial['image'].name
-            full_old_image_path = os.path.join(settings.MEDIA_ROOT, old_image_path)
-            if default_storage.exists(full_old_image_path):
-                default_storage.delete(full_old_image_path)'''
-
-        # Check if a new image for the event is uploaded
-        new_image_uploaded = 'image' in request.FILES and request.FILES['image'] != form.initial.get('image')
-
-        # Check whether an image for the event exists
-        old_image = form.initial.get('image')
-        old_image_path = old_image.name if old_image else None
-
-        # If a new image is uploaded and an old image exists, delete the old image
-        if new_image_uploaded and old_image_path:
-            full_old_image_path = os.path.join(settings.MEDIA_ROOT, old_image_path)
-            default_storage.delete(full_old_image_path) if default_storage.exists(full_old_image_path) else None
-
         if form.is_valid():
             if form.instance.type == "private":
                 form.instance.is_visible = False
             else:
                 form.instance.is_visible = True
+
+            # Check if a new image for the event is uploaded
+            new_image_uploaded = "image" in request.FILES and request.FILES[
+                "image"
+            ] != form.initial.get("image")
+
+            # Check whether an image for the event exists
+            old_image = form.initial.get("image")
+            old_image_path = old_image.name if old_image else None
+
+            # If a new image is uploaded and an old image exists, delete the old image
+            if new_image_uploaded and old_image_path:
+                full_old_image_path = os.path.join(settings.MEDIA_ROOT, old_image_path)
+                default_storage.delete(full_old_image_path) if default_storage.exists(
+                    full_old_image_path
+                ) else None
+
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -247,30 +236,6 @@ class LeaveFromEvent(LoginRequiredMixin, View):
 
 class RateEvent(LoginRequiredMixin, View):
     model = Rating
-    import json
-    from datetime import datetime
-
-    from django.contrib.auth.mixins import LoginRequiredMixin
-    from django.core.serializers import serialize
-    from django.db.models import Q
-    from django.shortcuts import get_object_or_404, redirect, render
-    from django.urls import reverse_lazy
-    from django.views.generic import (
-        CreateView,
-        ListView,
-        DetailView,
-        UpdateView,
-        DeleteView,
-        View,
-        TemplateView,
-    )
-
-    from apps.events.forms import EventForm
-    from apps.events.models.events import Event
-    from apps.events.models.categories import Category
-    from apps.events.models.rating import Rating
-    from config import settings
-    from apps.events.utils import events_image_upload_path
 
     class EventCreation(LoginRequiredMixin, CreateView):
         model = Event
@@ -314,8 +279,10 @@ class RateEvent(LoginRequiredMixin, View):
             self.object = self.get_object()
             form = self.get_form()
 
-            if form.initial['image'].name == events_image_upload_path(self.object, self.object.image.name):
-                form.initial['image'].name.delete()
+            if form.initial["image"].name == events_image_upload_path(
+                self.object, self.object.image.name
+            ):
+                form.initial["image"].name.delete()
 
             # 1) check new image for the event is uploaded  - check where the method events_image_upload_path() is called
             # 2) check whether images for the event exists  - form.initial['image'].name != null
@@ -346,7 +313,9 @@ class RateEvent(LoginRequiredMixin, View):
                     | Q(participants__in=[self.request.user]) & Q(is_finished=False)
                 ).distinct()
             else:
-                self.queryset = self.model.objects.filter(Q(is_visible=True) & Q(is_finished=False))
+                self.queryset = self.model.objects.filter(
+                    Q(is_visible=True) & Q(is_finished=False)
+                )
             return super().get_queryset()
 
         def post(self, request):
@@ -359,10 +328,10 @@ class RateEvent(LoginRequiredMixin, View):
 
             object_list = Event.objects.filter(
                 (
-                        Q(name__icontains=searched)
-                        | Q(address__icontains=searched)
-                        | Q(description__icontains=searched)
-                        | Q(category__name__icontains=searched)
+                    Q(name__icontains=searched)
+                    | Q(address__icontains=searched)
+                    | Q(description__icontains=searched)
+                    | Q(category__name__icontains=searched)
                 )
             )
 
@@ -420,16 +389,16 @@ class RateEvent(LoginRequiredMixin, View):
             for event in geo_events["features"]:
                 attrs = event["properties"]
                 event_name = attrs["name"]
-                event_start = datetime.strptime(attrs["start_date"], "%Y-%m-%dT%H:%M:%SZ").strftime(
-                    "%-d %B %H:%M"
-                )
+                event_start = datetime.strptime(
+                    attrs["start_date"], "%Y-%m-%dT%H:%M:%SZ"
+                ).strftime("%-d %B %H:%M")
                 attrs["start_date"] = event_start
                 attrs.update(
                     {
                         "balloonContentHeader": f"<center>{event_name}</center></br><center>{event_start}</center>",
                         "balloonContent": f'<center><a href="/events/{attrs["pk"]}">'
-                                          + f'<img class="img-responsive" src="/media/{attrs["image"]}"'
-                                          + ' width="250px" height="250px"></a></center>',
+                        + f'<img class="img-responsive" src="/media/{attrs["image"]}"'
+                        + ' width="250px" height="250px"></a></center>',
                         "clusterCaption": f"Событие: {event_name}",
                         "hintContent": event_name,
                     }
@@ -498,15 +467,3 @@ class RateEvent(LoginRequiredMixin, View):
             rating_object.delete()
 
         return redirect("events:event_detail", pk=event_id)
-
-
-# Finding events within radius
-# from django.contrib.gis.geos import Point
-# from django.contrib.gis.measure import Distance
-#
-#
-# lat = 52.5
-# lng = 1.0
-# radius = 10
-# point = Point(lng, lat)
-# Event.objects.filter(location__distance_lt=(point, Distance(km=radius)))
