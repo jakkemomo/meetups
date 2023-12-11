@@ -25,7 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv")
+SECRET_KEY = os.environ.get("SECRET_KEY",
+                            "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -152,7 +153,8 @@ GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
 GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 
 APP_URL = os.getenv("APP_URL", "http://localhost:8000")
-VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{APP_URL}/api/v1/verify/email")
+VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL",
+                             f"{APP_URL}/api/v1/verify/email")
 CONFIRM_PASSWORD_RESET_URL = os.getenv(
     "CONFIRM_FORGOT_PASSWORD_URL",
     f"{APP_URL}/api/v1/password/reset/confirm"
@@ -181,7 +183,8 @@ else:
             os.path.join(BASE_DIR, 'gcpCredentials.json'),
         )
     except FileNotFoundError:
-        logging.warning('No gcpCredentials.json file found. Using default credentials.')
+        logging.warning(
+            'No gcpCredentials.json file found. Using default credentials.')
 
     GS_QUERYSTRING_AUTH = False
 
@@ -201,7 +204,8 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication',],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication', ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
 }
@@ -211,19 +215,25 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
-    "AUTH_COOKIE_DOMAIN": None,  # A string like "example.com", or None for standard domain cookie.
-    "AUTH_COOKIE_SECURE": False,  # Whether the auth cookies should be secure (https:// only).
-    "AUTH_COOKIE_HTTP_ONLY": True,  # Http only cookie flag.It's not fetch by javascript.
+    "AUTH_COOKIE": "access_token",
+    # Cookie name. Enables cookies if value is set.
+    "AUTH_COOKIE_DOMAIN": None,
+    # A string like "example.com", or None for standard domain cookie.
+    "AUTH_COOKIE_SECURE": False,
+    # Whether the auth cookies should be secure (https:// only).
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    # Http only cookie flag.It's not fetch by javascript.
     "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
-    "AUTH_COOKIE_SAMESITE": "Lax",  # Whether to set the flag restricting cookie leaks on cross-site requests.
+    "AUTH_COOKIE_SAMESITE": "Lax",
+    # Whether to set the flag restricting cookie leaks on cross-site requests.
     # This can be 'Lax', 'Strict', or None to disable the flag.
     "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
     "UPDATE_LAST_LOGIN": True,
 }
 
 SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
 }
 
 # Logging
@@ -232,7 +242,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
-            'level': 'ERROR',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
@@ -249,10 +259,15 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'core_app': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': True,
+        }
     },
 }
 
-EMAIL_BACKEND = 'backends.email_backend.EmailBackend'
+EMAIL_BACKEND = 'backends.email.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
