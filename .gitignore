@@ -158,3 +158,5 @@ gcpCredentials.json
 
 .DS_Store
 
+#images
+media/events/image/*
