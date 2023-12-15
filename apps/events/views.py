@@ -78,13 +78,8 @@ class EventEdition(LoginRequiredMixin, UpdateView):
 
             new_image_uploaded = False  # Initialize the flag at the start
 
-            try:
-                # Check if a new image for the event is uploaded
-                if request.FILES["image"] and request.FILES["image"] != form.initial.get("image"):
-                    new_image_uploaded = True
-            except KeyError:
-                # Handle the absence of the 'image' key in request.FILES
-                print("No 'image' key in request.FILES")
+            if request.FILES.get("image", "") != form.initial.get("image"):
+                new_image_uploaded = True
 
             # Check whether an image for the event exists
             old_image = form.initial.get("image")
