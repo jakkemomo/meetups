@@ -142,24 +142,20 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class PasswordResetChangeSerializer(serializers.ModelSerializer):
+class PasswordFormSerializer(serializers.Serializer):
     password = serializers.CharField(
         write_only=True,
         required=True,
         validators=[validate_password],
     )
-    password2 = serializers.CharField(
+    confirmed_password = serializers.CharField(
         write_only=True,
         required=True,
         validators=[validate_password],
     )
 
-    class Meta:
-        model = User
-        fields = ("password", "password2", )
-
     def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
+        if attrs["password"] != attrs["confirmed_password"]:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match"}
             )
@@ -167,34 +163,22 @@ class PasswordResetChangeSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class PasswordChangeSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
-    )
-    password2 = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
-    )
+class PasswordChangeSerializer(PasswordFormSerializer):
     old_password = serializers.CharField(
         write_only=True,
         required=True,
         validators=[validate_password],
     )
 
-    class Meta:
-        model = User
-        fields = ("password", "password2", "old_password", )
-
     def validate(self, attrs):
-        user = self.context.get("user")
+        super().validate(attrs)
 
-        if attrs["password"] != attrs["password2"]:
+        user = self.context.get("user")
+        if not user:
             raise serializers.ValidationError(
-                {"password": "Password fields didn't match"}
+                {"user": "The user is not authenticated"}
             )
+
         if user.check_password(attrs["password"]):
             raise serializers.ValidationError(
                 {"password": "The new password is the same as old one"}

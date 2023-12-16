@@ -4,11 +4,16 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from .views import (
-    DecoratedTokenObtainPairView, DecoratedTokenBlacklistView,
+    DecoratedTokenObtainPairView,
+    DecoratedTokenBlacklistView,
     DecoratedTokenVerifyView,
-    DecoratedTokenRefreshView, RegisterView, VerifyEmailView,
+    DecoratedTokenRefreshView,
+    RegisterView,
+    VerifyEmailView,
     ReverifyEmailView,
-    PasswordResetView, PasswordResetConfirmView, PasswordResetChangeView,
+    PasswordResetView,
+    PasswordResetConfirmView,
+    PasswordResetChangeView,
     PasswordChangeView,
 )
 
