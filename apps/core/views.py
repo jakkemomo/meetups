@@ -6,20 +6,27 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenVerifyView
-from rest_framework_simplejwt.views import TokenRefreshView, \
-    TokenObtainPairView
-
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+    TokenObtainPairView,
+)
 from apps.core import helpers
-from apps.core.serializers import RegisterSerializer, \
-    TokenVerifyResponseSerializer, TokenBlacklistResponseSerializer, \
-    TokenRefreshResponseSerializer, TokenObtainPairResponseSerializer, \
-    RegisterResponseSerializer, \
-    ReverifyEmailSerializer, PasswordResetSerializer, \
-    PasswordChangeSerializer
+from apps.core.serializers import (
+    RegisterSerializer,
+    TokenVerifyResponseSerializer,
+    TokenBlacklistResponseSerializer,
+    TokenRefreshResponseSerializer,
+    TokenObtainPairResponseSerializer,
+    RegisterResponseSerializer,
+    ReverifyEmailSerializer,
+    PasswordResetSerializer,
+    PasswordChangeSerializer,
+    PasswordFormSerializer,
+)
 from apps.profiles.models import User
 
 logger = logging.getLogger("core_app")
@@ -157,25 +164,36 @@ class DecoratedTokenObtainPairView(TokenObtainPairView):
 
 
 class PasswordResetView(APIView):
+    """
+    This view handles the request of an unauthorised user who has forgotten
+    his password and emailing him with a reset password link
+    with confirmation_token.
+    """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = PasswordResetSerializer
 
     def get_serializer(self, *args, **kwargs):
+        """
+        This function is using to generate swagger documents.
+        """
         return self.serializer_class(self, *args, **kwargs)
 
     @swagger_auto_schema(
         tags=['auth'],
     )
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid(raise_exception=True):
-            return Response(
-                {"detail": "Email is invalid"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        """
+        Validates the request data and sends a reset password email with
+        confirmation_token in query parameters to a user.
 
+        Input: User's email
+        Result: Email confirmation_token with  sent
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         user = serializer.validated_data.get("user")
+
         if not user:
             return Response(
                 data={"detail": "User not found"},
@@ -201,6 +219,10 @@ class PasswordResetView(APIView):
 
 
 class PasswordResetConfirmView(APIView):
+    """
+    This view validates the confirmation token from the query parameters
+    and generates a new reset token then returning it in the response body.
+    """
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
@@ -220,6 +242,13 @@ class PasswordResetConfirmView(APIView):
         ],
     )
     def get(self, request, *args, **kwargs):
+        """
+        Validates the user_id and confirmation_token from the query parameters
+        and returns a new reset_token.
+
+        Input: None (query parameters)
+        Result: 200 response with reset_token in body
+        """
         user_id = request.query_params.get('user_id', '')
         confirmation_token = request.query_params.get('confirmation_token', '')
         user_model = get_user_model()
@@ -247,12 +276,20 @@ class PasswordResetConfirmView(APIView):
         return Response({"reset_token": reset_token})
 
 
-class PasswordChangeView(APIView):
+class PasswordResetChangeView(APIView):
+    """
+    This view validates the token from the query parameters from the
+    PasswordResetConfirmView's GET-request response and
+    changes user's password.
+    """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
-    serializer_class = PasswordChangeSerializer
+    serializer_class = PasswordFormSerializer
 
     def get_serializer(self, *args, **kwargs):
+        """
+        This function is using to generate swagger documents.
+        """
         return self.serializer_class(self, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -273,6 +310,13 @@ class PasswordChangeView(APIView):
         ],
     )
     def post(self, request, *args, **kwargs):
+        """
+        Validates the user_id and reset_token from the query parameters and
+        the new password from the request data, then changes user's password.
+
+        Input: password, confirmed_password
+        Result: Password changed
+        """
         serializer = self.get_serializer(data=request.data)
         user_id = request.query_params.get('user_id', '')
         reset_token = request.query_params.get('reset_token', '')
@@ -297,9 +341,55 @@ class PasswordChangeView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        if not serializer.is_valid(raise_exception=True):
+        if not serializer.is_valid():
             return Response(
-                {"detail": "Password is invalid"},
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(serializer.validated_data["password"])
+        user.save()
+
+        return Response('Your password has been changed')
+
+
+class PasswordChangeView(APIView):
+    """
+    This view handles the request of an authorised user
+    who wants to change its password.
+    It validates the old and new passwords from the request data
+    and changes the user's password.
+    """
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PasswordChangeSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        This function is using to generate swagger documents.
+        """
+        return self.serializer_class(self, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=['auth'],
+    )
+    def post(self, request, *args, **kwargs):
+        """
+        Validates the old and new passwords from the request data,
+        then changes user's password.
+
+        Input: old_password, password, confirmed_password
+        Result: Password changed
+        """
+        user = request.user
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"user": user}
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
