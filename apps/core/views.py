@@ -256,7 +256,7 @@ class PasswordResetConfirmView(APIView):
         try:
             user = user_model.objects.get(id=user_id)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'warning: {__name__}: {exc}')
+            logger.warning(f'Get user failed: {exc}')
             user = None
 
         if not user:
@@ -325,7 +325,7 @@ class PasswordResetChangeView(APIView):
         try:
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'warning: {__name__}: {exc}')
+            logger.warning(f'Get user failed: {exc}')
             user = None
 
         if not user:
