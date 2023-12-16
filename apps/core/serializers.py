@@ -131,12 +131,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
             attrs["user"] = user
         except user_model.DoesNotExist:
             raise serializers.ValidationError(
-                {"email": "There are no users with that Email address!"}
-            )
-
-        if not user.is_email_verified:
-            raise serializers.ValidationError(
-                {"email": "Email is not verified!"}
+                {"email": "There are no users with that Email address"}
             )
 
         return attrs

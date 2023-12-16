@@ -29,6 +29,8 @@ from apps.core.serializers import (
 )
 from apps.profiles.models import User
 
+logger = logging.getLogger("core_app")
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -69,7 +71,8 @@ class VerifyEmailView(APIView):
         user_model = get_user_model()
         try:
             user = user_model.objects.get(id=user_id)
-        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
+            logger.warning(f'warning: {__name__}: {exc}')
             user = None
         if user is None:
             return Response('User not found', status=status.HTTP_404_NOT_FOUND)
@@ -191,12 +194,21 @@ class PasswordResetView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data.get("user")
 
+        if not user:
+            return Response(
+                data={"detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         try:
             helpers.send_reset_password_email(user)
 
-        except Exception as e:
+        except Exception as exc:
+            logger.error(f'Error type: {type(exc).__name__}, '
+                         f'location: {__name__}, user id: {user.id}')
             return Response(
-                {"detail": str(e)},
+                data={"detail": "An error occurred while sending an email. "
+                                "Please try again later"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -243,10 +255,11 @@ class PasswordResetConfirmView(APIView):
 
         try:
             user = user_model.objects.get(id=user_id)
-        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
+            logger.warning(f'warning: {__name__}: {exc}')
             user = None
 
-        if not User:
+        if not user:
             return Response(
                 'User not found',
                 status=status.HTTP_404_NOT_FOUND
@@ -311,13 +324,14 @@ class PasswordResetChangeView(APIView):
 
         try:
             user = user_model.objects.get(id=user_id)
-        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
+            logger.warning(f'warning: {__name__}: {exc}')
             user = None
 
         if not user:
             return Response(
-                'User not found',
-                status=status.HTTP_404_NOT_FOUND
+                data='User not found',
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         if not default_token_generator.check_token(user, reset_token):
