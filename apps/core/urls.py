@@ -3,8 +3,19 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from .views import (DecoratedTokenObtainPairView, DecoratedTokenBlacklistView, DecoratedTokenVerifyView, \
-                    DecoratedTokenRefreshView, RegisterView, VerifyEmailView, ReverifyEmailView)
+from .views import (
+    DecoratedTokenObtainPairView,
+    DecoratedTokenBlacklistView,
+    DecoratedTokenVerifyView,
+    DecoratedTokenRefreshView,
+    RegisterView,
+    VerifyEmailView,
+    ReverifyEmailView,
+    PasswordResetView,
+    PasswordResetConfirmView,
+    PasswordResetChangeView,
+    PasswordChangeView,
+)
 
 app_name = "core"
 
@@ -32,4 +43,8 @@ urlpatterns = [
     path("api/v1/reverify/email", ReverifyEmailView.as_view(), name="reverify-email"),
     path("api/v1/token/refresh/", DecoratedTokenRefreshView.as_view(), name="token-refresh"),
     path("api/v1/token/verify/", DecoratedTokenVerifyView.as_view(), name="token-verify"),
+    path("api/v1/password/reset/", PasswordResetView.as_view(), name="password-reset"),
+    path("api/v1/password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password-reset-confirm"),
+    path("api/v1/password/reset/change/", PasswordResetChangeView.as_view(), name="password-reset-change"),
+    path("api/v1/password/change/", PasswordChangeView.as_view(), name="password-change"),
 ]

@@ -34,14 +34,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data["email"].lower(),
         )
+        user.set_password(validated_data["password"])
+        user.save()
+
         try:
             helpers.send_verification_email(user)
         except Exception as e:
             user.delete()
             raise e
 
-        user.set_password(validated_data["password"])
-        user.save()
         return user
 
 
@@ -110,3 +111,76 @@ class TokenPairSerializer(TokenObtainPairSerializer):
             return None
         data = super(TokenPairSerializer, self).validate(attrs)
         return data
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ("email", )
+
+    def validate(self, attrs):
+        email = attrs["email"]
+        user_model = get_user_model()
+
+        try:
+            user = user_model.objects.get(email=email)
+            attrs["user"] = user
+        except user_model.DoesNotExist:
+            raise serializers.ValidationError(
+                {"email": "There are no users with that Email address"}
+            )
+
+        return attrs
+
+
+class PasswordFormSerializer(serializers.Serializer):
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
+    confirmed_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["confirmed_password"]:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match"}
+            )
+
+        return attrs
+
+
+class PasswordChangeSerializer(PasswordFormSerializer):
+    old_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
+
+    def validate(self, attrs):
+        super().validate(attrs)
+
+        user = self.context.get("user")
+        if not user:
+            raise serializers.ValidationError(
+                {"user": "The user is not authenticated"}
+            )
+
+        if user.check_password(attrs["password"]):
+            raise serializers.ValidationError(
+                {"password": "The new password is the same as old one"}
+            )
+        if not user.check_password(attrs["old_password"]):
+            raise serializers.ValidationError(
+                {"old_password": "Existing password is incorrect"}
+            )
+
+        return attrs

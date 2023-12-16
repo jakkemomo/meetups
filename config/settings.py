@@ -154,7 +154,48 @@ USE_TZ = True
 
 AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
-VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{SERVICE_URL}/api/v1/verify/email")
+
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
+GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
+
+APP_URL = os.getenv("APP_URL", "http://localhost:8000")
+VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{APP_URL}/api/v1/verify/email")
+CONFIRM_PASSWORD_RESET_URL = os.getenv(
+    "CONFIRM_FORGOT_PASSWORD_URL",
+    f"{APP_URL}/api/v1/password/reset/confirm"
+)
+
+if DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATIC_URL = "/static/"
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+    MEDIA_URL = "/media/"
+else:
+    from google.oauth2 import service_account
+
+    # Set "static" folder
+    STATICFILES_STORAGE = 'config.gcsUtils.Static'
+
+    # Set "media" folder
+    DEFAULT_FILE_STORAGE = 'config.gcsUtils.Media'
+
+    # Add an unique ID to a file name if same file name exists
+    GS_FILE_OVERWRITE = False
+
+    try:
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+            os.path.join(BASE_DIR, 'gcpCredentials.json'),
+        )
+    except FileNotFoundError:
+        logging.warning('No gcpCredentials.json file found. Using default credentials.')
+
+    GS_QUERYSTRING_AUTH = False
+
+    STATIC_URL = f'{GS_BUCKET_URL}/static/'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -162,7 +203,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication',],
+    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication', ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
 }
@@ -172,13 +213,12 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
-    "AUTH_COOKIE_DOMAIN": None,  # A string like "example.com", or None for standard domain cookie.
-    "AUTH_COOKIE_SECURE": False,  # Whether the auth cookies should be secure (https:// only).
-    "AUTH_COOKIE_HTTP_ONLY": True,  # Http only cookie flag.It's not fetch by javascript.
+    "AUTH_COOKIE": "access_token", # Cookie name. Enables cookies if value is set.
+    "AUTH_COOKIE_DOMAIN": None, # A string like "example.com", or None for standard domain cookie.
+    "AUTH_COOKIE_SECURE": False, # Whether the auth cookies should be secure (https:// only).
+    "AUTH_COOKIE_HTTP_ONLY": True, # Http only cookie flag.It's not fetch by javascript.
     "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
-    "AUTH_COOKIE_SAMESITE": "Lax",  # Whether to set the flag restricting cookie leaks on cross-site requests.
-    # This can be 'Lax', 'Strict', or None to disable the flag.
+    "AUTH_COOKIE_SAMESITE": "Lax", # Whether to set the flag restricting cookie leaks on cross-site requests. This can be 'Lax', 'Strict', or None to disable the flag.
     "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
     "UPDATE_LAST_LOGIN": True,
 }
@@ -193,7 +233,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
-            'level': 'ERROR',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
@@ -210,11 +250,16 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'core_app': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': True,
+        }
     },
 }
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'backends.email.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
