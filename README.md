@@ -1,13 +1,23 @@
 # Meetups App
 
-## First run
-1. Create `.env` file in the root dir with fields from `.env.example`
-2. Optionally (to use maps) [get and set](https://yandex.ru/dev/jsapi-v2-1/doc/ru/#get-api-key) yandex maps api key or, even better, [google maps api key](https://developers.google.com/maps/documentation/javascript/get-api-key) in the `.env` file
-3. Install docker-compose
-4. `chmod +x entrypoint.sh && ./entrypoint.sh` (You can also use entrypoint-mac.sh if you are using mac, but be sure to install psycopg lib before that)
+## Pre requirements
+Install [docker](https://docs.docker.com/engine/install/) and [docker compose](https://docs.docker.com/compose/install/)
 
-This will install postgres db in docker, install geo dependencies, create superuser admin:admin, run migrations and run server.
-5. After you have done this once you can just run `python manage.py runserver` next time
+## Basic setup
+1. Create `.env` file in the root dir with filled out fields from `.env.example`
+2. Run `docker-compose -f deployments/docker-compose.yml up -d`
+3. Go to `http://localhost:8000/swagger` and you should see the app running
+
+## Local setup for easier debugging
+1. Create `.env` file in the root dir with filled out fields from `.env.example`
+2. Run your postgres db via `docker-compose -f deployments/docker-compose-db.yml up -d`
+3. For linux: install geo dependencies via `sudo apt-get install binutils libproj-dev gdal-bin`
+4. For mac: install geo dependencies via `brew install binutils proj gdal`
+5. Setup your virtual environment and install requirements via `pip install -r requirements/local.txt`
+6. Install pre-commit hooks via `pre-commit install` for code formatting and linting before commit
+7. Run migrations via `python manage.py migrate`
+8. Run server via `python manage.py runserver`
+9. Go to `http://localhost:8000/swagger` and you should see the app running
 
 
 ### Creating an App
@@ -15,8 +25,8 @@ This will install postgres db in docker, install geo dependencies, create superu
 2. Run `python manage.py startapp poll apps/poll` from the root directory of the project
 
 ### How to update from main branch
-1. git stash && git checkout main && git pull && pip install -r requirements/common.txt && python manage.py migrate && git stash pop
-
+`git stash && git checkout main && git pull && pip install -r requirements/common.txt && python manage.py migrate && git stash pop
+`
 ### How to make pull request on a new branch:
 1. git checkout -b new_branch
 2. git add name_of_changed_file

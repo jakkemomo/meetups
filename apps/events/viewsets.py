@@ -5,8 +5,7 @@ from django.db.models import Q, Count
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -36,9 +35,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
 
     model = Event
-    # queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
-    permission_classes = [EventPermissions]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     lookup_url_kwarg = "event_id"
 
     def get_template_names(self):
@@ -131,8 +128,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
 
     model = Rating
-    permission_classes = [RatingPermissions]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions]
     lookup_url_kwarg = "rating_id"
     http_method_names = ["post", "get", "put", "delete"]
 
@@ -166,8 +162,8 @@ class TagViewSet(viewsets.ModelViewSet):
     """
 
     model = Tag
-    permission_classes = [TagPermissions]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    queryset = Tag.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly, TagPermissions]
     lookup_url_kwarg = "tag_id"
     http_method_names = ["post", "get", "put", "delete"]
 
