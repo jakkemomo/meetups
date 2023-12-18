@@ -2,6 +2,7 @@ import json
 
 from django.core.serializers import serialize
 from django.db.models import Q, Count
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
@@ -9,8 +10,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from apps.events.models import Event, Rating, Tag
-from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
+from apps.core.search import TrigramSimilaritySearchFilter
+from apps.events.models import (
+    Event,
+    Rating,
+    Tag,
+)
+from apps.events.permissions import (
+    RatingPermissions,
+    EventPermissions,
+    TagPermissions,
+)
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -27,6 +37,7 @@ from apps.events.serializers import (
     GeoJsonSerializer,
     EventRegisterSerializer
 )
+from apps.events.filters import EventFilter
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -37,6 +48,9 @@ class EventViewSet(viewsets.ModelViewSet):
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     lookup_url_kwarg = "event_id"
+    filter_backends = [DjangoFilterBackend, TrigramSimilaritySearchFilter]
+    search_fields = ['name', 'tags__name']
+    filterset_class = EventFilter
 
     def get_template_names(self):
         match self.action:
@@ -166,6 +180,8 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, TagPermissions]
     lookup_url_kwarg = "tag_id"
     http_method_names = ["post", "get", "put", "delete"]
+    filter_backends = [TrigramSimilaritySearchFilter]
+    search_fields = ['name']
 
     def get_serializer_class(self):
         match self.action:

@@ -1,1 +1,2 @@
 CREATE EXTENSION postgis;
+CREATE EXTENSION pg_trgm;
