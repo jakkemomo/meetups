@@ -180,8 +180,8 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, TagPermissions]
     lookup_url_kwarg = "tag_id"
     http_method_names = ["post", "get", "put", "delete"]
-    filter_backends = [TrigramSimilaritySearchFilter]
-    search_fields = ['name']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
 
     def get_serializer_class(self):
         match self.action:
