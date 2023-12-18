@@ -10,4 +10,4 @@ class EventFilter(FilterSet):
 
     class Meta:
         model = Event
-        fields: list[str] = ['name']
+        fields: list[str] = []
