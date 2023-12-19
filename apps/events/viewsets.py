@@ -51,9 +51,6 @@ class EventViewSet(viewsets.ModelViewSet):
             # Removing bucket (the first part before the first '/')
             image_path = '/'.join(image_path.split('/')[1:])
 
-            # Encode the whitespaces in the image_path
-            image_path = quote(image_path)
-
             print(f"Extracted path from URL: {image_path}")
             if default_storage.exists(image_path):
                 print("File existence check result: True")
