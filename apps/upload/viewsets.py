@@ -5,7 +5,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.upload.serializers import (
@@ -17,7 +17,7 @@ logger = logging.getLogger("upload_app")
 
 
 class UploadViewSet(CreateAPIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, ]
     serializer_class = UploadSerializer
     http_method_names = ["post", ]

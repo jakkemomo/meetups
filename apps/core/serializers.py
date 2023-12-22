@@ -2,8 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.db.models import Q
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.utils.translation import gettext_lazy as _
 
 from apps.core import helpers
 from apps.profiles.models import User
@@ -108,7 +110,9 @@ class TokenPairSerializer(TokenObtainPairSerializer):
             user = user_model.objects.get(Q(username=username) | Q(email=username.lower()))
             attrs['username'] = user.username
         except user_model.DoesNotExist:
-            pass
+            raise NotFound(
+                _("There are no users with that Username or Email address")
+            )
         data = super(TokenPairSerializer, self).validate(attrs)
         return data
 
