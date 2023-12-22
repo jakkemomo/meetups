@@ -66,6 +66,7 @@ else:
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
 
 # Geo libraries path
@@ -94,9 +95,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -233,7 +234,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
@@ -259,7 +260,7 @@ LOGGING = {
 }
 
 # Email
-EMAIL_BACKEND = 'backends.email.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
