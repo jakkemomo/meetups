@@ -108,7 +108,7 @@ class TokenPairSerializer(TokenObtainPairSerializer):
             user = user_model.objects.get(Q(username=username) | Q(email=username.lower()))
             attrs['username'] = user.username
         except user_model.DoesNotExist:
-            return None
+            pass
         data = super(TokenPairSerializer, self).validate(attrs)
         return data
 
