@@ -49,7 +49,7 @@ class EventViewSet(viewsets.ModelViewSet):
             parsed_url = urlparse(image_url)
             image_path = unquote(parsed_url.path.lstrip('/'))
             # Removing bucket (the first part before the first '/')
-            image_path = '/'.join(image_path.split('/')[1:])
+            image_path = '/'.join(image_path.split('/')[2:])
 
             print(f"Extracted path from URL: {image_path}")
             if default_storage.exists(image_path):
