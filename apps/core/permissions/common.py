@@ -13,8 +13,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Instance must have an attribute named `owner`.
-        return obj.created_by == request.user
+        return is_owner(request, obj)
 
 
 def is_participant(request, obj):

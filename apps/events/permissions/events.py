@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from apps.events.permissions.common import is_verified, is_owner, is_participant
+from apps.core.permissions.common import is_verified, is_owner, is_participant
 
 
 class EventPermissions(permissions.BasePermission):

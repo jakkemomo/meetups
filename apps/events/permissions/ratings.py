@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from apps.events.permissions.common import is_participant, is_verified
+from apps.core.permissions.common import is_participant, is_verified
 
 
 class RatingPermissions(permissions.BasePermission):

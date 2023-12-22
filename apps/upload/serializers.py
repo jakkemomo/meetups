@@ -1,5 +1,5 @@
+import uuid
 from io import BytesIO
-import re
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import FileExtensionValidator
@@ -21,7 +21,8 @@ class UploadSerializer(serializers.Serializer):
 
     def validate_file(self, file):
         if file.content_type != "image/webp":
-            return self.convert_to_webp(file)
+            file = self.convert_to_webp(file)
+        file.name = f'{uuid.uuid4().hex}.webp'
         return file
 
     @staticmethod
@@ -37,5 +38,4 @@ class UploadSerializer(serializers.Serializer):
             content=file.getvalue(),
             content_type="image/webp",
         )
-        file.name = re.sub(r'\.\w+$', '.webp', file.name)
         return file
