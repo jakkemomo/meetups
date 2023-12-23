@@ -66,7 +66,6 @@ else:
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://127.0.0.1:3000',
 ]
 
 # Geo libraries path
@@ -155,45 +154,14 @@ USE_TZ = True
 
 AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
-
-GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
-GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
-
-APP_URL = os.getenv("APP_URL", "http://localhost:8000")
-VERIFY_EMAIL_URL = os.getenv("VERIFY_EMAIL_URL", f"{APP_URL}/api/v1/verify/email")
+VERIFY_EMAIL_URL = os.getenv(
+    "VERIFY_EMAIL_URL",
+    f"{SERVICE_URL}/api/v1/verify/email"
+)
 CONFIRM_PASSWORD_RESET_URL = os.getenv(
     "CONFIRM_FORGOT_PASSWORD_URL",
-    f"{APP_URL}/api/v1/password/reset/confirm"
+    f"{SERVICE_URL}/api/v1/password/reset/confirm"
 )
-
-if DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-    STATIC_URL = "/static/"
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-    MEDIA_URL = "/media/"
-else:
-    from google.oauth2 import service_account
-
-    # Set "static" folder
-    STATICFILES_STORAGE = 'config.gcsUtils.Static'
-
-    # Set "media" folder
-    DEFAULT_FILE_STORAGE = 'config.gcsUtils.Media'
-
-    # Add an unique ID to a file name if same file name exists
-    GS_FILE_OVERWRITE = False
-
-    try:
-        GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-            os.path.join(BASE_DIR, 'gcpCredentials.json'),
-        )
-    except FileNotFoundError:
-        logging.warning('No gcpCredentials.json file found. Using default credentials.')
-
-    GS_QUERYSTRING_AUTH = False
-
-    STATIC_URL = f'{GS_BUCKET_URL}/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
