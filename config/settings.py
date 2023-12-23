@@ -95,9 +95,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -214,12 +214,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_COOKIE": "access_token", # Cookie name. Enables cookies if value is set.
-    "AUTH_COOKIE_DOMAIN": None, # A string like "example.com", or None for standard domain cookie.
-    "AUTH_COOKIE_SECURE": False, # Whether the auth cookies should be secure (https:// only).
-    "AUTH_COOKIE_HTTP_ONLY": True, # Http only cookie flag.It's not fetch by javascript.
-    "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
-    "AUTH_COOKIE_SAMESITE": "Lax", # Whether to set the flag restricting cookie leaks on cross-site requests. This can be 'Lax', 'Strict', or None to disable the flag.
     "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
     "UPDATE_LAST_LOGIN": True,
 }
@@ -248,12 +242,12 @@ LOGGING = {
     'loggers': {
         'upload_app': {
             'handlers': ['console'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': True,
         },
         'core_app': {
             'handlers': ['console'],
-            'level': 'WARNING',
+            'level': 'DEBUG',
             'propagate': True,
         }
     },
