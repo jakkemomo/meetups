@@ -47,7 +47,9 @@ class EventViewSet(viewsets.ModelViewSet):
         if image_url:
             print(f"Deleting image with URL: {image_url}")
             parsed_url = urlparse(image_url)
+            print(f"Parsed URL: {parsed_url}")
             image_path = unquote(parsed_url.path.lstrip('/'))
+            print(f"Image path: {image_path}")
             # Removing bucket (the first part before the first '/')
             image_path = '/'.join(image_path.split('/')[2:])
 
