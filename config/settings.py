@@ -219,12 +219,18 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'profiles_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
         }
     },
 }
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Use 'EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend' in your .env
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
