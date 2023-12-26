@@ -20,7 +20,6 @@ class UserRatingViewSet (viewsets.ModelViewSet):
     """
     model = UserRating
     permission_classes = [IsAuthenticatedOrReadOnly, UserRatingPermissions]
-    lookup_url_kwarg = "user_rated_id"
     http_method_names = ["post", "get", "put", "delete"]
 
     def get_queryset(self):
