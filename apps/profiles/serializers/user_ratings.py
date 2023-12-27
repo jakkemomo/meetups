@@ -3,6 +3,12 @@ from rest_framework.generics import get_object_or_404
 from apps.profiles.models.user_rate import UserRating, User
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "avatar_url"]
+
+
 class UserRatingCreateSerializer(serializers.ModelSerializer):
     value = serializers.IntegerField(min_value=0, max_value=5, default=5)
 
@@ -38,6 +44,7 @@ class UserRatingUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserRatingListSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False)
 
     class Meta:
         model = UserRating
