@@ -6,7 +6,7 @@ from rest_framework import routers
 app_name = "profiles"
 
 router = routers.SimpleRouter()
-router.register('user_ratings', UserRatingViewSet, basename="User rating")
+router.register('user_ratings', UserRatingViewSet)
 
 urlpatterns = [
     path("api/v1/", include(router.urls)),

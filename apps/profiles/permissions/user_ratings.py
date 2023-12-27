@@ -1,6 +1,5 @@
 from rest_framework import permissions
 
-from apps.core.permissions.common import is_verified, is_participant
 
 
 class UserRatingPermissions(permissions.BasePermission):
@@ -11,7 +10,5 @@ class UserRatingPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-#        elif view.action in ['create', 'update',]:
-#            return is_verified(request) and is_participant(request, obj)
         else:
             return False
