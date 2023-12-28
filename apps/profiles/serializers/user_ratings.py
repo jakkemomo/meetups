@@ -17,12 +17,14 @@ class UserRatingCreateSerializer(serializers.ModelSerializer):
         fields = ['value', 'user_rated', 'comment']
 
     def create(self, validated_data):
-        user_rated = get_object_or_404(User, id=self.context["view"].kwargs["user_rated_id"])
-        user_rater = self.context["request"].user_rater
+        user_rated = validated_data.pop("user_rated")
+        user_rater = self.context["request"].user
+        validated_data["user_rater"] = user_rater
         value = validated_data.pop("value")
-        user_rating_object = UserRating.objects.create(user_rated=user_rated, user_rater=user_rater, value=value)
-
-        return user_rating_object
+        comment = validated_data.pop("comment")
+        user_rating = UserRating.objects.create(user_rated=user_rated, user_rater=user_rater, value=value
+                                                , comment=comment, created_by=user_rater)
+        return user_rating
 
 
 class UserRatingUpdateSerializer(serializers.ModelSerializer):
@@ -44,7 +46,6 @@ class UserRatingUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserRatingListSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=False)
 
     class Meta:
         model = UserRating

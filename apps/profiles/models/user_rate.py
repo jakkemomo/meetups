@@ -21,4 +21,4 @@ class UserRating(AbstractBaseModel):
         db_table = 'user_rating'
 
     def __str__(self):
-        return f'{self.user_rater} rated {self.user_rated} as {self.value} with comment {self.comment}'
+        return self.user_rated
