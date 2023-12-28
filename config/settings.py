@@ -20,6 +20,7 @@ GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 GS_QUERYSTRING_AUTH = False
 
 SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
+SERVICE_ACCOUNT = False
 
 if SERVICE_URL:
     from urllib.parse import urlparse
@@ -29,7 +30,7 @@ if SERVICE_URL:
     CSRF_TRUSTED_ORIGINS = [SERVICE_URL]
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
+    SERVICE_ACCOUNT = True
 else:
     SERVICE_URL = "http://localhost:8000"
     ALLOWED_HOSTS = ['*']
@@ -46,10 +47,10 @@ else:
     from google.oauth2 import service_account
 
     # Set "static" folder
-    STATICFILES_STORAGE = 'config.gcsUtils.Static'
+    STATICFILES_STORAGE = 'config.gcs_utils.static'
 
     # Set "media" folder
-    DEFAULT_FILE_STORAGE = 'config.gcsUtils.Media'
+    DEFAULT_FILE_STORAGE = 'config.gcs_utils.media'
 
     # Add an unique ID to a file name if same file name exists
     GS_FILE_OVERWRITE = False
@@ -58,6 +59,7 @@ else:
         GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
             os.path.join(BASE_DIR, 'gcpCredentials.json'),
         )
+        SERVICE_ACCOUNT = True
     except FileNotFoundError:
         logging.warning('No gcpCredentials.json file found. Using default credentials.')
 
