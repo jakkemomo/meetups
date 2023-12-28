@@ -133,8 +133,12 @@ class RatingViewSet(viewsets.ModelViewSet):
     http_method_names = ["post", "get", "put", "delete"]
 
     def get_queryset(self):
-        event = self.get_object()
-        self.queryset = Rating.objects.filter(event=event, user=self.request.user)
+        if self.kwargs.get("rating_id"):
+            event = Event.objects.filter(id=self.kwargs["event_id"])
+            self.queryset = Rating.objects.filter(event=event, rating=self.kwargs["rating_id"])
+        else :
+            event = Event.objects.filter(id=self.kwargs["event_id"])
+            self.queryset = Rating.objects.filter(event=event, user=self.request.user)
         return self.queryset.all()
 
     def get_serializer_class(self):

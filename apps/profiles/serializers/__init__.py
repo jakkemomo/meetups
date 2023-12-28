@@ -1,0 +1,4 @@
+from .user_ratings import UserRatingListSerializer
+from .user_ratings import UserRatingRetrieveSerializer
+from .user_ratings import UserRatingCreateSerializer
+from .user_ratings import UserRatingUpdateSerializer
