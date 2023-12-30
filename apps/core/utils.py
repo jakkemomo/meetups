@@ -5,7 +5,7 @@ from django.core.files.storage import default_storage
 logger = logging.getLogger(__name__)
 
 
-def delete_image_if_exists(instance) -> None:
+def delete_image_if_exists(instance):
     image_url = instance.image_url
     if image_url:
         try:
@@ -15,3 +15,5 @@ def delete_image_if_exists(instance) -> None:
             logger.error(
                 f"An error occurred while deleting a file: {image_url}.\n{exc}"
             )
+        except Exception as exc:
+            return exc
