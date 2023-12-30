@@ -153,3 +153,4 @@ cython_debug/
 # Visual Studio Code
 .vscode
 /gcpCredentials.json
+/media/
