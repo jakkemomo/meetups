@@ -6,7 +6,7 @@ Install [docker](https://docs.docker.com/engine/install/) and [docker compose](h
 ## Basic setup
 1. Create `.env` file in the root dir with filled out fields from `.env.example`
 2. Run `docker-compose -f deployments/docker-compose.yml up -d`
-3. Go to `http://ldococalhost:8000/swagger` and you should see the app running
+3. Go to `http://localhost:8000/swagger` and you should see the app running
 
 ## Local setup for easier debugging
 1. Create `.env` file in the root dir with filled out fields from `.env.example`
