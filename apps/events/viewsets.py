@@ -28,8 +28,10 @@ from apps.events.serializers import (
     EventRegisterSerializer
 )
 
-from urllib.parse import urlparse, unquote, quote
-from django.core.files.storage import default_storage
+from apps.core.utils import delete_image_if_exists
+import logging
+
+logger = logging.getLogger("events_app")
 
 class EventViewSet(viewsets.ModelViewSet):
     """
@@ -38,28 +40,13 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         event_instance = self.get_object()
-        self.delete_image_if_exists(event_instance)
+        result = delete_image_if_exists(event_instance)
+        if result:
+            logger.warning(
+                f"An error occurred while deleting a file: {result}"
+            )
         # Proceed with the standard destroy operation
         return super().destroy(request, *args, **kwargs)
-
-    def delete_image_if_exists(self, event_instance):
-        image_url = event_instance.image_url
-        if image_url:
-            print(f"Deleting image with URL: {image_url}")
-            parsed_url = urlparse(image_url)
-            print(f"Parsed URL: {parsed_url}")
-            image_path = unquote(parsed_url.path.lstrip('/'))
-            print(f"Image path: {image_path}")
-            # Removing bucket (the first part before the first '/')
-            image_path = '/'.join(image_path.split('/')[2:])
-
-            print(f"Extracted path from URL: {image_path}")
-            if default_storage.exists(image_path):
-                print("File existence check result: True")
-                default_storage.delete(image_path)
-            else:
-                print("File existence check result: False")
-                print(f"The image file at path {image_path} does not exist in storage.")
 
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]

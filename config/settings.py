@@ -224,6 +224,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'events_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
         }
     },
 }
