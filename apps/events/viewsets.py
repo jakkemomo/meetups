@@ -33,6 +33,7 @@ import logging
 
 logger = logging.getLogger("events_app")
 
+
 class EventViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
@@ -40,11 +41,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         event_instance = self.get_object()
-        result = delete_image_if_exists(event_instance)
-        if result:
-            logger.warning(
-                f"An error occurred while deleting a file: {result}"
-            )
+        delete_image_if_exists(event_instance)
         # Proceed with the standard destroy operation
         return super().destroy(request, *args, **kwargs)
 
