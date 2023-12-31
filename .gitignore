@@ -153,11 +153,12 @@ cython_debug/
 # Visual Studio Code
 .vscode
 
-#Credentials
+# Credentials
 /gcpCredentials.json
 
-#media folder with outdated images
+# media folder with outdated images
 /media/
 
-#
+# MacOS techical files
 .DS_Store
+**/.DS_Store
