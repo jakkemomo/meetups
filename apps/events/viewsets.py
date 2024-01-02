@@ -28,11 +28,22 @@ from apps.events.serializers import (
     EventRegisterSerializer
 )
 
+from apps.core.utils import delete_image_if_exists
+import logging
+
+logger = logging.getLogger("events_app")
+
 
 class EventViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
+
+    def destroy(self, request, *args, **kwargs):
+        event_instance = self.get_object()
+        delete_image_if_exists(event_instance)
+        # Proceed with the standard destroy operation
+        return super().destroy(request, *args, **kwargs)
 
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
