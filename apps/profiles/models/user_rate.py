@@ -10,9 +10,9 @@ user_model = settings.AUTH_USER_MODEL
 class UserRating(AbstractBaseModel):
     """Keeps rating for a user with comments"""
     value = models.SmallIntegerField(null=True)
-    user_rater = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_rater")
     user_rated = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_rated")
     comment = models.CharField(max_length=256, null=True)
+    updated_by = None
 
     class Meta:
         ordering = ["-value"]

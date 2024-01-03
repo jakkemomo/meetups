@@ -14,7 +14,7 @@ class UserRatingCreateSerializer(serializers.ModelSerializer):
         user = get_object_or_404(User, id=self.context["view"].kwargs["user_id"])
         creator = self.context["request"].user
         value = validated_data.pop("value")
-        user_rating = UserRating.objects.create(user_rated=user, value=value, user_rater=creator, created_by=creator)
+        user_rating = UserRating.objects.create(user_rated=user, value=value, created_by=creator)
         return user_rating
 
 
@@ -44,7 +44,7 @@ class UserRatingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['value', 'user_rater', 'comment']
+        fields = ['value', 'created_by', 'comment']
 
 
 class UserRatingRetrieveSerializer(serializers.ModelSerializer):
