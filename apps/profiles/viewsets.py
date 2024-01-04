@@ -17,11 +17,17 @@ class UserRatingViewSet (viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing user's ratings.
     """
-    queryset = UserRating.objects.all()
     model = UserRating
     lookup_url_kwarg = 'rating_id'
     permission_classes = [IsAuthenticatedOrReadOnly, UserRatingPermissions]
     http_method_names = ["post", "get", "put", "delete"]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the ratings for the user
+        defined in user_id position of the URL
+        """
+        return UserRating.objects.filter(user_rated_id=self.kwargs["user_id"])
 
     def get_serializer_class(self):
         match self.action:
