@@ -19,6 +19,3 @@ class UserRating(AbstractBaseModel):
         verbose_name = "UserRating"
         verbose_name_plural = "UserRatings"
         db_table = 'user_rating'
-
-    def __str__(self):
-        return self.user_rated
