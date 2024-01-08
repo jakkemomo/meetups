@@ -27,12 +27,19 @@ class UserRatingUpdateSerializer(serializers.ModelSerializer):
         model = UserRating
         fields = ['value', 'comment']
 
+    def update(self, instance, validated_data):
+        instance.value = validated_data['value']
+        instance.comment = validated_data['comment']
+        instance.updated_by_id = self.context["request"].user.id
+        instance.save()
+        return instance
+
 
 class UserRatingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['value', 'created_by', 'comment']
+        fields = ['value', 'created_by', 'updated_by', 'comment']
 
 
 class UserRatingRetrieveSerializer(serializers.ModelSerializer):

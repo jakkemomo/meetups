@@ -23,7 +23,6 @@ class Migration(migrations.Migration):
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_created', to=settings.AUTH_USER_MODEL, verbose_name='Created by')),
                 ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(class)s_updated', to=settings.AUTH_USER_MODEL, verbose_name='Updated by')),
                 ('user_rated', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_rated', to=settings.AUTH_USER_MODEL)),
-                ('user_rater', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_rater', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'UserRating',
