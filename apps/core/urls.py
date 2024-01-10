@@ -13,7 +13,6 @@ from .views import (
     ReverifyEmailView,
     PasswordResetView,
     PasswordResetConfirmView,
-    PasswordResetChangeView,
     PasswordChangeView,
 )
 
@@ -45,6 +44,5 @@ urlpatterns = [
     path("api/v1/token/verify/", DecoratedTokenVerifyView.as_view(), name="token-verify"),
     path("api/v1/password/reset/", PasswordResetView.as_view(), name="password-reset"),
     path("api/v1/password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password-reset-confirm"),
-    path("api/v1/password/reset/change/", PasswordResetChangeView.as_view(), name="password-reset-change"),
     path("api/v1/password/change/", PasswordChangeView.as_view(), name="password-change"),
 ]
