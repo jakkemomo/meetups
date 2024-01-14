@@ -13,5 +13,6 @@ class User(AbstractUser):
     image_url = models.CharField(max_length=250, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
 
+    # These fields are using in AbstractUser model
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", ]

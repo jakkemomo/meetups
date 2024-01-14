@@ -39,9 +39,11 @@ def send_reset_password_email(user):
         f'?token={token}'
     )
     subject = 'Confirm password reset'
-    message = (
-        f'Please click on the following link to reset your password: '
-        f'{verification_link}'
+    message = render_to_string(
+        'emails/reset_password.html',
+        {
+            'verification_link': verification_link,
+        }
     )
     email = EmailMessage(subject, message, to=[user.email])
     email.content_subtype = 'html'
