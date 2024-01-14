@@ -13,7 +13,7 @@ from apps.profiles.models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        required=True, min_length=4, max_length=15, validators=[UniqueValidator(queryset=User.objects.all())]
+        required=True, min_length=2, max_length=128,
     )
     email = serializers.EmailField(
         required=True, validators=[UniqueValidator(queryset=User.objects.all())]
@@ -97,14 +97,14 @@ class TokenBlacklistResponseSerializer(serializers.Serializer):
 class TokenPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
-        username = attrs["username"]
+        email = attrs["email"]
         user_model = get_user_model()
         try:
-            user = user_model.objects.get(Q(username=username) | Q(email=username.lower()))
-            attrs['username'] = user.username
+            user = user_model.objects.get(email=email)
+            attrs['email'] = user.email
         except user_model.DoesNotExist:
             raise NotFound(
-                _("There are no users with that Username or Email address")
+                _("There are no users with that Email address")
             )
         data = super(TokenPairSerializer, self).validate(attrs)
         return data

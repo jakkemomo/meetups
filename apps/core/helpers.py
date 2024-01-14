@@ -34,28 +34,27 @@ def send_reset_password_email(user):
 
     token = encode_json_data(data)
 
-    # verification_link = (
-    #     f'{settings.CONFIRM_PASSWORD_RESET_URL}'
-    #     f'?token={token}'
-    # )
+    verification_link = (
+        f'{settings.CONFIRM_PASSWORD_RESET_URL}'
+        f'?token={token}'
+    )
     subject = 'Confirm password reset'
-    # message = (
-    #     f'Please click on the following link to reset your password: '
-    #     f'{verification_link}'
-    # )
-    message = f'Your reset token: {token}'
+    message = (
+        f'Please click on the following link to reset your password: '
+        f'{verification_link}'
+    )
     email = EmailMessage(subject, message, to=[user.email])
     email.content_subtype = 'html'
 
     email.send()
 
 
-def encode_json_data(data: dict):
+def encode_json_data(data: dict) -> str:
     """
     This function creates url-safe encoded token to secure a dict with data
     """
     handled_data = json.dumps(data).encode('utf-8')
-    token = base64.urlsafe_b64encode(handled_data).decode('utf-8').rstrip('=')
+    token = base64.urlsafe_b64encode(handled_data).decode('utf-8')
 
     return token
 
@@ -64,7 +63,7 @@ def decode_json_data(token: str) -> dict:
     """
     This function decodes url-safe token to a dict with data
     """
-    token_bytes = token.encode('utf-8') + b'=' * (-len(token) % 4)
+    token_bytes = token.encode('utf-8')
     data = json.loads(base64.urlsafe_b64decode(token_bytes).decode('utf-8'))
 
     return data
