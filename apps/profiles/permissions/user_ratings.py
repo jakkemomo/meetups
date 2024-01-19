@@ -11,10 +11,10 @@ class UserRatingPermissions(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         elif view.action in ['create', 'update', 'partial_update', 'destroy']:
-            return is_verified(request) and is_not_rated(request, obj) and is_owner(request, obj)
+            return is_verified(request) and is_self_rated(request, obj) and is_owner(request, obj)
         else:
             return False
 
 
-def is_not_rated(request, obj):
-    return request.user != obj.user_rated or request.user.is_staff
+def is_self_rated(request, obj):
+    return request.user != obj.user_rated

@@ -6,7 +6,7 @@ class UserRatingCreateSerializer(serializers.ModelSerializer):
     """
     User's rating serializers for profile viewset
     """
-    value = serializers.IntegerField(min_value=0, max_value=5, default=5)
+    value = serializers.IntegerField(min_value=0, max_value=5)
 
     class Meta:
         model = UserRating
@@ -21,7 +21,7 @@ class UserRatingCreateSerializer(serializers.ModelSerializer):
 
 
 class UserRatingUpdateSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(min_value=0, max_value=5, default=5)
+    value = serializers.IntegerField(min_value=0, max_value=5)
 
     class Meta:
         model = UserRating
@@ -39,10 +39,10 @@ class UserRatingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['value', 'created_by', 'updated_by', 'comment']
+        fields = ['value', 'created_by', 'user_rated', 'comment']
 
 
 class UserRatingRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRating
-        fields = ['value', 'comment']
+        fields = ['value', 'comment', 'created_by', 'created_at', 'updated_at']
