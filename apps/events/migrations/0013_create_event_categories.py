@@ -23,4 +23,4 @@ class Migration(migrations.Migration):
             ]
         )
 
-    operations = [migrations.RunPython(create_event_categories)]
+    # operations = [migrations.RunPython(create_event_categories)]
