@@ -1,6 +1,5 @@
 import json
 
-from django.core.files.storage import default_storage
 from django.core.serializers import serialize
 from django.db.models import Q, Count
 from drf_yasg.utils import swagger_auto_schema, no_body
