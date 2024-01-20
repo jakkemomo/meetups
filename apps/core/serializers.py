@@ -1,14 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.utils.translation import gettext_lazy as _
 
 from apps.core import helpers
 from apps.profiles.models import User
+from config import settings
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -96,18 +94,17 @@ class TokenBlacklistResponseSerializer(serializers.Serializer):
 
 class TokenPairSerializer(TokenObtainPairSerializer):
 
-    def validate(self, attrs):
-        email = attrs["email"]
-        user_model = get_user_model()
-        try:
-            user = user_model.objects.get(email=email)
-            attrs['email'] = user.email
-        except user_model.DoesNotExist:
-            raise NotFound(
-                _("There are no users with that Email address")
-            )
-        data = super(TokenPairSerializer, self).validate(attrs)
-        return data
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token['name'] = user.username
+        token['aud'] = 'WEB'
+        token['iss'] = settings.SERVICE_URL
+        token['is_staff'] = user.is_staff
+        token['is_verified'] = user.is_email_verified
+
+        return token
 
 
 class PasswordResetSerializer(serializers.ModelSerializer):

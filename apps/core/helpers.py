@@ -1,5 +1,6 @@
 import base64
 import json
+from typing import Any
 
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
@@ -61,7 +62,7 @@ def encode_json_data(data: dict) -> str:
     return token
 
 
-def decode_json_data(token: str) -> dict:
+def decode_json_data(token: str) -> Any:
     """
     This function decodes url-safe token to a dict with data
     """
