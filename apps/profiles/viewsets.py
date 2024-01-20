@@ -35,10 +35,5 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         profile_instance = self.get_object()
-        result = delete_image_if_exists(profile_instance)
-        if result:
-            logger.warning(
-                f"An error occurred while deleting a file: {result}"
-            )
-
+        delete_image_if_exists(profile_instance)
         return super().destroy(request, *args, **kwargs)
