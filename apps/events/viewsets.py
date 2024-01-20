@@ -47,8 +47,8 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         event_instance = self.get_object()
-        if event_instance.image_url != request.data.get(
-                'image_url', event_instance.image_url):
+        if event_instance.image_url != request.data.get("image_url",
+                                                        event_instance.image_url):
             delete_image_if_exists(event_instance)
 
         # Proceed with the standard update operation
