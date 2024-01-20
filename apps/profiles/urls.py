@@ -1,9 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 
-from .views import ProfileView
+from rest_framework import routers
+from apps.profiles.viewsets import ProfileViewSet, UserRatingViewSet
 
 app_name = "profiles"
+router = routers.SimpleRouter()
+
+router.register('user/(?P<user_id>[^/.]+)/user_ratings', UserRatingViewSet, basename="UserRating")
+router.register("profiles", ProfileViewSet, basename="Profiles")
 
 urlpatterns = [
-    path("<str:pk>/", ProfileView.as_view(), name="profile"),
+    path("api/v1/", include(router.urls)),
 ]
