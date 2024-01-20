@@ -1,5 +1,6 @@
 import json
 
+from django.core.files.storage import default_storage
 from django.core.serializers import serialize
 from django.db.models import Q, Count
 from drf_yasg.utils import swagger_auto_schema, no_body
@@ -44,6 +45,15 @@ class EventViewSet(viewsets.ModelViewSet):
         delete_image_if_exists(event_instance)
         # Proceed with the standard destroy operation
         return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        event_instance = self.get_object()
+        if event_instance.image_url != request.data.get(
+                'image_url') :
+            delete_image_if_exists(event_instance)
+
+        # Proceed with the standard update operation
+        return super().update(request, *args, **kwargs)
 
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]

@@ -15,5 +15,4 @@ def delete_image_if_exists(instance):
             logger.error(
                 f"An error occurred while deleting a file: {image_url}.\n{exc}"
             )
-        except Exception as exc:
-            return exc
+            raise
