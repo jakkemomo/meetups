@@ -98,11 +98,8 @@ class TokenPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        token['name'] = user.username
         token['aud'] = 'WEB'
         token['iss'] = settings.SERVICE_URL
-        token['is_staff'] = user.is_staff
-        token['is_verified'] = user.is_email_verified
 
         return token
 
