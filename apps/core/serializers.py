@@ -13,23 +13,16 @@ from apps.profiles.models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        required=True, min_length=4, max_length=15, validators=[UniqueValidator(queryset=User.objects.all())]
+        required=True, min_length=2, max_length=128,
     )
     email = serializers.EmailField(
         required=True, validators=[UniqueValidator(queryset=User.objects.all())]
     )
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
     class Meta:
         model = User
-        fields = ("username", "email", "password", "password2")
-
-    def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-
-        return attrs
+        fields = ("username", "email", "password")
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -104,14 +97,14 @@ class TokenBlacklistResponseSerializer(serializers.Serializer):
 class TokenPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
-        username = attrs["username"]
+        email = attrs["email"]
         user_model = get_user_model()
         try:
-            user = user_model.objects.get(Q(username=username) | Q(email=username.lower()))
-            attrs['username'] = user.username
+            user = user_model.objects.get(email=email)
+            attrs['email'] = user.email
         except user_model.DoesNotExist:
             raise NotFound(
-                _("There are no users with that Username or Email address")
+                _("There are no users with that Email address")
             )
         data = super(TokenPairSerializer, self).validate(attrs)
         return data
@@ -147,16 +140,19 @@ class PasswordFormSerializer(serializers.Serializer):
         required=True,
         validators=[validate_password],
     )
-    confirmed_password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
-    )
 
     def validate(self, attrs):
-        if attrs["password"] != attrs["confirmed_password"]:
+        super().validate(attrs)
+
+        user = self.context.get("user")
+        if not user:
             raise serializers.ValidationError(
-                {"password": "Password fields didn't match"}
+                {"user": "The user is not authenticated"}
+            )
+
+        if user.check_password(attrs["password"]):
+            raise serializers.ValidationError(
+                {"password": "The new password is the same as old one"}
             )
 
         return attrs
@@ -173,15 +169,6 @@ class PasswordChangeSerializer(PasswordFormSerializer):
         super().validate(attrs)
 
         user = self.context.get("user")
-        if not user:
-            raise serializers.ValidationError(
-                {"user": "The user is not authenticated"}
-            )
-
-        if user.check_password(attrs["password"]):
-            raise serializers.ValidationError(
-                {"password": "The new password is the same as old one"}
-            )
         if not user.check_password(attrs["old_password"]):
             raise serializers.ValidationError(
                 {"old_password": "Existing password is incorrect"}
