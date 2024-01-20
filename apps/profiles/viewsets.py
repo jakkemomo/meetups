@@ -1,10 +1,11 @@
 import logging
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
 
+from apps.core.utils import delete_image_if_exists
 from apps.profiles.models import UserRating, User
+from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
 from apps.profiles.serializers import (
     UserRatingListSerializer,
     UserRatingUpdateSerializer,
@@ -14,14 +15,11 @@ from apps.profiles.serializers import (
     ProfileUpdateSerializer,
     ProfileListSerializer,
 )
-from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
-from apps.core.utils import delete_image_if_exists
-
 
 logger = logging.getLogger("profiles_app")
 
 
-class UserRatingViewSet (viewsets.ModelViewSet):
+class UserRatingViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing user's ratings.
     """
@@ -36,7 +34,7 @@ class UserRatingViewSet (viewsets.ModelViewSet):
         defined in user_id position of the URL
         """
         return UserRating.objects.filter(user_rated_id=self.kwargs["user_id"])
-    
+
     def get_serializer_class(self):
         match self.action:
             case "retrieve":
@@ -53,7 +51,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated, ProfilePermissions, ]
     http_method_names = ["get", "put", "patch", "delete", ]
-
 
     def get_serializer_class(self):
         match self.action:

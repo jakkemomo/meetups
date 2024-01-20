@@ -1,4 +1,11 @@
-from .user_ratings import UserRatingListSerializer
-from .user_ratings import UserRatingRetrieveSerializer
-from .user_ratings import UserRatingCreateSerializer
-from .user_ratings import UserRatingUpdateSerializer
+from .profiles import (
+    ProfileRetrieveSerializer,
+    ProfileUpdateSerializer,
+    ProfileListSerializer,
+)
+from .user_ratings import (
+    UserRatingListSerializer,
+    UserRatingUpdateSerializer,
+    UserRatingCreateSerializer,
+    UserRatingRetrieveSerializer,
+)
