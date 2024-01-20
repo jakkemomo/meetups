@@ -28,6 +28,7 @@ from apps.core.serializers import (
     PasswordFormSerializer,
 )
 from apps.profiles.models import User
+from apps.core.helpers import decode_json_data
 
 logger = logging.getLogger("core_app")
 
@@ -165,9 +166,9 @@ class DecoratedTokenObtainPairView(TokenObtainPairView):
 
 class PasswordResetView(APIView):
     """
-    This view handles the request of an unauthorised user who has forgotten
-    his password and emailing him with a reset password link
-    with confirmation_token.
+    This view handles password reset requests from unauthenticated users.
+    Validates the user's email, generates a 'reset_token', and sends an email
+    with a password reset link containing the 'token'.
     """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
@@ -184,11 +185,14 @@ class PasswordResetView(APIView):
     )
     def post(self, request, *args, **kwargs):
         """
-        Validates the request data and sends a reset password email with
-        confirmation_token in query parameters to a user.
+        Validates the user's email from the request data,
+        generates a reset token, and sends a reset password email to the user.
+        The email contains a link with  encrypted JSON data
+        (including 'user_id' and 'reset_token') as a
+        'token' in the query parameters.
 
         Input: User's email
-        Result: Email confirmation_token with  sent
+        Result: Email with 'reset_token' sent
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -220,67 +224,10 @@ class PasswordResetView(APIView):
 
 class PasswordResetConfirmView(APIView):
     """
-    This view validates the confirmation token from the query parameters
-    and generates a new reset token then returning it in the response body.
-    """
-    permission_classes = (AllowAny,)
-
-    @swagger_auto_schema(
-        tags=['auth'],
-        manual_parameters=[
-            openapi.Parameter(
-                'user_id', openapi.IN_QUERY,
-                description="user unique id",
-                type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'confirmation_token',
-                openapi.IN_QUERY,
-                description="confirmation token",
-                type=openapi.TYPE_STRING
-            )
-        ],
-    )
-    def get(self, request, *args, **kwargs):
-        """
-        Validates the user_id and confirmation_token from the query parameters
-        and returns a new reset_token.
-
-        Input: None (query parameters)
-        Result: 200 response with reset_token in body
-        """
-        user_id = request.query_params.get('user_id', '')
-        confirmation_token = request.query_params.get('confirmation_token', '')
-        user_model = get_user_model()
-
-        try:
-            user = user_model.objects.get(id=user_id)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'Get user failed: {exc}')
-            user = None
-
-        if not user:
-            return Response(
-                'User not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        if not default_token_generator.check_token(user, confirmation_token):
-            return Response(
-                data='Token is invalid or expired. '
-                     'Please request another password changing.',
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        reset_token = default_token_generator.make_token(user)
-        return Response({"reset_token": reset_token})
-
-
-class PasswordResetChangeView(APIView):
-    """
-    This view validates the token from the query parameters from the
-    PasswordResetConfirmView's GET-request response and
-    changes user's password.
+    This view handles password reset confirmations.
+    Decodes the 'user_id' and 'reset_token' from the provided 'token' in the
+    URL, validates them, and changes the user's password to the new one
+    provided in the request data.
     """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
@@ -296,61 +243,84 @@ class PasswordResetChangeView(APIView):
         tags=['auth'],
         manual_parameters=[
             openapi.Parameter(
-                'user_id',
+                'token',
                 openapi.IN_QUERY,
-                description="user unique id",
-                type=openapi.TYPE_STRING,
-            ),
-            openapi.Parameter(
-                'reset_token',
-                openapi.IN_QUERY,
-                description="reset token",
-                type=openapi.TYPE_STRING,
+                description="token",
+                type=openapi.TYPE_STRING
             )
         ],
     )
     def post(self, request, *args, **kwargs):
         """
-        Validates the user_id and reset_token from the query parameters and
-        the new password from the request data, then changes user's password.
+        Decodes the JSON data from the 'token' in the query parameters of
+        the request. Validates 'user_id', 'reset_token', and a new 'password'
+        from the request data. If validation is successful,
+        changes the user's password to the new one.
 
-        Input: password, confirmed_password
-        Result: Password changed
+        Input: password
+        Result: Password is changed
         """
-        serializer = self.get_serializer(data=request.data)
-        user_id = request.query_params.get('user_id', '')
-        reset_token = request.query_params.get('reset_token', '')
+        token = request.query_params.get('token', '')
+
+        try:
+            data = decode_json_data(token)
+        except Exception as exc:
+            logger.warning(f'Decoding failed: {exc}')
+            data = None
+
+        if not data:
+            return Response(
+                data={
+                    "token": "Error decoding token. "
+                    "Please ensure your token is valid and properly formatted."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user_id = data.get('user_id', '')
+        reset_token = data.get('reset_token', '')
+
         user_model = get_user_model()
 
         try:
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'Get user failed: {exc}')
+            logger.warning(f'Post user failed: {exc}')
             user = None
 
         if not user:
             return Response(
-                data='User not found',
+                data={"user": "User not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if not default_token_generator.check_token(user, reset_token):
             return Response(
-                data='Token is invalid or expired. '
-                     'Please request another password changing.',
+                data={
+                    "token": "Token is invalid or expired. "
+                             "Please request another password changing.",
+                },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"user": user}
+        )
+
         if not serializer.is_valid():
             return Response(
-                serializer.errors,
+                data=serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         user.set_password(serializer.validated_data["password"])
         user.save()
 
-        return Response('Your password has been changed')
+        return Response(
+            data={"detail": "Your password has been changed"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class PasswordChangeView(APIView):

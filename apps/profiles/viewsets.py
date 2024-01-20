@@ -1,16 +1,24 @@
+import logging
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
+from apps.profiles.models import UserRating, User
 from apps.profiles.serializers import (
     UserRatingListSerializer,
     UserRatingUpdateSerializer,
     UserRatingCreateSerializer,
     UserRatingRetrieveSerializer,
+    ProfileRetrieveSerializer,
+    ProfileUpdateSerializer,
+    ProfileListSerializer,
 )
-from apps.profiles.permissions import UserRatingPermissions
-from apps.profiles.models import UserRating
+from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
+from apps.core.utils import delete_image_if_exists
+
+
+logger = logging.getLogger("profiles_app")
 
 
 class UserRatingViewSet (viewsets.ModelViewSet):
@@ -28,7 +36,7 @@ class UserRatingViewSet (viewsets.ModelViewSet):
         defined in user_id position of the URL
         """
         return UserRating.objects.filter(user_rated_id=self.kwargs["user_id"])
-
+    
     def get_serializer_class(self):
         match self.action:
             case "retrieve":
@@ -39,3 +47,26 @@ class UserRatingViewSet (viewsets.ModelViewSet):
                 return UserRatingUpdateSerializer
             case "list":
                 return UserRatingListSerializer
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, ProfilePermissions, ]
+    http_method_names = ["get", "put", "patch", "delete", ]
+
+
+    def get_serializer_class(self):
+        match self.action:
+            case "retrieve":
+                return ProfileRetrieveSerializer
+            case "list":
+                return ProfileListSerializer
+            case "update":
+                return ProfileUpdateSerializer
+            case "partial_update":
+                return ProfileUpdateSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        profile_instance = self.get_object()
+        delete_image_if_exists(profile_instance)
+        return super().destroy(request, *args, **kwargs)

@@ -8,5 +8,11 @@ class User(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
 
-    avatar_url = models.CharField(max_length=250, null=True, blank=True)
+    username = models.CharField(max_length=128, unique=False)
+    email = models.EmailField(max_length=255, unique=True)
+    image_url = models.CharField(max_length=250, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
+
+    # These fields are using in AbstractUser model
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username", ]
