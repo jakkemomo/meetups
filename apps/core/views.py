@@ -14,6 +14,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
+
 from apps.core import helpers
 from apps.core.serializers import (
     RegisterSerializer,
@@ -26,6 +27,7 @@ from apps.core.serializers import (
     PasswordResetSerializer,
     PasswordChangeSerializer,
     PasswordFormSerializer,
+    TokenObtainPairWithoutPasswordSerializer,
 )
 from apps.profiles.models import User
 from apps.core.helpers import decode_json_data
@@ -50,6 +52,7 @@ class RegisterView(generics.CreateAPIView):
 
 class VerifyEmailView(APIView):
     permission_classes = (AllowAny,)
+    serializer_class = TokenObtainPairWithoutPasswordSerializer
 
     @swagger_auto_schema(
         tags=['auth'],
@@ -61,32 +64,62 @@ class VerifyEmailView(APIView):
                                              description="confirmation token",
                                              type=openapi.TYPE_STRING)],
         responses={
-            status.HTTP_200_OK: 'Email successfully confirmed',
-            status.HTTP_400_BAD_REQUEST: 'Token is invalid or expired',
-            status.HTTP_404_NOT_FOUND: 'User not found',
-        },
+            status.HTTP_200_OK: '{"refresh": ..., "access": ...}',
+            status.HTTP_400_BAD_REQUEST: "Token is invalid or expired OR "
+                                         "Email is already verified",
+            status.HTTP_404_NOT_FOUND: "User not found",
+        }
+
     )
     def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id', '')
-        confirmation_token = request.query_params.get('confirmation_token', '')
+        token = request.query_params.get('token', '')
+
+        try:
+            data = decode_json_data(token)
+        except Exception as exc:
+            logger.warning(f'Decoding failed: {exc}')
+            data = None
+
+        user_id = data.get('user_id', '')
+        confirmation_token = data.get('confirmation_token', '')
+
         user_model = get_user_model()
+
         try:
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
             logger.warning(f'warning: {__name__}: {exc}')
             user = None
+
         if user is None:
-            return Response('User not found', status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                'User not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         if user.is_email_verified:
-            return Response('Email is already verified',
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                'Email is already verified',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not default_token_generator.check_token(user, confirmation_token):
             return Response(
-                'Token is invalid or expired. Please request another confirmation email by signing in.',
-                status=status.HTTP_400_BAD_REQUEST)
+                'Token is invalid or expired. '
+                'Please request another confirmation email by signing in.',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         user.is_email_verified = True
         user.save()
-        return Response('Email successfully confirmed')
+
+        token_obtain_pair = self.serializer_class(
+            data={"email": user.email}
+        )
+        token_obtain_pair.is_valid(raise_exception=True)
+        access_token = token_obtain_pair.validated_data
+
+        return Response(access_token, status=status.HTTP_200_OK)
 
 
 class ReverifyEmailView(generics.CreateAPIView):
@@ -272,7 +305,7 @@ class PasswordResetConfirmView(APIView):
             return Response(
                 data={
                     "token": "Error decoding token. "
-                    "Please ensure your token is valid and properly formatted."
+                             "Please ensure your token is valid and properly formatted."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )

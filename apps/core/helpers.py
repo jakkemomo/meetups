@@ -11,7 +11,18 @@ from config import settings
 
 def send_verification_email(user):
     confirmation_token = default_token_generator.make_token(user)
-    verification_link = f'{settings.VERIFY_EMAIL_URL}?user_id={user.id}&confirmation_token={confirmation_token}'
+    data = {
+        'user_id': user.id,
+        'confirmation_token': confirmation_token
+    }
+
+    token = encode_json_data(data)
+
+    verification_link = (
+        f'{settings.VERIFY_EMAIL_URL}'
+        f'?token={token}'
+    )
+
     subject = 'Activate your account'
     message = render_to_string(
         'emails/email_verification.html',
