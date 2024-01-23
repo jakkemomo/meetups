@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profiles', '0007_user_is_email_verified'),
+        ('profiles', '0008_rename_avatar_url_user_image_url'),
     ]
 
     operations = [
