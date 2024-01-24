@@ -8,7 +8,11 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
+<<<<<<<< HEAD:apps/profiles/migrations/0010_userrating.py
         ('profiles', '0009_alter_user_email_alter_user_username'),
+========
+        ('profiles', '0008_rename_avatar_url_user_image_url'),
+>>>>>>>> origin/feature/8693ketzk-Add-location-entity:apps/profiles/migrations/0009_userrating.py
     ]
 
     operations = [
