@@ -14,7 +14,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=255, unique=True)
     image_url = models.CharField(max_length=250, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.DO_NOTHING, default=1)
 
     # These fields are using in AbstractUser model
     USERNAME_FIELD = "email"
