@@ -7,7 +7,6 @@ from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists
 from apps.profiles.models import UserRating, User
-from apps.profiles.models.location import Location
 from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
 from apps.profiles.serializers import (
     UserRatingListSerializer,
