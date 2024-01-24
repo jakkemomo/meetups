@@ -6,11 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-<<<<<<<< HEAD:apps/profiles/migrations/0011_alter_userrating_value.py
         ('profiles', '0010_userrating'),
-========
-        ('profiles', '0009_userrating'),
->>>>>>>> origin/feature/8693ketzk-Add-location-entity:apps/profiles/migrations/0010_alter_userrating_value.py
     ]
 
     operations = [
