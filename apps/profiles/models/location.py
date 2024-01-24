@@ -10,9 +10,9 @@ from apps.core.models import AbstractBaseModel
 class Location(AbstractBaseModel):
     TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
-    name = models.CharField(max_length=255, null=True, blank=True)
-    country = models.CharField(max_length=255, null=True, blank=True)
-    center = PointField(default=Point(27.561831, 53.902284))
+    name = models.CharField(max_length=255, default="Minsk")
+    country = models.CharField(max_length=255, default="BY")
+    center = PointField(geography=True, default=Point(27.561831, 53.902284))
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='Europe/Minsk')
 
     class Meta:

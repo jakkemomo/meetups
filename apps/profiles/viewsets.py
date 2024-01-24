@@ -1,10 +1,13 @@
 import logging
 
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists
 from apps.profiles.models import UserRating, User
+from apps.profiles.models.location import Location
 from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
 from apps.profiles.serializers import (
     UserRatingListSerializer,
@@ -15,6 +18,7 @@ from apps.profiles.serializers import (
     ProfileUpdateSerializer,
     ProfileListSerializer,
 )
+from apps.profiles.serializers.locations import UserLocationRetrieveSerializer, UserLocationUpdateSerializer
 
 logger = logging.getLogger("profiles_app")
 
@@ -67,3 +71,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         profile_instance = self.get_object()
         delete_image_if_exists(profile_instance)
         return super().destroy(request, *args, **kwargs)
+
+    @action(detail=False, methods=["get"], url_path="me/location", url_name="my-location")
+    def location(self, request, *_, **__):
+        user = User.objects.get(email=request.user.email)
+        serializer = UserLocationRetrieveSerializer(user.location, many=False)
+        return Response(serializer.data)
