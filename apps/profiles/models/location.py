@@ -20,7 +20,6 @@ class Location(AbstractBaseModel):
         verbose_name = "Location"
         verbose_name_plural = "Locations"
         db_table = 'location'
-        unique_together = ('name', 'country',)
 
     def __str__(self):
         return f"{self.name} ({self.country})"

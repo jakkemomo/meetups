@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
 from apps.profiles.models import User
-from apps.core.utils import delete_image_if_exists
-from apps.profiles.serializers.locations import UserLocationRetrieveSerializer
+from apps.core.utils import delete_image_if_exists, validate_location
+from apps.profiles.serializers.locations import LocationRetrieveSerializer, LocationUpdateSerializer
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
-    location = UserLocationRetrieveSerializer(many=False)
+    location = LocationRetrieveSerializer(many=False)
 
     class Meta:
         model = User
@@ -31,6 +31,22 @@ class ProfileListSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
         )
+
+
+class ProfileUpdateLocationSerializer(serializers.ModelSerializer):
+    location = LocationUpdateSerializer(many=False)
+
+    class Meta:
+        model = User
+        fields = ("location", )
+
+    def update(self, instance, validated_data):
+        if "location" in validated_data:
+            new_location = validate_location(validated_data["location"])
+            if instance.location != new_location:
+                instance.location = new_location
+                instance.save()
+        return instance
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):

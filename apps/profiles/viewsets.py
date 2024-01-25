@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -17,7 +17,8 @@ from apps.profiles.serializers import (
     ProfileUpdateSerializer,
     ProfileListSerializer,
 )
-from apps.profiles.serializers.locations import UserLocationRetrieveSerializer, UserLocationUpdateSerializer
+from apps.profiles.serializers.locations import LocationRetrieveSerializer
+from apps.profiles.serializers.profiles import ProfileUpdateLocationSerializer
 
 logger = logging.getLogger("profiles_app")
 
@@ -65,6 +66,10 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 return ProfileUpdateSerializer
             case "partial_update":
                 return ProfileUpdateSerializer
+            case "location":
+                return LocationRetrieveSerializer
+            case "update_location":
+                return ProfileUpdateLocationSerializer
 
     def destroy(self, request, *args, **kwargs):
         profile_instance = self.get_object()
@@ -73,6 +78,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="me/location", url_name="my-location")
     def location(self, request, *_, **__):
-        user = User.objects.get(email=request.user.email)
-        serializer = UserLocationRetrieveSerializer(user.location, many=False)
+        profile = User.objects.get(email=request.user.email)
+        serializer = LocationRetrieveSerializer(profile.location, many=False)
         return Response(serializer.data)
+
+    @location.mapping.put
+    def update_location(self, request, *_, **__):
+        profile = User.objects.get(email=request.user.email)
+        serializer = ProfileUpdateLocationSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
