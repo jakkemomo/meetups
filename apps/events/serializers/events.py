@@ -1,7 +1,7 @@
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
-from apps.events.models import Event, Tag, Category
+from apps.events.models import Event, Tag, Category, FavoriteEvent
 from apps.profiles.models import User
 
 
@@ -129,4 +129,12 @@ class EventRetrieveSerializer(BaseEventSerializer):
 
 
 class EventRegisterSerializer(serializers.Serializer):
+    pass
+
+
+class EventFavoriteAddSerializer (serializers.Serializer):
+    pass
+
+
+class EventFavoriteDeleteSerializer (serializers.Serializer):
     pass

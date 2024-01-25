@@ -9,7 +9,9 @@ from .events import (
     EventUpdateSerializer,
     EventRetrieveSerializer,
     EventListSerializer,
-    EventRegisterSerializer
+    EventRegisterSerializer,
+    EventFavoriteAddSerializer,
+    EventFavoriteDeleteSerializer,
 )
 from .ratings import (
     RatingCreateSerializer,

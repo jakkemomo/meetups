@@ -16,5 +16,7 @@ class EventPermissions(permissions.BasePermission):
             return is_verified(request) and not is_participant(request, obj)
         elif view.action == 'leave_from_event':
             return is_verified(request) and is_participant(request, obj)
+        elif view.action == 'add_to_favorite' or 'delete_from_favorite':
+            return request.user.is_authenticated
         else:
             return False
