@@ -26,10 +26,7 @@ def validate_location(data: dict[str, str | None]):
         try:
             new_location = Location.objects.get(name=new_loc_name, country=new_loc_country)
             return new_location
-        except Location.DoesNotExist as exc:
-            logger.error(
-                f"An error occurred while updating current user location: .\n{exc}"
-            )
+        except Location.DoesNotExist as _:
             raise serializers.ValidationError(
                 {"location": f"There are no location with name: `{new_loc_name}` and country: `{new_loc_country}`"}
             )
