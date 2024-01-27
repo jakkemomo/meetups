@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -14,6 +15,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.core import helpers
 from apps.core.serializers import (
@@ -27,7 +29,6 @@ from apps.core.serializers import (
     PasswordResetSerializer,
     PasswordChangeSerializer,
     PasswordFormSerializer,
-    TokenObtainPairWithoutPasswordSerializer,
 )
 from apps.profiles.models import User
 from apps.core.helpers import decode_json_data
@@ -52,7 +53,6 @@ class RegisterView(generics.CreateAPIView):
 
 class VerifyEmailView(APIView):
     permission_classes = (AllowAny,)
-    serializer_class = TokenObtainPairWithoutPasswordSerializer
 
     @swagger_auto_schema(
         tags=['auth'],
@@ -113,13 +113,15 @@ class VerifyEmailView(APIView):
         user.is_email_verified = True
         user.save()
 
-        token_obtain_pair = self.serializer_class(
-            data={"email": user.email}
-        )
-        token_obtain_pair.is_valid(raise_exception=True)
-        access_token = token_obtain_pair.validated_data
+        refresh = RefreshToken.for_user(user)
+        refresh.access_token.set_exp(lifetime=timedelta(hours=1))
 
-        return Response(access_token, status=status.HTTP_200_OK)
+        return Response(
+            data={
+                'access': str(refresh.access_token),
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ReverifyEmailView(generics.CreateAPIView):
