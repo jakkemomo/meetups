@@ -32,7 +32,7 @@ if SERVICE_URL:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SERVICE_ACCOUNT = True
 else:
-    SERVICE_URL = "http://localhost:8000"
+    SERVICE_URL = "http://localhost:8000/"
     ALLOWED_HOSTS = ['*']
 
 
@@ -158,11 +158,11 @@ AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
 VERIFY_EMAIL_URL = os.getenv(
     "VERIFY_EMAIL_URL",
-    f"{SERVICE_URL}/api/v1/verify/email/"
+    f"{SERVICE_URL}api/v1/verify/email/"
 )
 CONFIRM_PASSWORD_RESET_URL = os.getenv(
     "CONFIRM_FORGOT_PASSWORD_URL",
-    f"{SERVICE_URL}/api/v1/password/reset/confirm/"
+    f"{SERVICE_URL}api/v1/password/reset/confirm/"
 )
 
 # Default primary key field type
