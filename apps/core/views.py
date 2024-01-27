@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -14,6 +15,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from apps.core import helpers
 from apps.core.serializers import (
     RegisterSerializer,
@@ -61,32 +64,74 @@ class VerifyEmailView(APIView):
                                              description="confirmation token",
                                              type=openapi.TYPE_STRING)],
         responses={
-            status.HTTP_200_OK: 'Email successfully confirmed',
-            status.HTTP_400_BAD_REQUEST: 'Token is invalid or expired',
-            status.HTTP_404_NOT_FOUND: 'User not found',
-        },
+            status.HTTP_200_OK: '{"refresh": ..., "access": ...}',
+            status.HTTP_400_BAD_REQUEST: "Token is invalid or expired OR "
+                                         "Email is already verified",
+            status.HTTP_404_NOT_FOUND: "User not found",
+        }
+
     )
     def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id', '')
-        confirmation_token = request.query_params.get('confirmation_token', '')
+        token = request.query_params.get('token')
+
+        try:
+            data = decode_json_data(token)
+        except Exception as exc:
+            logger.warning(f'Decoding failed: {exc}')
+
+            return Response(
+                'Invalid payload.',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_id = data['user_id']
+            confirmation_token = data['confirmation_token']
+        except KeyError as exc:
+            logger.warning(f'Data not found: {exc}')
+
+            return Response(
+                'Invalid token.',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user_model = get_user_model()
+
         try:
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
             logger.warning(f'warning: {__name__}: {exc}')
-            user = None
-        if user is None:
-            return Response('User not found', status=status.HTTP_404_NOT_FOUND)
+
+            return Response(
+                'User not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         if user.is_email_verified:
-            return Response('Email is already verified',
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                'Email is already verified',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not default_token_generator.check_token(user, confirmation_token):
             return Response(
-                'Token is invalid or expired. Please request another confirmation email by signing in.',
-                status=status.HTTP_400_BAD_REQUEST)
+                'Token is invalid or expired. '
+                'Please request another confirmation email by signing in.',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         user.is_email_verified = True
         user.save()
-        return Response('Email successfully confirmed')
+
+        refresh = RefreshToken.for_user(user)
+        refresh.access_token.set_exp(lifetime=timedelta(hours=1))
+
+        return Response(
+            data={
+                'access': str(refresh.access_token),
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ReverifyEmailView(generics.CreateAPIView):
@@ -272,7 +317,7 @@ class PasswordResetConfirmView(APIView):
             return Response(
                 data={
                     "token": "Error decoding token. "
-                    "Please ensure your token is valid and properly formatted."
+                             "Please ensure your token is valid and properly formatted."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
