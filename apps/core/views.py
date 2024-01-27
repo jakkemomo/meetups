@@ -72,16 +72,28 @@ class VerifyEmailView(APIView):
 
     )
     def get(self, request, *args, **kwargs):
-        token = request.query_params.get('token', '')
+        token = request.query_params.get('token')
 
         try:
             data = decode_json_data(token)
         except Exception as exc:
             logger.warning(f'Decoding failed: {exc}')
-            data = None
 
-        user_id = data.get('user_id', '')
-        confirmation_token = data.get('confirmation_token', '')
+            return Response(
+                'Invalid payload.',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_id = data['user_id']
+            confirmation_token = data['confirmation_token']
+        except KeyError as exc:
+            logger.warning(f'Data not found: {exc}')
+
+            return Response(
+                'Invalid token.',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         user_model = get_user_model()
 
@@ -89,9 +101,7 @@ class VerifyEmailView(APIView):
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
             logger.warning(f'warning: {__name__}: {exc}')
-            user = None
 
-        if user is None:
             return Response(
                 'User not found',
                 status=status.HTTP_404_NOT_FOUND
