@@ -26,8 +26,6 @@ from apps.events.serializers import (
     TagListSerializer,
     GeoJsonSerializer,
     EventRegisterSerializer,
-    EventFavoriteAddSerializer,
-    EventFavoriteDeleteSerializer,
 )
 
 from apps.core.utils import delete_image_if_exists
@@ -110,10 +108,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventRegisterSerializer
             case "leave_from_event":
                 return EventRegisterSerializer
-            case 'event_favorite_add':
-                return EventFavoriteAddSerializer
-            case 'event_favorite_delete':
-                return EventFavoriteDeleteSerializer
 
     @swagger_auto_schema(
         request_body=no_body
@@ -158,8 +152,6 @@ class EventViewSet(viewsets.ModelViewSet):
         url_name='event_favorite_add'
     )
     def add_to_favorite(self, request, event_id: int):
-        event = self.get_object()
-        event_id = event.id
         user_id = request.user.id
         favorite = FavoriteEvent(event_id=event_id, user_id=user_id)
         favorite.save()
@@ -177,7 +169,7 @@ class EventViewSet(viewsets.ModelViewSet):
     )
     def delete_from_favorite(self, request, event_id: int):
         user_id = request.user.id
-        FavoriteEvent.objects.filter(user_id=user_id).delete()
+        FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
 
 

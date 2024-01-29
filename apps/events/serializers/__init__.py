@@ -10,8 +10,6 @@ from .events import (
     EventRetrieveSerializer,
     EventListSerializer,
     EventRegisterSerializer,
-    EventFavoriteAddSerializer,
-    EventFavoriteDeleteSerializer,
 )
 from .ratings import (
     RatingCreateSerializer,
