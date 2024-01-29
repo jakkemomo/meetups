@@ -112,7 +112,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventRegisterSerializer
             case 'event_favorite_add':
                 return EventFavoriteAddSerializer
-            case'event_favorite_delete':
+            case 'event_favorite_delete':
                 return EventFavoriteDeleteSerializer
 
     @swagger_auto_schema(
@@ -157,7 +157,7 @@ class EventViewSet(viewsets.ModelViewSet):
         url_path='favorite',
         url_name='event_favorite_add'
     )
-    def add_to_favorite (self, request, event_id: int):
+    def add_to_favorite(self, request, event_id: int):
         event = self.get_object()
         event_id = event.id
         user_id = request.user.id
@@ -175,12 +175,13 @@ class EventViewSet(viewsets.ModelViewSet):
         url_path='defavorite',
         url_name='event_favorite_delete'
     )
-    def delete_from_favorite (self, request, event_id: int):
+    def delete_from_favorite(self, request, event_id: int):
         event_id = event_id
         user_id = request.user.id
         favorite = FavoriteEvent.objects.get(event_id=event_id, user_id=user_id)
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class RatingViewSet(viewsets.ModelViewSet):
     """
