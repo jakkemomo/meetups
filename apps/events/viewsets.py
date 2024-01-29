@@ -178,7 +178,7 @@ class EventViewSet(viewsets.ModelViewSet):
     def delete_from_favorite(self, request, event_id: int):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK)
 
 
 class RatingViewSet(viewsets.ModelViewSet):
