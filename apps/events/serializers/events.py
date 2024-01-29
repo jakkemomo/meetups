@@ -133,8 +133,8 @@ class EventRegisterSerializer(serializers.Serializer):
 
 
 class EventFavoriteAddSerializer(serializers.Serializer):
-    None
+    pass
 
 
 class EventFavoriteDeleteSerializer(serializers.Serializer):
-    None
+    pass
