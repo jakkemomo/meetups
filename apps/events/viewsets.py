@@ -176,10 +176,10 @@ class EventViewSet(viewsets.ModelViewSet):
         url_name='event_favorite_delete'
     )
     def delete_from_favorite(self, request, event_id: int):
-        event_id = event_id
+
         user_id = request.user.id
-        favorite = FavoriteEvent.objects.get(event_id=event_id, user_id=user_id)
-        favorite.delete()
+        FavoriteEvent.objects.filter(user_id=user_id).delete()
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
