@@ -9,7 +9,7 @@ from .events import (
     EventUpdateSerializer,
     EventRetrieveSerializer,
     EventListSerializer,
-    EventRegisterSerializer
+    EventRegisterSerializer,
 )
 from .ratings import (
     RatingCreateSerializer,
