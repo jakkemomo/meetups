@@ -2,6 +2,7 @@ import json
 
 from django.core.serializers import serialize
 from django.db.models import Q, Count
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
@@ -58,8 +59,9 @@ class EventViewSet(viewsets.ModelViewSet):
 
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
-    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter]
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name']
+    filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name']
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
@@ -83,6 +85,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
+        city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:
