@@ -11,7 +11,7 @@ class TrigramSimilaritySearchFilter(SearchFilter):
     search_description = _('A search term.')
 
     def get_trigram_similarity(self, view, request):
-        return getattr(view, 'trigram_similarity', 0.3)
+        return getattr(view, 'trigram_similarity', 0.2)
 
     def get_search_terms(self, request):
         """
