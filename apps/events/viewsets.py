@@ -5,10 +5,12 @@ from django.db.models import Q, Count
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
 from apps.events.serializers import (
@@ -56,6 +58,9 @@ class EventViewSet(viewsets.ModelViewSet):
 
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter]
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name']
+    ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
     def get_template_names(self):

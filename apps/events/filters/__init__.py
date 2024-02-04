@@ -1,0 +1,1 @@
+from .trigram_search import TrigramSimilaritySearchFilter
