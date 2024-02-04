@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from apps.events.models import Event, Rating, Tag
+from apps.events.models import Event, Rating, Tag, FavoriteEvent
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
 from apps.events.serializers import (
     EventListSerializer,
@@ -25,7 +25,7 @@ from apps.events.serializers import (
     TagUpdateSerializer,
     TagListSerializer,
     GeoJsonSerializer,
-    EventRegisterSerializer
+    EventRegisterSerializer,
 )
 
 from apps.core.utils import delete_image_if_exists
@@ -139,6 +139,37 @@ class EventViewSet(viewsets.ModelViewSet):
         event = self.get_object()
         event.participants.remove(request.user.id)
         event.save()
+        return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[EventPermissions],
+        url_path='favorite',
+        url_name='event_favorite_add'
+    )
+    def add_to_favorite(self, request, event_id: int):
+        user_id = request.user.id
+        favorite = FavoriteEvent(event_id=event_id, user_id=user_id)
+        favorite.save()
+        return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @action(
+        methods=['delete'],
+        detail=True,
+        permission_classes=[EventPermissions],
+        url_path='defavorite',
+        url_name='event_favorite_delete'
+    )
+    def delete_from_favorite(self, request, event_id: int):
+        user_id = request.user.id
+        FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
 
 
