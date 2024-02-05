@@ -1,20 +1,25 @@
 import os
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.test_settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.core import mail
+from django.test.utils import override_settings
 
 from apps.profiles.models.users import User
+from config.settings import SERVICE_URL
 
 
 class SignupTests(APITestCase):
     def setUp(self):
-        self.path = "http://127.0.0.1:8000/api/v1/signup/"
+        self.path = f"{SERVICE_URL}api/v1/signup/"
 
+    @override_settings(
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_valid(self):
         data = {
             "username": "test",
@@ -47,6 +52,7 @@ class SignupTests(APITestCase):
         self.assertEqual(mail.outbox[0].subject, 'Activate your account')
         self.assertEqual(mail.outbox[0].to, [user.email])
 
+    # username field
     def test_username_not_provided(self):
         data = {
             "email": "user@example.com",
@@ -120,6 +126,7 @@ class SignupTests(APITestCase):
         )
         self.assertFalse(User.objects.filter(email=data.get("email")).first())
 
+    # email field
     def test_email_not_provided(self):
         data = {
             "username": "test",
@@ -163,24 +170,7 @@ class SignupTests(APITestCase):
         )
         self.assertFalse(User.objects.filter(email=data.get("email")).first())
 
-    def test_email_exists(self):
-        path = "http://127.0.0.1:8000/api/v1/signup/"
-        data = {
-            "username": "test",
-            "email": "user@example.com",
-            "password": "test",
-        }
-        self.client.post(path=path, data=data, format="json")
-        response = self.client.post(path=path, data=data, format="json")
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.data,
-            {"email": ["This field must be unique."],
-             }
-        )
-        self.assertTrue(User.objects.filter(email=data.get("email")).first())
-
+    # password field
     def test_password_not_provided(self):
         data = {
             "email": "user@example.com",
@@ -210,3 +200,32 @@ class SignupTests(APITestCase):
             }
         )
         self.assertFalse(User.objects.filter(email=data.get("email")).first())
+
+
+class SignupTestsUserExists(APITestCase):
+    def setUp(self):
+        self.path = f"{SERVICE_URL}api/v1/signup/"
+        self.data = {
+            "username": "test",
+            "email": "user@example.com",
+            "password": "test",
+        }
+        self.client.post(path=self.path, data=self.data, format="json")
+
+    # email field
+    def test_email_exists(self):
+        response = self.client.post(
+            path=self.path,
+            data=self.data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data,
+            {"email": ["This field must be unique."],
+             }
+        )
+        self.assertTrue(
+            User.objects.filter(email=self.data.get("email")).first()
+        )
