@@ -22,5 +22,5 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    list_display = ("name", "country", "center", "timezone")
+    list_display = ("id", "name", "country", "center", "timezone")
     search_fields = ("name", "country")

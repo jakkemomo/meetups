@@ -77,7 +77,7 @@
       "created_at": "2024-01-23T08:51:49.537Z",
       "updated_by": null,
       "updated_at": "2024-01-23T08:51:49.537Z",
-      "city": "Warsaw",
+      "name": "Warsaw",
       "country": "PL",
       "center": "POINT(52.2319581 21.0067249)",
       "timezone": "Europe/Warsaw"

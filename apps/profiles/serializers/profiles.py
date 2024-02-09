@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists
-from apps.profiles.serializers.cities import CityRetrieveSerializer
+from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
@@ -34,6 +34,8 @@ class ProfileListSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    city = CityUpdateSerializer(many=False)
+
     class Meta:
         model = User
         fields = (
@@ -42,10 +44,17 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "email",
             "image_url",
             "is_email_verified",
+            "city",
         )
 
     def update(self, instance, validated_data):
         if 'image_url' in validated_data and not validated_data['image_url']:
             delete_image_if_exists(instance)
+
+        if "city" in validated_data:
+            new_city = validate_city(validated_data["city"])
+            if instance.city != new_city:
+                instance.city = new_city
+                instance.save()
 
         return super().update(instance, validated_data)

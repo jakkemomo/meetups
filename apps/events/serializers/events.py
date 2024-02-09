@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category
 from apps.profiles.models import User
+from apps.profiles.serializers.cities import CityRetrieveSerializer
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
@@ -116,6 +117,7 @@ class EventRetrieveSerializer(BaseEventSerializer):
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
+    city = CityRetrieveSerializer(many=False)
     participants_number = serializers.IntegerField()
 
     def get_location(self, obj):

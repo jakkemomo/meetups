@@ -19,4 +19,4 @@ class CityRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = City
-        fields = ["name", "country", "center", "timezone"]
+        fields = ["id", "name", "country", "center", "timezone"]
