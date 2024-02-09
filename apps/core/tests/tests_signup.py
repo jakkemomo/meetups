@@ -5,40 +5,36 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from rest_framework import status
-from rest_framework.test import APITestCase
 from django.core import mail
 from django.test.utils import override_settings
 
 from apps.profiles.models.users import User
-from config.settings import SERVICE_URL
+from apps.core.tests.models import CoreTestsBase
 
 
-class SignupTests(APITestCase):
-    def setUp(self):
-        self.path = f"{SERVICE_URL}api/v1/signup/"
+class SignupTests(CoreTestsBase):
 
     @override_settings(
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
     def test_valid(self):
-        data = {
-            "username": "test",
-            "email": "user@example.com",
-            "password": "test",
-        }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=self.DATA,
+            format="json",
+        )
 
         # Testing response
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             response.data,
             {
-                "username": data.get("username"),
-                "email": data.get("email")
+                "username": self.DATA.get("username"),
+                "email": self.DATA.get("email")
             }
         )
 
-        user = User.objects.filter(email=data.get("email")).first()
+        user = User.objects.filter(email=self.DATA.get("email")).first()
 
         # Testing user
         self.assertTrue(user)
@@ -58,7 +54,11 @@ class SignupTests(APITestCase):
             "email": "user@example.com",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -73,7 +73,11 @@ class SignupTests(APITestCase):
             "email": "user@example.com",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -88,7 +92,11 @@ class SignupTests(APITestCase):
             "email": "user@example.com",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -114,7 +122,11 @@ class SignupTests(APITestCase):
             "email": "user@example.com",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -132,7 +144,11 @@ class SignupTests(APITestCase):
             "username": "test",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -146,7 +162,11 @@ class SignupTests(APITestCase):
             "email": "",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -162,7 +182,10 @@ class SignupTests(APITestCase):
             "email": "invalid@mail",
             "password": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data, format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -176,7 +199,11 @@ class SignupTests(APITestCase):
             "email": "user@example.com",
             "username": "test",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -191,7 +218,11 @@ class SignupTests(APITestCase):
             "email": "user@example.com",
             "password": "",
         }
-        response = self.client.post(path=self.path, data=data, format="json")
+        response = self.client.post(
+            path=self.SIGNUP_PATH,
+            data=data,
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -202,30 +233,23 @@ class SignupTests(APITestCase):
         self.assertFalse(User.objects.filter(email=data.get("email")).first())
 
 
-class SignupTestsUserExists(APITestCase):
+class SignupTestsUserExists(CoreTestsBase):
     def setUp(self):
-        self.path = f"{SERVICE_URL}api/v1/signup/"
-        self.data = {
-            "username": "test",
-            "email": "user@example.com",
-            "password": "test",
-        }
-        self.client.post(path=self.path, data=self.data, format="json")
+        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
 
     # email field
     def test_email_exists(self):
         response = self.client.post(
-            path=self.path,
-            data=self.data,
+            path=self.SIGNUP_PATH,
+            data=self.DATA,
             format="json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data,
-            {"email": ["This field must be unique."],
-             }
+            {"email": ["This field must be unique."]},
         )
         self.assertTrue(
-            User.objects.filter(email=self.data.get("email")).first()
+            User.objects.filter(email=self.DATA.get("email")).first()
         )
