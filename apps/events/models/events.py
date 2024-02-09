@@ -21,7 +21,7 @@ class Event(AbstractBaseModel):
     tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True, default="Minsk")
-    city = models.ForeignKey(City, on_delete=models.SET_DEFAULT, default=1)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=True, null=True)
     location = PointField(default=Point(27.561831, 53.902284))
     type = fields.CharField(
         max_length=10,
