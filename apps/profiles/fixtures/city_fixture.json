@@ -1,0 +1,86 @@
+[
+  {
+    "model": "profiles.city",
+    "pk": 1,
+    "fields": {
+      "created_by": null,
+      "created_at": "2024-01-23T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2024-01-23T08:51:49.537Z",
+      "name": "Unknown",
+      "country": "World",
+      "center": "POINT(53.9024716 27.5618225)",
+      "timezone": "UTC"
+    }
+  },
+  {
+    "model": "profiles.city",
+    "pk": 2,
+    "fields": {
+      "created_by": null,
+      "created_at": "2024-01-23T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2024-01-23T08:51:49.537Z",
+      "name": "Minsk",
+      "country": "BY",
+      "center": "POINT(53.9024716 27.5618225)",
+      "timezone": "Europe/Minsk"
+    }
+  },
+  {
+    "model": "profiles.city",
+    "pk": 3,
+    "fields": {
+      "created_by": null,
+      "created_at": "2024-01-23T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2024-01-23T08:51:49.537Z",
+      "name": "Moscow",
+      "country": "RU",
+      "center": "POINT(55.7504461 37.6174943)",
+      "timezone": "Europe/Moscow"
+    }
+  },
+  {
+    "model": "profiles.city",
+    "pk": 4,
+    "fields": {
+      "created_by": null,
+      "created_at": "2024-01-23T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2024-01-23T08:51:49.537Z",
+      "name": "Kyiv",
+      "country": "UA",
+      "center": "POINT(50.4500336 30.5241361)",
+      "timezone": "Europe/Kyiv"
+    }
+  },
+  {
+    "model": "profiles.city",
+    "pk": 5,
+    "fields": {
+      "created_by": null,
+      "created_at": "2024-01-23T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2024-01-23T08:51:49.537Z",
+      "name": "Astana",
+      "country": "KZ",
+      "center": "POINT(51.1282205 71.4306682)",
+      "timezone": "Asia/Almaty"
+    }
+  },
+  {
+    "model": "profiles.city",
+    "pk": 6,
+    "fields": {
+      "created_by": null,
+      "created_at": "2024-01-23T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2024-01-23T08:51:49.537Z",
+      "city": "Warsaw",
+      "country": "PL",
+      "center": "POINT(52.2319581 21.0067249)",
+      "timezone": "Europe/Warsaw"
+    }
+  }
+]
