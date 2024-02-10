@@ -9,12 +9,18 @@ from .events import (
     EventUpdateSerializer,
     EventRetrieveSerializer,
     EventListSerializer,
-    EventRegisterSerializer,
+    EmptySerializer,
 )
 from .ratings import (
     RatingCreateSerializer,
     RatingRetrieveSerializer,
     RatingUpdateSerializer,
     RatingListSerializer,
+)
+from .review import (
+    ReviewListSerializer,
+    ReviewCreateSerializer,
+    ReviewUpdateSerializer,
+    ReviewRetrieveSerializer
 )
 from .map import GeoJsonSerializer

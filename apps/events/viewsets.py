@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.events.filters import TrigramSimilaritySearchFilter
-from apps.events.models import Event, Rating, Tag, FavoriteEvent
+from apps.events.models import Event, Rating, Tag, FavoriteEvent, Review
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
 from apps.events.serializers import (
     EventListSerializer,
@@ -28,7 +28,8 @@ from apps.events.serializers import (
     TagUpdateSerializer,
     TagListSerializer,
     GeoJsonSerializer,
-    EventRegisterSerializer,
+    EmptySerializer, ReviewRetrieveSerializer, ReviewCreateSerializer, ReviewUpdateSerializer,
+    ReviewListSerializer,
 )
 
 from apps.core.utils import delete_image_if_exists
@@ -85,7 +86,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        city = self.request.query_params.get('city')
+        # city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:
@@ -113,9 +114,13 @@ class EventViewSet(viewsets.ModelViewSet):
             case "partial_update":
                 return EventUpdateSerializer
             case "register_for_event":
-                return EventRegisterSerializer
+                return EmptySerializer
             case "leave_from_event":
-                return EventRegisterSerializer
+                return EmptySerializer
+            case "add_to_favorite":
+                return EmptySerializer
+            case "delete_from_favorite":
+                return EmptySerializer
 
     @swagger_auto_schema(
         request_body=no_body
@@ -255,3 +260,27 @@ class MarkerViewSet(mixins.ListModelMixin, GenericViewSet):
                 fields=["id", "name", "start_date", "end_date", "description", "address"])
         )
         return Response(geo_events, status=status.HTTP_200_OK)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    model = Review
+    permission_classes = [IsAuthenticatedOrReadOnly, ]
+    http_method_names = ["post", "get", "put", "delete"]
+
+    def get_serializer_class(self):
+        match self.action:
+            case "retrieve":
+                return ReviewRetrieveSerializer
+            case "create":
+                return ReviewCreateSerializer
+            case "update":
+                return ReviewUpdateSerializer
+            case "list":
+                return ReviewListSerializer
+
+    def list(self, request, *args, **kwargs):
+        event = self.get_object()
+        queryset = Review.objects.filter(event=event)
+        serializer = ReviewListSerializer(queryset, many=True, context={"request": request})
+
+        return Response(serializer.data)
