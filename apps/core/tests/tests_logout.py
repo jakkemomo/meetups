@@ -1,30 +1,19 @@
 import os
 import django
-from django.urls import reverse
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from rest_framework import status
-from rest_framework.test import APITestCase
 from django.test.utils import override_settings
 
-
-class LogoutTestsBase(APITestCase):
-    SIGNUP_PATH = reverse('core:signup')
-    LOGIN_PATH = reverse('core:login')
-    LOGOUT_PATH = reverse('core:logout')
-    DATA = {
-            "username": "test",
-            "email": "user@example.com",
-            "password": "test",
-        }
+from apps.core.tests.models import CoreTestsBase
 
 
 @override_settings(
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
 )
-class LogoutTests(LogoutTestsBase):
+class LogoutTests(CoreTestsBase):
     def setUp(self):
         self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
         response = self.client.post(self.LOGIN_PATH, self.DATA)
@@ -51,7 +40,7 @@ class LogoutTests(LogoutTestsBase):
         )
 
 
-class LogoutTestsUserLoggedOut(LogoutTestsBase):
+class LogoutTestsUserLoggedOut(CoreTestsBase):
     def setUp(self):
         self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
         response = self.client.post(self.LOGIN_PATH, self.DATA)
