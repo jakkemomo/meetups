@@ -86,7 +86,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:
