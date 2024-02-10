@@ -10,11 +10,6 @@ class TagCreateSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ["id", "name"]
 
-    def create(self, validated_data):
-        name = validated_data.pop("name")
-        tag_object = Tag.objects.create(name=name)
-        return tag_object
-
 
 class TagRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,12 +23,6 @@ class TagUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ["id", "name"]
-
-    def update(self, instance, validated_data):
-        name = validated_data.pop("name")
-        instance.name = name
-        instance.save()
-        return instance
 
 
 class TagListSerializer(serializers.ModelSerializer):
