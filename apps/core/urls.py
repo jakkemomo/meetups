@@ -14,6 +14,7 @@ from .views import (
     PasswordResetView,
     PasswordResetConfirmView,
     PasswordChangeView,
+    CheckEmailExistsView,
 )
 
 app_name = "core"
@@ -45,4 +46,5 @@ urlpatterns = [
     path("api/v1/password/reset/", PasswordResetView.as_view(), name="password-reset"),
     path("api/v1/password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password-reset-confirm"),
     path("api/v1/password/change/", PasswordChangeView.as_view(), name="password-change"),
+    path("api/v1/email-exists/", CheckEmailExistsView.as_view(), name="email_exists"),
 ]
