@@ -173,13 +173,7 @@ class EventViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         request_body=no_body
     )
-    @action(
-        methods=['delete'],
-        detail=True,
-        permission_classes=[EventPermissions],
-        url_path='defavorite',
-        url_name='event_favorite_delete'
-    )
+    @add_to_favorite.mapping.delete
     def delete_from_favorite(self, request, event_id: int):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
