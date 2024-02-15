@@ -191,6 +191,8 @@ class RatingViewSet(viewsets.ModelViewSet):
     http_method_names = ["post", "get", "put", "delete"]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Rating.objects.none()
         event = self.get_object()
         self.queryset = Rating.objects.filter(event=event, user=self.request.user)
         return self.queryset.all()
@@ -259,7 +261,13 @@ class MarkerViewSet(mixins.ListModelMixin, GenericViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     model = Review
     permission_classes = [IsAuthenticatedOrReadOnly, ]
+    lookup_url_kwarg = "review_id"
     http_method_names = ["post", "get", "put", "delete"]
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Review.objects.none()
+        return Review.objects.filter(event_id=self.kwargs["event_id"])
 
     def get_serializer_class(self):
         match self.action:
@@ -271,10 +279,3 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewUpdateSerializer
             case "list":
                 return ReviewListSerializer
-
-    def list(self, request, *args, **kwargs):
-        event = self.get_object()
-        queryset = Review.objects.filter(event=event)
-        serializer = ReviewListSerializer(queryset, many=True, context={"request": request})
-
-        return Response(serializer.data)
