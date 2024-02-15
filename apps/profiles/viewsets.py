@@ -33,6 +33,8 @@ class UserRatingViewSet(viewsets.ModelViewSet):
         This view should return a list of all the ratings for the user
         defined in user_id position of the URL
         """
+        if getattr(self, "swagger_fake_view", False):
+            return UserRating.objects.none()
         return UserRating.objects.filter(user_rated_id=self.kwargs["user_id"])
 
     def get_serializer_class(self):
