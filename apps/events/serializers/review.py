@@ -12,21 +12,19 @@ class ReviewRetrieveSerializer(serializers.ModelSerializer):
 class ReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["review", "user", "event"]
+        fields = ["review", ]
 
     def create(self, validated_data):
-        user = self.context["request"].user
-        review = validated_data.pop("review")
-        event = self.context["request"].event_id
-        rating_object = Review.objects.create(event=event, user=user, review=review)
-
-        return rating_object
+        user_id = self.context['request'].user.id
+        event_id = self.context["view"].kwargs["event_id"]
+        review_object = Review.objects.create(review=validated_data["review"], user_id=user_id, event_id=event_id)
+        return review_object
 
 
 class ReviewUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["review", "user", "event"]
+        fields = ["review", ]
 
     def update(self, instance, validated_data):
         review = validated_data.pop("review")
