@@ -13,8 +13,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Review
-from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
-from apps.events.permissions.review import ReviewPermissions
+from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, ReviewPermissions
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
