@@ -85,7 +85,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        # city = self.request.query_params.get('city')  # Why do we need this? if we can add city__name on 63 and 64 line?
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:

@@ -3,7 +3,7 @@ import logging
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
-from apps.core.utils import delete_image_if_exists
+from apps.core.utils import delete_image_if_exists, validate_city
 from apps.profiles.models import UserRating, User
 from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
 from apps.profiles.serializers import (
@@ -67,3 +67,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
         profile_instance = self.get_object()
         delete_image_if_exists(profile_instance)
         return super().destroy(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        city = self.request.data.get("city", None)
+        if city:
+            new_city = validate_city(city)
+            if instance.city != new_city:
+                instance.city = new_city
+                instance.save()
+        serializer.save()

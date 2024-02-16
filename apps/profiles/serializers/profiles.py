@@ -51,10 +51,4 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         if 'image_url' in validated_data and not validated_data['image_url']:
             delete_image_if_exists(instance)
 
-        if "city" in validated_data:
-            new_city = validate_city(validated_data["city"])
-            if instance.city != new_city:
-                instance.city = new_city
-                instance.save()
-
         return super().update(instance, validated_data)
