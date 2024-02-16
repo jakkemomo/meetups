@@ -14,6 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Review
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions
+from apps.events.permissions.review import ReviewPermissions
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -28,7 +29,10 @@ from apps.events.serializers import (
     TagUpdateSerializer,
     TagListSerializer,
     GeoJsonSerializer,
-    EmptySerializer, ReviewRetrieveSerializer, ReviewCreateSerializer, ReviewUpdateSerializer,
+    EmptySerializer,
+    ReviewRetrieveSerializer,
+    ReviewCreateSerializer,
+    ReviewUpdateSerializer,
     ReviewListSerializer,
 )
 
@@ -86,7 +90,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        # city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:
@@ -186,7 +189,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
 
     model = Rating
-    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions, ]
     lookup_url_kwarg = "rating_id"
     http_method_names = ["post", "get", "put", "delete"]
 
@@ -260,7 +263,7 @@ class MarkerViewSet(mixins.ListModelMixin, GenericViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     model = Review
-    permission_classes = [IsAuthenticatedOrReadOnly, ]
+    permission_classes = [IsAuthenticatedOrReadOnly, ReviewPermissions]
     lookup_url_kwarg = "review_id"
     http_method_names = ["post", "get", "put", "delete"]
 

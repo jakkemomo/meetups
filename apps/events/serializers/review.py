@@ -26,13 +26,6 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
         model = Review
         fields = ["review", ]
 
-    def update(self, instance, validated_data):
-        review = validated_data.pop("review")
-        instance.review = review
-        instance.save()
-
-        return instance
-
 
 class ReviewListSerializer(serializers.ModelSerializer):
     class Meta:
