@@ -4,6 +4,12 @@ from .tags import (
     TagUpdateSerializer,
     TagListSerializer,
 )
+from .categories import (
+    CategoryRetrieveSerializer,
+    CategoryUpdateSerializer,
+    CategoryListSerializer,
+    CategoryCreateSerializer,
+)
 from .events import (
     EventCreateSerializer,
     EventUpdateSerializer,
