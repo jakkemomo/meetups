@@ -128,5 +128,5 @@ class EventRetrieveSerializer(BaseEventSerializer):
         exclude = ["ratings", "updated_by"]
 
 
-class EmptySerializer(serializers.Serializer):
+class EventRegisterSerializer(serializers.Serializer):
     pass
