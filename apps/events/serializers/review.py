@@ -17,7 +17,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_id = self.context['request'].user.id
         event_id = self.context["view"].kwargs["event_id"]
-        review_object = Review.objects.create(review=validated_data["review"], user_id=user_id, event_id=event_id)
+        review_object = Review.objects.create(review=validated_data["review"], created_by_id=user_id, event_id=event_id)
         return review_object
 
 
