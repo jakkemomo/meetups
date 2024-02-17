@@ -15,7 +15,7 @@ from .events import (
     EventUpdateSerializer,
     EventRetrieveSerializer,
     EventListSerializer,
-    EventRegisterSerializer,
+    EmptySerializer,
 )
 from .ratings import (
     RatingCreateSerializer,

@@ -28,7 +28,7 @@ from apps.events.serializers import (
     TagUpdateSerializer,
     TagListSerializer,
     GeoJsonSerializer,
-    EventRegisterSerializer,
+    EmptySerializer,
     ReviewRetrieveSerializer,
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
@@ -118,13 +118,13 @@ class EventViewSet(viewsets.ModelViewSet):
             case "partial_update":
                 return EventUpdateSerializer
             case "register_for_event":
-                return EventUpdateSerializer
+                return EmptySerializer
             case "leave_from_event":
-                return EventUpdateSerializer
+                return EmptySerializer
             case "add_to_favorite":
-                return EventRegisterSerializer
+                return EmptySerializer
             case "delete_from_favorite":
-                return EventRegisterSerializer
+                return EmptySerializer
 
     @swagger_auto_schema(
         request_body=no_body
