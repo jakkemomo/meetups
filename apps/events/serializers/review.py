@@ -6,7 +6,7 @@ from apps.events.models import Review
 class ReviewRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["review", "user", "event"]
+        fields = ["review", "created_by", "event"]
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -30,4 +30,4 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
 class ReviewListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["review", "user", "event"]
+        fields = ["review", "created_by", "event"]

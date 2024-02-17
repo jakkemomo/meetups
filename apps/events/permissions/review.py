@@ -1,9 +1,5 @@
 from rest_framework import permissions
-from apps.core.permissions.common import is_verified
-
-
-def is_reviewer(request, obj):
-    return request.user == obj.user
+from apps.core.permissions.common import is_verified, is_owner
 
 
 class ReviewPermissions(permissions.BasePermission):
@@ -15,6 +11,6 @@ class ReviewPermissions(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         elif view.action in ['update', 'partial_update', 'destroy']:
-            return is_verified(request) and is_reviewer(request, obj)
+            return is_verified(request) and is_owner(request, obj)
         else:
             return False
