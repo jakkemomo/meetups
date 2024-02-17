@@ -29,6 +29,7 @@ from apps.core.serializers import (
     PasswordResetSerializer,
     PasswordChangeSerializer,
     PasswordFormSerializer,
+    EmailCheckSerializer,
 )
 from apps.profiles.models import User
 from apps.core.helpers import decode_json_data
@@ -412,3 +413,33 @@ class PasswordChangeView(APIView):
         user.save()
 
         return Response('Your password has been changed')
+
+
+class CheckEmailExistsView(APIView):
+    """
+    This view checks if a user with a certain email exists in the database.
+    """
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,) # Allow any user (authenticated or not) to access this view
+    serializer_class = EmailCheckSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        This function is using to generate swagger documents.
+        """
+        return self.serializer_class(self, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=['auth'],
+    )
+    def post(self, request, *args, **kwargs):
+        """
+        Checks the database for a user with the given email address.
+        Input: email
+        Result: A boolean indicating whether a user with the email exists
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email', '')  # Email is taken from serializer
+        user_exists = User.objects.filter(email=email).exists()
+        return Response(user_exists)
