@@ -420,9 +420,8 @@ class CheckEmailExistsView(APIView):
     This view checks if a user with a certain email exists in the database.
     """
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,) # Allow any user (authenticated or not) to access this view
     serializer_class = EmailCheckSerializer
-
 
     def get_serializer(self, *args, **kwargs):
         """
@@ -442,7 +441,5 @@ class CheckEmailExistsView(APIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email', '')  # Email is taken from serializer
-        # email = request.data.get('email', '')  - rewritten to get from serializer
-
         user_exists = User.objects.filter(email=email).exists()
         return Response(user_exists)
