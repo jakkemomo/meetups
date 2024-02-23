@@ -22,11 +22,13 @@ def delete_image_if_exists(instance):
 
 def validate_city(data: dict[str, str | None]):
     new_city_name, new_city_country = data.get("name"), data.get("country")
-    if new_city_name and new_city_country:
-        try:
-            new_location = City.objects.get(name=new_city_name, country=new_city_country)
-            return new_location
-        except City.DoesNotExist as _:
-            raise serializers.ValidationError(
-                {"location": f"There are no city with name: `{new_city_name}` and country: `{new_city_country}`"}
-            )
+    try:
+        if new_city_name and new_city_country:
+            return City.objects.get(name=new_city_name, country=new_city_country)
+        elif new_city_name and not new_city_country:
+            return City.objects.get(name=new_city_name)
+        return City.object.get(country=new_city_country)
+    except City.DoesNotExist as _:
+        raise serializers.ValidationError(
+            {"location": f"There are no city with name: `{new_city_name}` and country: `{new_city_country}`"}
+        )
