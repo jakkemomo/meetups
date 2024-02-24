@@ -21,7 +21,7 @@ def populate_default_city(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profiles', '0011_alter_userrating_value'),
+        ('profiles', '0013_alter_user_username'),
     ]
 
     operations = [
