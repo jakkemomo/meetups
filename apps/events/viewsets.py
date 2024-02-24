@@ -14,6 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, ReviewPermissions
+
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -68,6 +69,7 @@ class EventViewSet(viewsets.ModelViewSet):
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city__name']
     filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name', 'city__name']
+
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
@@ -91,6 +93,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
+        city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:

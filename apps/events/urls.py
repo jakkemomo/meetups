@@ -3,6 +3,7 @@ from rest_framework import routers
 
 from .viewsets import EventViewSet, RatingViewSet, TagViewSet, MarkerViewSet, CategoryViewSet, ReviewViewSet
 
+
 app_name = "events"
 
 router = routers.SimpleRouter()
