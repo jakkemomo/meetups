@@ -1,7 +1,9 @@
 import logging
 
-from rest_framework import viewsets
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists, validate_city
 from apps.profiles.models import UserRating, User
@@ -77,3 +79,19 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 instance.city = new_city
                 instance.save()
         serializer.save()
+
+class MyProfileViewSet(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProfileRetrieveSerializer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: ProfileRetrieveSerializer,
+        },
+        tags=['profiles'],
+    )
+    def get(self, request, *args, **kwargs):
+        instance = request.user
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
