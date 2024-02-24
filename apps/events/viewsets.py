@@ -12,8 +12,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.events.filters import TrigramSimilaritySearchFilter
-from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category
-from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions
+from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
+from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, ReviewPermissions
+
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -28,7 +29,12 @@ from apps.events.serializers import (
     TagUpdateSerializer,
     TagListSerializer,
     GeoJsonSerializer,
-    EventRegisterSerializer, CategoryRetrieveSerializer, CategoryCreateSerializer, CategoryUpdateSerializer,
+    EmptySerializer,
+    ReviewRetrieveSerializer,
+    ReviewCreateSerializer,
+    ReviewUpdateSerializer,
+    ReviewListSerializer,
+    CategoryRetrieveSerializer, CategoryCreateSerializer, CategoryUpdateSerializer,
     CategoryListSerializer,
 )
 
@@ -61,8 +67,9 @@ class EventViewSet(viewsets.ModelViewSet):
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
-    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name']
-    filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name']
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city__name']
+    filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name', 'city__name']
+
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
@@ -114,9 +121,13 @@ class EventViewSet(viewsets.ModelViewSet):
             case "partial_update":
                 return EventUpdateSerializer
             case "register_for_event":
-                return EventRegisterSerializer
+                return EmptySerializer
             case "leave_from_event":
-                return EventRegisterSerializer
+                return EmptySerializer
+            case "add_to_favorite":
+                return EmptySerializer
+            case "delete_from_favorite":
+                return EmptySerializer
 
     @swagger_auto_schema(
         request_body=no_body
@@ -169,13 +180,7 @@ class EventViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         request_body=no_body
     )
-    @action(
-        methods=['delete'],
-        detail=True,
-        permission_classes=[EventPermissions],
-        url_path='defavorite',
-        url_name='event_favorite_delete'
-    )
+    @add_to_favorite.mapping.delete
     def delete_from_favorite(self, request, event_id: int):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
@@ -188,11 +193,13 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
 
     model = Rating
-    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions, ]
     lookup_url_kwarg = "rating_id"
     http_method_names = ["post", "get", "put", "delete"]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Rating.objects.none()
         event = self.get_object()
         self.queryset = Rating.objects.filter(event=event, user=self.request.user)
         return self.queryset.all()
@@ -279,3 +286,26 @@ class MarkerViewSet(mixins.ListModelMixin, GenericViewSet):
                 fields=["id", "name", "start_date", "end_date", "description", "address"])
         )
         return Response(geo_events, status=status.HTTP_200_OK)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    model = Review
+    permission_classes = [IsAuthenticatedOrReadOnly, ReviewPermissions]
+    lookup_url_kwarg = "review_id"
+    http_method_names = ["post", "get", "put", "delete"]
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Review.objects.none()
+        return Review.objects.filter(event_id=self.kwargs["event_id"])
+
+    def get_serializer_class(self):
+        match self.action:
+            case "retrieve":
+                return ReviewRetrieveSerializer
+            case "create":
+                return ReviewCreateSerializer
+            case "update":
+                return ReviewUpdateSerializer
+            case "list":
+                return ReviewListSerializer

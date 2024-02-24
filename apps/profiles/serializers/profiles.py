@@ -2,9 +2,12 @@ from rest_framework import serializers
 
 from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists
+from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
+    city = CityRetrieveSerializer(many=False)
+
     class Meta:
         model = User
         fields = (
@@ -13,6 +16,7 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "city",
             "image_url",
             "is_email_verified",
         )
@@ -30,6 +34,8 @@ class ProfileListSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    city = CityUpdateSerializer(many=False)
+
     class Meta:
         model = User
         fields = (
@@ -38,6 +44,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "email",
             "image_url",
             "is_email_verified",
+            "city",
         )
 
     def update(self, instance, validated_data):
