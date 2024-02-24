@@ -61,8 +61,8 @@ class EventViewSet(viewsets.ModelViewSet):
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
-    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name']
-    filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name']
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city__name']
+    filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name', 'city__name']
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 

@@ -9,6 +9,7 @@ from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
 from apps.events.models.rating import Rating
 from apps.events.models.tags import Tag
+from apps.profiles.models.city import City
 
 user_model = settings.AUTH_USER_MODEL
 
@@ -20,6 +21,7 @@ class Event(AbstractBaseModel):
     tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=True, blank=True, default="Minsk")
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=True, null=True)
     location = PointField(default=Point(27.561831, 53.902284))
     type = fields.CharField(
         max_length=10,
