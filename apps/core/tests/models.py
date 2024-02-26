@@ -7,6 +7,7 @@ class CoreTestsBase(APITestCase):
     LOGIN_PATH = reverse('core:login')
     LOGOUT_PATH = reverse('core:logout')
     VERIFY_EMAIL_PATH = reverse('core:verify-email')
+    REVERIFY_EMAIL_PATH = reverse('core:reverify-email')
     DATA = {
             "username": "test",
             "email": "user@example.com",
