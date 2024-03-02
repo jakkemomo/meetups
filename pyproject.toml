@@ -82,12 +82,12 @@ exclude = [
 minversion = "6.0.0"
 testpaths = []
 python_files = 'test*.py'
-# always run in parallel (requires pytest-xdist, see test-requirements.txt)
+# always run in parallel (requires pytest-xdist, see tests-requirements.txt)
 # and enable strict mode: require all markers
 # to be defined and raise on invalid config values
 addopts = "-nauto --strict-markers --strict-config"
 
-# treat xpasses as test failures so they get converted to regular tests as soon as possible
+# treat xpasses as tests failures so they get converted to regular tests as soon as possible
 xfail_strict = true
 
 [tool.coverage.run]

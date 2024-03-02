@@ -149,7 +149,7 @@ class ReverifyEmailView(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(email=request.data['email'])
+        user = User.objects.filter(email=request.data['email']).first()
         if not user:
             return Response('User not found', status=status.HTTP_404_NOT_FOUND)
         if user.is_email_verified:
