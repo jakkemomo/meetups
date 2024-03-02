@@ -68,6 +68,7 @@ else:
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://meetups-ui-6vuzexfx2q-lm.a.run.app/'
 ]
 
 # Geo libraries path
