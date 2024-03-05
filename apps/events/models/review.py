@@ -6,9 +6,12 @@ user_model = settings.AUTH_USER_MODEL
 
 
 class Review(AbstractBaseModel):
-    """Keeps events review by the users"""
+    """Keeps events review by the users.
+    Review and Rating are created at the same time.
+    Review deleted without Rating. Deleting Rating is cause deleting linked Review."""
     event = models.ForeignKey("events.Event", on_delete=models.CASCADE)
     review = models.CharField(max_length=1000, null=True)
+    rating = models.OneToOneField('events.Rating', related_name='rating', on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['event']
