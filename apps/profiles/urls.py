@@ -1,13 +1,19 @@
 from django.urls import path, include
 
 from rest_framework import routers
-from apps.profiles.viewsets import ProfileViewSet, UserRatingViewSet, MyProfileViewSet
+from apps.profiles.viewsets import (
+    ProfileViewSet,
+    UserRatingViewSet,
+    MyProfileViewSet,
+    FollowerViewSet,
+)
 
 app_name = "profiles"
 router = routers.SimpleRouter()
 
-router.register('user/(?P<user_id>[^/.]+)/user_ratings', UserRatingViewSet, basename="UserRating")
-router.register("profiles", ProfileViewSet, basename="Profiles")
+router.register('users/(?P<user_id>[^/.]+)/user_ratings', UserRatingViewSet, basename="UserRating")
+router.register("users", ProfileViewSet, basename="Profiles")
+router.register("users", FollowerViewSet, basename="Followers")
 
 urlpatterns = [
     path("api/v1/", include(router.urls)),

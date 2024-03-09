@@ -1,7 +1,15 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .viewsets import EventViewSet, RatingViewSet, TagViewSet, MarkerViewSet, CategoryViewSet, ReviewViewSet
+from .viewsets import (
+    EventViewSet,
+    RatingViewSet,
+    TagViewSet,
+    MarkerViewSet,
+    CategoryViewSet,
+    ReviewViewSet,
+    UserEventViewSet,
+)
 
 
 app_name = "events"
@@ -9,6 +17,7 @@ app_name = "events"
 router = routers.SimpleRouter()
 router.register("events", EventViewSet, basename="Events")
 router.register("events/(?P<event_id>[^/.]+)/ratings", RatingViewSet, basename="Events rating")
+router.register("events", UserEventViewSet, basename="User events")
 router.register("categories", CategoryViewSet, basename="Categories")
 router.register("tags", TagViewSet, basename="Tags")
 router.register("markers", MarkerViewSet, basename="Markers")

@@ -7,13 +7,16 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, \
+    IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.events.filters import TrigramSimilaritySearchFilter
-from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
-from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, ReviewPermissions
+from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, \
+    Review
+from apps.events.permissions import RatingPermissions, EventPermissions, \
+    TagPermissions, CategoriesPermissions, ReviewPermissions
 
 from apps.events.serializers import (
     EventListSerializer,
@@ -34,12 +37,18 @@ from apps.events.serializers import (
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
     ReviewListSerializer,
-    CategoryRetrieveSerializer, CategoryCreateSerializer, CategoryUpdateSerializer,
+    CategoryRetrieveSerializer, CategoryCreateSerializer,
+    CategoryUpdateSerializer,
     CategoryListSerializer,
 )
 
 from apps.core.utils import delete_image_if_exists
+from apps.profiles.models.users import User
+from apps.profiles.models.followers import Follower
 import logging
+
+from apps.profiles.permissions.followers import FollowerPermissions
+from apps.profiles.utils import get_user_object
 
 logger = logging.getLogger("events_app")
 
@@ -185,6 +194,71 @@ class EventViewSet(viewsets.ModelViewSet):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
+
+
+class UserEventViewSet(viewsets.ModelViewSet):
+    model = Event
+    serializer_class = EventListSerializer
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        IsAuthenticated,
+        FollowerPermissions,
+    ]
+    http_method_names = ["get"]
+    lookup_url_kwarg = "user_id"
+
+    def get_queryset(self):
+        self.queryset = (
+            self.model.objects
+            .annotate(participants_number=Count("participants"))
+            .order_by("-start_date")
+        )
+        return self.queryset.all()
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsAuthenticatedOrReadOnly],
+        url_path="created_by",
+        url_name="event_list_created_by_user",
+    )
+    def list_created_by_user(self, request, user_id):
+        user = get_user_object(user_id)
+        queryset = self.get_queryset().filter(created_by=user)
+
+        if user != request.user:
+            queryset = queryset.filter(is_visible=True)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsAuthenticated, FollowerPermissions],
+        url_path="is_participant",
+        url_name="event_list_user_is_participant",
+    )
+    def list_user_is_participant(self, request, user_id):
+        user = get_user_object(user_id)
+        queryset = self.get_queryset().filter(participants__id=user_id)
+
+        if user != request.user:
+            queryset = queryset.filter(is_visible=True)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(auto_schema=None)
+    def retrieve(self, request):
+        pass
+
+    @swagger_auto_schema(auto_schema=None)
+    def list(self, request):
+        pass
 
 
 class RatingViewSet(viewsets.ModelViewSet):

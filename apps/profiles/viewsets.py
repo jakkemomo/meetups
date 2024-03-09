@@ -1,13 +1,19 @@
 import logging
 
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists, validate_city
 from apps.profiles.models import UserRating, User
-from apps.profiles.permissions import UserRatingPermissions, ProfilePermissions
+from apps.profiles.models.followers import Follower
+from apps.profiles.permissions import (
+    UserRatingPermissions,
+    ProfilePermissions,
+)
+from apps.profiles.permissions.followers import FollowerPermissions
 from apps.profiles.serializers import (
     UserRatingListSerializer,
     UserRatingUpdateSerializer,
@@ -16,7 +22,9 @@ from apps.profiles.serializers import (
     ProfileRetrieveSerializer,
     ProfileUpdateSerializer,
     ProfileListSerializer,
+    FollowerSerializer,
 )
+from apps.profiles.utils import get_user_object, is_current_user
 
 logger = logging.getLogger("profiles_app")
 
@@ -55,6 +63,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated, ProfilePermissions, ]
     http_method_names = ["get", "put", "patch", "delete", ]
+    lookup_url_kwarg = "user_id"
 
     def get_serializer_class(self):
         match self.action:
@@ -82,6 +91,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 instance.save()
         serializer.save()
 
+
 class MyProfileViewSet(generics.RetrieveAPIView):
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -91,9 +101,155 @@ class MyProfileViewSet(generics.RetrieveAPIView):
         responses={
             status.HTTP_200_OK: ProfileRetrieveSerializer,
         },
-        tags=['profiles'],
+        tags=['users'],
     )
     def get(self, request, *args, **kwargs):
         instance = request.user
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class FollowerViewSet(viewsets.ModelViewSet):
+    model = Follower
+    queryset = Follower.objects.all()
+    serializer_class = FollowerSerializer
+    permission_classes = (IsAuthenticated, FollowerPermissions)
+    http_method_names = ["get", "post", "delete"]
+    lookup_url_kwarg = "user_id"
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        url_name="follow_user",
+    )
+    def follow(self, request, user_id):
+        user = get_user_object(user_id=user_id)
+        is_current_user(request, user)
+
+        instance = Follower.objects.filter(user=user, follower=request.user).first()
+        if instance:
+            if instance.status == Follower.Status.ACCEPTED:
+                return Response(
+                    status=status.HTTP_409_CONFLICT,
+                    data={"detail": "Already following"}
+                )
+            elif instance.status in (
+                    Follower.Status.PENDING,
+                    Follower.Status.DECLINED,
+            ):
+                return Response(
+                    status=status.HTTP_409_CONFLICT,
+                    data={"detail": "Follow request already sent"}
+                )
+
+        data = {"user": user.id, "follower": request.user.id}
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+
+        # WS logic
+
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data=serializer.data,
+        )
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        url_name="accept_follow_request",
+    )
+    def accept(self, request, user_id):
+        user = get_user_object(user_id=user_id)
+        is_current_user(request, user)
+
+        instance = Follower.objects.filter(user=request.user, follower=user,).first()
+        if not instance:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={"detail": f"No such follow requests was found"}
+            )
+
+        if instance.status == Follower.Status.ACCEPTED:
+            return Response(
+                status=status.HTTP_409_CONFLICT,
+                data={"detail": f"{user} is already following you"},
+            )
+
+        instance.status = Follower.Status.ACCEPTED
+        instance.save()
+        serializer = self.get_serializer(instance)
+
+        # WS logic
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data=serializer.data,
+        )
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["delete"],
+        detail=True,
+        url_name="unfollow_user",
+    )
+    def unfollow(self, request, user_id):
+        user = get_user_object(user_id=user_id)
+        is_current_user(request, user)
+
+        instance = Follower.objects.filter(user=user, follower=request.user).first()
+        if not instance:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={"detail": f"You are not following {user}"},
+            )
+
+        if instance.status == Follower.Status.ACCEPTED:
+            message = f"You are no longer following {user}"
+        else:
+            message = f"You canceled follow request to {user}"
+
+        instance.delete()
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data={"detail": message},
+        )
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="followers",
+        url_name="list_user_followers",
+    )
+    def list_followers(self, request, user_id):
+        user = get_user_object(user_id=user_id)
+        queryset = self.queryset.filter(user=user, status=Follower.Status.ACCEPTED)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="following",
+        url_name="list_user_following",
+    )
+    def list_following(self, request, user_id):
+        user = get_user_object(user_id=user_id)
+        queryset = self.queryset.filter(follower=user, status=Follower.Status.ACCEPTED)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
