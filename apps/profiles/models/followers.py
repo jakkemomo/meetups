@@ -36,4 +36,4 @@ class Follower(AbstractBaseModel):
         db_table = "follower"
 
     def __str__(self):
-        return f"{self.user}'s follower – {self.follower}"
+        return f"{self.follower} following {self.user}"

@@ -8,15 +8,7 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.exceptions import ErrorDetail
 
-from apps.profiles.tests.followers.fixtures import (
-    api_client,
-    mock_test_user,
-    mock_test_user_2,
-    mock_follower_accepted,
-    mock_follower_pending,
-    mock_follower_declined,
-    get_tokens,
-)
+from apps.profiles.tests.followers.fixtures import *
 from apps.profiles.tests.followers.constants import UNFOLLOW_URL
 
 
@@ -39,38 +31,38 @@ def test_unfollow_accepted_valid(
 
 
 @pytest.mark.django_db
-def test_unfollow_pending_valid(
+def test_unfollow_pending_valid_private(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_pending,
+        mock_test_user_2_private,
+        mock_follower_pending_private,
 ):
     token = get_tokens(mock_test_user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.delete(
-        reverse(UNFOLLOW_URL, args=[mock_test_user_2.id])
+        reverse(UNFOLLOW_URL, args=[mock_test_user_2_private.id])
     )
     assert response.status_code == 200
     assert response.data == {
-        'detail': f'You canceled follow request to {mock_test_user_2}'
+        'detail': f'You canceled follow request to {mock_test_user_2_private}'
     }
 
 
 @pytest.mark.django_db
-def test_unfollow_declined_valid(
+def test_unfollow_declined_valid_private(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_declined,
+        mock_test_user_2_private,
+        mock_follower_declined_private,
 ):
     token = get_tokens(mock_test_user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.delete(
-        reverse(UNFOLLOW_URL, args=[mock_test_user_2.id])
+        reverse(UNFOLLOW_URL, args=[mock_test_user_2_private.id])
     )
     assert response.status_code == 200
     assert response.data == {
-        'detail': f'You canceled follow request to {mock_test_user_2}'
+        'detail': f'You canceled follow request to {mock_test_user_2_private}'
     }
 
 

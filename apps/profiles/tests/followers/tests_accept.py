@@ -8,55 +8,47 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.exceptions import ErrorDetail
 
-from apps.profiles.tests.followers.fixtures import (
-    api_client,
-    mock_test_user,
-    mock_test_user_2,
-    mock_follower_accepted,
-    mock_follower_pending,
-    mock_follower_declined,
-    get_tokens,
-)
+from apps.profiles.tests.followers.fixtures import *
 from apps.profiles.tests.followers.constants import ACCEPT_URL
 from apps.profiles.models.followers import Follower
 
 
 @pytest.mark.django_db
-def test_accept_pending(
+def test_accept_pending_private(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_pending,
+        mock_test_user_2_private,
+        mock_follower_pending_private,
 ):
-    token = get_tokens(mock_test_user_2)
+    token = get_tokens(mock_test_user_2_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.post(
         reverse(ACCEPT_URL, args=[mock_test_user.id])
     )
     assert response.status_code == 200
-    assert response.data['id'] is not None
-    assert response.data['user'] == mock_test_user_2.id
-    assert response.data['follower'] == mock_test_user.id
-    assert response.data['status'] == Follower.Status.ACCEPTED
+    assert response.data.get('id') is not None
+    assert response.data.get('user') == mock_test_user_2_private.id
+    assert response.data.get('follower') == mock_test_user.id
+    assert response.data.get('status') == Follower.Status.ACCEPTED
 
 
 @pytest.mark.django_db
-def test_accept_declined(
+def test_accept_declined_private(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_declined,
+        mock_test_user_2_private,
+        mock_follower_declined_private,
 ):
-    token = get_tokens(mock_test_user_2)
+    token = get_tokens(mock_test_user_2_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.post(
         reverse(ACCEPT_URL, args=[mock_test_user.id])
     )
     assert response.status_code == 200
-    assert response.data['id'] is not None
-    assert response.data['user'] == mock_test_user_2.id
-    assert response.data['follower'] == mock_test_user.id
-    assert response.data['status'] == Follower.Status.ACCEPTED
+    assert response.data.get('id') is not None
+    assert response.data.get('user') == mock_test_user_2_private.id
+    assert response.data.get('follower') == mock_test_user.id
+    assert response.data.get('status') == Follower.Status.ACCEPTED
 
 
 @pytest.mark.django_db
@@ -95,8 +87,6 @@ def test_accept_user_not_found(
 def test_accept_no_creds(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_pending,
 ):
     response = api_client.post(
         reverse(ACCEPT_URL, args=[mock_test_user.id])

@@ -23,9 +23,18 @@ def mock_test_user_2() -> User:
 
 
 @pytest.fixture
+def mock_test_user_private() -> User:
+    return User.objects.create(
+        email="user_private@example.com",
+        password="test",
+        is_private=True,
+    )
+
+
+@pytest.fixture
 def mock_test_user_2_private() -> User:
     return User.objects.create(
-        email="user2@example.com",
+        email="user2_private@example.com",
         password="test2",
         is_private=True,
     )
@@ -34,7 +43,6 @@ def mock_test_user_2_private() -> User:
 @pytest.fixture
 def mock_follower_accepted(mock_test_user, mock_test_user_2) -> Follower:
     data = {
-        'id': 1,
         'user': mock_test_user_2,
         'follower': mock_test_user,
         'status': Follower.Status.ACCEPTED,
@@ -43,10 +51,19 @@ def mock_follower_accepted(mock_test_user, mock_test_user_2) -> Follower:
 
 
 @pytest.fixture
-def mock_follower_pending(mock_test_user, mock_test_user_2) -> Follower:
+def mock_follower_accepted_private(mock_test_user_private, mock_test_user_2_private) -> Follower:
     data = {
-        'id': 1,
-        'user': mock_test_user_2,
+        'user': mock_test_user_2_private,
+        'follower': mock_test_user_private,
+        'status': Follower.Status.ACCEPTED,
+    }
+    return Follower.objects.create(**data)
+
+
+@pytest.fixture
+def mock_follower_pending_private(mock_test_user, mock_test_user_2_private) -> Follower:
+    data = {
+        'user': mock_test_user_2_private,
         'follower': mock_test_user,
         'status': Follower.Status.PENDING,
     }
@@ -54,11 +71,50 @@ def mock_follower_pending(mock_test_user, mock_test_user_2) -> Follower:
 
 
 @pytest.fixture
-def mock_follower_declined(mock_test_user, mock_test_user_2) -> Follower:
+def mock_follower_declined_private(mock_test_user, mock_test_user_2_private) -> Follower:
     data = {
-        'id': 1,
-        'user': mock_test_user_2,
+        'user': mock_test_user_2_private,
         'follower': mock_test_user,
+        'status': Follower.Status.DECLINED,
+    }
+    return Follower.objects.create(**data)
+
+
+@pytest.fixture
+def mock_follower_accepted_reversed(mock_test_user, mock_test_user_2) -> Follower:
+    data = {
+        'user': mock_test_user,
+        'follower': mock_test_user_2,
+        'status': Follower.Status.ACCEPTED,
+    }
+    return Follower.objects.create(**data)
+
+
+@pytest.fixture
+def mock_follower_accepted_private_reversed(mock_test_user_private, mock_test_user_2_private) -> Follower:
+    data = {
+        'user': mock_test_user_private,
+        'follower': mock_test_user_2_private,
+        'status': Follower.Status.ACCEPTED,
+    }
+    return Follower.objects.create(**data)
+
+
+@pytest.fixture
+def mock_follower_pending_private_reversed(mock_test_user_private, mock_test_user_2_private) -> Follower:
+    data = {
+        'user': mock_test_user_private,
+        'follower': mock_test_user_2_private,
+        'status': Follower.Status.PENDING,
+    }
+    return Follower.objects.create(**data)
+
+
+@pytest.fixture
+def mock_follower_declined_private_reversed(mock_test_user_private, mock_test_user_2_private) -> Follower:
+    data = {
+        'user': mock_test_user_private,
+        'follower': mock_test_user_2_private,
         'status': Follower.Status.DECLINED,
     }
     return Follower.objects.create(**data)

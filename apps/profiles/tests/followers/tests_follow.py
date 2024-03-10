@@ -8,16 +8,7 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.exceptions import ErrorDetail
 
-from apps.profiles.tests.followers.fixtures import (
-    api_client,
-    mock_test_user,
-    mock_test_user_2,
-    mock_test_user_2_private,
-    mock_follower_accepted,
-    mock_follower_pending,
-    mock_follower_declined,
-    get_tokens,
-)
+from apps.profiles.tests.followers.fixtures import *
 from apps.profiles.tests.followers.constants import FOLLOW_URL
 from apps.profiles.models.followers import Follower
 
@@ -34,14 +25,14 @@ def test_follow_valid(
         reverse(FOLLOW_URL, args=[mock_test_user_2.id])
     )
     assert response.status_code == 201
-    assert response.data['id'] is not None
-    assert response.data['user'] == mock_test_user_2.id
-    assert response.data['follower'] == mock_test_user.id
-    assert response.data['status'] == Follower.Status.ACCEPTED
+    assert response.data.get('id') is not None
+    assert response.data.get('user') == mock_test_user_2.id
+    assert response.data.get('follower') == mock_test_user.id
+    assert response.data.get('status') == Follower.Status.ACCEPTED
 
 
 @pytest.mark.django_db
-def test_follow_private_valid(
+def test_follow_valid_private(
         api_client,
         mock_test_user,
         mock_test_user_2_private,
@@ -52,10 +43,10 @@ def test_follow_private_valid(
         reverse(FOLLOW_URL, args=[mock_test_user_2_private.id])
     )
     assert response.status_code == 201
-    assert response.data['id'] is not None
-    assert response.data['user'] == mock_test_user_2_private.id
-    assert response.data['follower'] == mock_test_user.id
-    assert response.data['status'] == Follower.Status.PENDING
+    assert response.data.get('id') is not None
+    assert response.data.get('user') == mock_test_user_2_private.id
+    assert response.data.get('follower') == mock_test_user.id
+    assert response.data.get('status') == Follower.Status.PENDING
 
 
 @pytest.mark.django_db
@@ -124,16 +115,16 @@ def test_follow_accepted(
 
 
 @pytest.mark.django_db
-def test_follow_pending(
+def test_follow_pending_private(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_pending,
+        mock_test_user_2_private,
+        mock_follower_pending_private,
 ):
     token = get_tokens(mock_test_user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.post(
-        reverse(FOLLOW_URL, args=[mock_test_user_2.id])
+        reverse(FOLLOW_URL, args=[mock_test_user_2_private.id])
     )
     assert response.status_code == 409
     assert response.data == {'detail': 'Follow request already sent'}
@@ -143,13 +134,13 @@ def test_follow_pending(
 def test_follow_declined(
         api_client,
         mock_test_user,
-        mock_test_user_2,
-        mock_follower_declined,
+        mock_test_user_2_private,
+        mock_follower_declined_private,
 ):
     token = get_tokens(mock_test_user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.post(
-        reverse(FOLLOW_URL, args=[mock_test_user_2.id])
+        reverse(FOLLOW_URL, args=[mock_test_user_2_private.id])
     )
     assert response.status_code == 409
     assert response.data == {'detail': 'Follow request already sent'}
