@@ -54,28 +54,28 @@ def event_not_visible_created_by_user_2_private(user_2_private) -> Event:
 
 
 @pytest.fixture
-def event_with_user_2(user_2, event) -> Event:
+def event_user_2_is_participant(user_2, event) -> Event:
     event.participants.add(user_2.id)
     event.save()
     return event
 
 
 @pytest.fixture
-def event_with_user_2_private(user_2_private, event) -> Event:
+def event_user_2_is_participant_private(user_2_private, event) -> Event:
     event.participants.add(user_2_private.id)
     event.save()
     return event
 
 
 @pytest.fixture
-def event_not_visible_with_user_2(user_2, event_not_visible) -> Event:
+def event_not_visible_user_2_is_participant(user_2, event_not_visible) -> Event:
     event_not_visible.participants.add(user_2.id)
     event_not_visible.save()
     return event_not_visible
 
 
 @pytest.fixture
-def event_not_visible_with_user_2_private(user_2_private, event_not_visible) -> Event:
+def event_not_visible_user_2_is_participant_private(user_2_private, event_not_visible) -> Event:
     event_not_visible.participants.add(user_2_private.id)
     event_not_visible.save()
     return event_not_visible

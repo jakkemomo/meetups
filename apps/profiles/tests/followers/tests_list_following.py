@@ -30,6 +30,7 @@ def test_list_following_without_following(
     assert response.data[0].get("follower") == user_2.id
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
+
 @pytest.mark.django_db
 def test_list_following_accepted(
         api_client,
