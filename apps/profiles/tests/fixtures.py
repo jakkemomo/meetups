@@ -13,17 +13,17 @@ def api_client() -> APIClient:
 
 
 @pytest.fixture
-def mock_test_user() -> User:
+def user() -> User:
     return User.objects.create(email="user@example.com", password="test")
 
 
 @pytest.fixture
-def mock_test_user_2() -> User:
+def user_2() -> User:
     return User.objects.create(email="user2@example.com", password="test2")
 
 
 @pytest.fixture
-def mock_test_user_private() -> User:
+def user_private() -> User:
     return User.objects.create(
         email="user_private@example.com",
         password="test",
@@ -32,7 +32,7 @@ def mock_test_user_private() -> User:
 
 
 @pytest.fixture
-def mock_test_user_2_private() -> User:
+def user_2_private() -> User:
     return User.objects.create(
         email="user2_private@example.com",
         password="test2",
@@ -41,80 +41,80 @@ def mock_test_user_2_private() -> User:
 
 
 @pytest.fixture
-def mock_follower_accepted(mock_test_user, mock_test_user_2) -> Follower:
+def follower_user_accepted(user, user_2) -> Follower:
     data = {
-        'user': mock_test_user_2,
-        'follower': mock_test_user,
+        'user': user_2,
+        'follower': user,
         'status': Follower.Status.ACCEPTED,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_accepted_private(mock_test_user_private, mock_test_user_2_private) -> Follower:
+def follower_user_accepted_private(user_private, user_2_private) -> Follower:
     data = {
-        'user': mock_test_user_2_private,
-        'follower': mock_test_user_private,
+        'user': user_2_private,
+        'follower': user_private,
         'status': Follower.Status.ACCEPTED,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_pending_private(mock_test_user, mock_test_user_2_private) -> Follower:
+def follower_user_pending_private(user_private, user_2_private) -> Follower:
     data = {
-        'user': mock_test_user_2_private,
-        'follower': mock_test_user,
+        'user': user_2_private,
+        'follower': user_private,
         'status': Follower.Status.PENDING,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_declined_private(mock_test_user, mock_test_user_2_private) -> Follower:
+def follower_user_declined_private(user_private, user_2_private) -> Follower:
     data = {
-        'user': mock_test_user_2_private,
-        'follower': mock_test_user,
+        'user': user_2_private,
+        'follower': user_private,
         'status': Follower.Status.DECLINED,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_accepted_reversed(mock_test_user, mock_test_user_2) -> Follower:
+def follower_user_2_accepted(user, user_2) -> Follower:
     data = {
-        'user': mock_test_user,
-        'follower': mock_test_user_2,
+        'user': user,
+        'follower': user_2,
         'status': Follower.Status.ACCEPTED,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_accepted_private_reversed(mock_test_user_private, mock_test_user_2_private) -> Follower:
+def follower_user_2_accepted_private(user_private, user_2_private) -> Follower:
     data = {
-        'user': mock_test_user_private,
-        'follower': mock_test_user_2_private,
+        'user': user_private,
+        'follower': user_2_private,
         'status': Follower.Status.ACCEPTED,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_pending_private_reversed(mock_test_user_private, mock_test_user_2_private) -> Follower:
+def follower_user_2_pending_private(user_private, user_2_private) -> Follower:
     data = {
-        'user': mock_test_user_private,
-        'follower': mock_test_user_2_private,
+        'user': user_private,
+        'follower': user_2_private,
         'status': Follower.Status.PENDING,
     }
     return Follower.objects.create(**data)
 
 
 @pytest.fixture
-def mock_follower_declined_private_reversed(mock_test_user_private, mock_test_user_2_private) -> Follower:
+def follower_user_2_declined_private(user_private, user_2_private) -> Follower:
     data = {
-        'user': mock_test_user_private,
-        'follower': mock_test_user_2_private,
+        'user': user_private,
+        'follower': user_2_private,
         'status': Follower.Status.DECLINED,
     }
     return Follower.objects.create(**data)
