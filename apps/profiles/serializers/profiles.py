@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.events.serializers import CategoryListSerializer
 from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists
 from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
@@ -7,6 +8,7 @@ from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateS
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
     city = CityRetrieveSerializer(many=False)
+    category_favorite = CategoryListSerializer(many=True)
 
     class Meta:
         model = User
@@ -19,6 +21,7 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "city",
             "image_url",
             "is_email_verified",
+            "category_favorite",
         )
 
 
