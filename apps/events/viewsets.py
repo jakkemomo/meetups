@@ -13,7 +13,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
-from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, ReviewPermissions
+from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
+    ReviewPermissions
 
 from apps.events.serializers import (
     EventListSerializer,
@@ -93,7 +94,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:
@@ -244,6 +244,32 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 return CategoryUpdateSerializer
             case "list":
                 return CategoryListSerializer
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[IsAuthenticatedOrReadOnly, CategoriesPermissions],
+        url_path='favorite',
+        url_name='category_favorite_add'
+    )
+    def add_category_to_favorite(self, request, category_id: int):
+        user = request.user
+        category = Category.objects.get(id=category_id)
+        user.category_favorite.add(category)
+        return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @add_category_to_favorite.mapping.delete
+    def delete_category_from_favorite(self, request, category_id: int):
+        user = request.user
+        category = Category.objects.get(id=category_id)
+        user.category_favorite.remove(category)
+        return Response(status=status.HTTP_200_OK)
 
 
 class TagViewSet(viewsets.ModelViewSet):
