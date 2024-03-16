@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists, validate_city
+from apps.profiles.managers import NotificationManager
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions import (
@@ -150,7 +151,10 @@ class FollowerViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
 
-        # WS logic
+        if user.is_private:
+            NotificationManager.follow_request(user.id, request.user.id)
+        else:
+            NotificationManager.follow(user.id, request.user.id)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -186,7 +190,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         instance.save()
         serializer = self.get_serializer(instance)
 
-        # WS logic
+        NotificationManager.accept_follow_request(request.user.id, user.id)
 
         return Response(
             status=status.HTTP_200_OK,
