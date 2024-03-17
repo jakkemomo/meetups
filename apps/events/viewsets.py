@@ -7,13 +7,14 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
-from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, ReviewPermissions
+from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
+    ReviewPermissions
 
 from apps.events.serializers import (
     EventListSerializer,
@@ -68,8 +69,14 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city__name']
-    filterset_fields = ['name', 'start_date', 'rating', 'tags__name', 'category__name', 'city__name']
-
+    filterset_fields = {
+        'name': ['exact', 'icontains'],
+        'start_date': ['exact', 'gte', 'lte'],
+        'rating': ['exact', 'gte', 'lte'],
+        'tags__name': ['exact', 'in'],
+        'category__name': ['exact', 'in'],
+        'city__name': ['exact', 'in'],
+    }
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
@@ -93,7 +100,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        city = self.request.query_params.get('city')
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(id=self.kwargs["pk"])
         else:
@@ -200,8 +206,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return Rating.objects.none()
-        event = self.get_object()
-        self.queryset = Rating.objects.filter(event=event, user=self.request.user)
+        self.queryset = Rating.objects.filter(event_id=self.kwargs["event_id"], user=self.request.user)
         return self.queryset.all()
 
     def get_serializer_class(self):
@@ -216,8 +221,7 @@ class RatingViewSet(viewsets.ModelViewSet):
                 return RatingListSerializer
 
     def list(self, request, *args, **kwargs):
-        event = self.get_object()
-        queryset = Rating.objects.filter(event=event)
+        queryset = Rating.objects.filter(event_id=kwargs["event_id"])
         serializer = RatingListSerializer(queryset, many=True, context={"request": request})
 
         return Response(serializer.data)
