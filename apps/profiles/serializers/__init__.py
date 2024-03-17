@@ -9,3 +9,6 @@ from .user_ratings import (
     UserRatingCreateSerializer,
     UserRatingRetrieveSerializer,
 )
+from .followers import (
+    FollowerSerializer,
+)

@@ -19,6 +19,7 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "city",
             "image_url",
             "is_email_verified",
+            "is_private",
         )
 
 
@@ -45,6 +46,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "image_url",
             "is_email_verified",
             "city",
+            "is_private",
         )
 
     def update(self, instance, validated_data):
