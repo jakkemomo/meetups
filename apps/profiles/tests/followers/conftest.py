@@ -1,43 +1,6 @@
 import pytest
 
-from rest_framework.test import APIClient
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from apps.profiles.models import User
 from apps.profiles.models.followers import Follower
-
-
-@pytest.fixture
-def api_client() -> APIClient:
-    return APIClient()
-
-
-@pytest.fixture
-def user() -> User:
-    return User.objects.create(email="user@example.com", password="test")
-
-
-@pytest.fixture
-def user_2() -> User:
-    return User.objects.create(email="user2@example.com", password="test2")
-
-
-@pytest.fixture
-def user_private() -> User:
-    return User.objects.create(
-        email="user_private@example.com",
-        password="test",
-        is_private=True,
-    )
-
-
-@pytest.fixture
-def user_2_private() -> User:
-    return User.objects.create(
-        email="user2_private@example.com",
-        password="test2",
-        is_private=True,
-    )
 
 
 @pytest.fixture
@@ -118,8 +81,3 @@ def follower_user_2_declined_private(user_private, user_2_private) -> Follower:
         'status': Follower.Status.DECLINED,
     }
     return Follower.objects.create(**data)
-
-
-def get_tokens(user) -> str:
-    refresh = RefreshToken.for_user(user)
-    return str(refresh.access_token)

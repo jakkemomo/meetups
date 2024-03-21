@@ -1,22 +1,19 @@
-import os
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()
-
+import pytest
 from rest_framework.reverse import reverse
 from rest_framework.exceptions import ErrorDetail
 
-from apps.profiles.tests.fixtures import *
+from apps.profiles.tests.utils import *
 from apps.profiles.tests.followers.constants import UNFOLLOW_URL
 
 
+@pytest.mark.usefixtures(
+    "follower_user_accepted",
+)
 @pytest.mark.django_db
 def test_unfollow_accepted_valid(
         api_client,
         user,
         user_2,
-        follower_user_accepted,
 ):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -29,12 +26,14 @@ def test_unfollow_accepted_valid(
     }
 
 
+@pytest.mark.usefixtures(
+    "follower_user_pending_private",
+)
 @pytest.mark.django_db
 def test_unfollow_pending_valid_private(
         api_client,
         user_private,
         user_2_private,
-        follower_user_pending_private,
 ):
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -47,12 +46,14 @@ def test_unfollow_pending_valid_private(
     }
 
 
+@pytest.mark.usefixtures(
+    "follower_user_declined_private",
+)
 @pytest.mark.django_db
 def test_unfollow_declined_valid_private(
         api_client,
         user_private,
         user_2_private,
-        follower_user_declined_private,
 ):
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -97,12 +98,14 @@ def test_unfollow_user_not_found(
     }
 
 
+@pytest.mark.usefixtures(
+    "follower_user_accepted",
+)
 @pytest.mark.django_db
 def test_unfollow_no_creds(
         api_client,
         user,
         user_2,
-        follower_user_accepted,
 ):
     response = api_client.delete(
         reverse(UNFOLLOW_URL, args=[user_2.id])

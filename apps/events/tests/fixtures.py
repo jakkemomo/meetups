@@ -1,7 +1,7 @@
 import pytest
 
 from apps.events.models.events import Event
-from apps.profiles.tests.fixtures import *
+from apps.profiles.tests.utils import *
 
 
 @pytest.fixture
