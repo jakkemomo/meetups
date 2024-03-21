@@ -9,6 +9,7 @@ from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
 from apps.events.models.rating import Rating
 from apps.events.models.tags import Tag
+from apps.events.utils import Currency, PeriodRepeatability
 from apps.profiles.models.city import City
 
 user_model = settings.AUTH_USER_MODEL
@@ -43,6 +44,12 @@ class Event(AbstractBaseModel):
     )
     desired_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
     ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
+    repeatable = fields.BooleanField(default=False)
+    repeatability = fields.CharField(choices=[(period.value, period) for period in PeriodRepeatability])
+    participants_age = fields.PositiveSmallIntegerField(default=18)
+    cost = fields.DecimalField(max_digits=8, decimal_places=2, localize=False, default=0.0)
+    free = fields.BooleanField(default=True)
+    currency = fields.CharField(choices=[(cur.value, cur) for cur in Currency])
 
     class Meta:
         ordering = ["start_date"]
