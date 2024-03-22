@@ -50,6 +50,7 @@ class Event(AbstractBaseModel):
     cost = fields.DecimalField(max_digits=8, decimal_places=2, localize=False, default=0.0)
     free = fields.BooleanField(default=True)
     currency = fields.CharField(choices=[(cur.value, cur) for cur in Currency])
+    gallery = models.JSONField(empty_strings_allowed=True, default=list)
 
     class Meta:
         ordering = ["start_date"]
