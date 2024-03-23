@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import fields
 from django.utils import timezone
@@ -45,12 +46,13 @@ class Event(AbstractBaseModel):
     desired_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
     ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
     repeatable = fields.BooleanField(default=False)
-    repeatability = fields.CharField(choices=[(period.value, period) for period in PeriodRepeatability])
+    repeatability = fields.CharField(choices=[(period.value, period) for period in PeriodRepeatability],
+                                     default=PeriodRepeatability.MONTH)
     participants_age = fields.PositiveSmallIntegerField(default=18)
-    cost = fields.DecimalField(max_digits=8, decimal_places=2, localize=False, default=0.0)
+    cost = fields.DecimalField(max_digits=8, decimal_places=2, default=0.0)
     free = fields.BooleanField(default=True)
-    currency = fields.CharField(choices=[(cur.value, cur) for cur in Currency])
-    gallery = models.JSONField(empty_strings_allowed=True, default=list)
+    currency = fields.CharField(choices=[(cur.value, cur) for cur in Currency], default=Currency.BYN)
+    gallery = ArrayField(models.CharField(max_length=250, null=True, blank=True, default=""), default=list)
 
     class Meta:
         ordering = ["start_date"]
