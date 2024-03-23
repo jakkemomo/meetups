@@ -49,7 +49,7 @@ class Event(AbstractBaseModel):
     repeatability = fields.CharField(choices=[(period.value, period) for period in PeriodRepeatability],
                                      default=PeriodRepeatability.MONTH)
     participants_age = fields.PositiveSmallIntegerField(default=18)
-    cost = fields.DecimalField(max_digits=8, decimal_places=2, default=0.0)
+    cost = fields.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     free = fields.BooleanField(default=True)
     currency = fields.CharField(choices=[(cur.value, cur) for cur in Currency], default=Currency.BYN)
     gallery = ArrayField(models.CharField(max_length=250, null=True, blank=True, default=""), default=list)
