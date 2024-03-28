@@ -1,12 +1,14 @@
 import os
 import django
+import pytest
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.reverse import reverse
+
+from apps.profiles.tests.utils import get_tokens
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from apps.events.tests.fixtures import *
 from apps.events.tests.events.constants import IS_PARTICIPANT_URL
 
 
