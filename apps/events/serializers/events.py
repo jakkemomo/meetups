@@ -3,7 +3,6 @@ from rest_framework import serializers
 
 from apps.core.utils import validate_city
 from apps.events.models import Event, Tag, Category
-from apps.events.utils import Currency
 from apps.profiles.models import User
 from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
 
