@@ -18,7 +18,8 @@ class User(AbstractUser):
     is_email_verified = models.BooleanField(default=False)
     bio = models.CharField(max_length=1000, null=True, blank=True)
     age = models.PositiveIntegerField(default=18, validators=[MinValueValidator(1), MaxValueValidator(100)])
-
+    category_favorite = models.ManyToManyField("events.Category", db_table="user_category_favorite",
+                                               related_name="categories_favorite")
     # These fields are using in AbstractUser model
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", ]

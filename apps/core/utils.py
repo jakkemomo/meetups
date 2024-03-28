@@ -20,7 +20,7 @@ def delete_image_if_exists(instance):
             raise
 
 
-def validate_city(data: dict[str, str | None]):
+def validate_city(data: dict[str, str | None]) -> City:
     new_city_name, new_city_country = data.get("name"), data.get("country")
     try:
         if new_city_name and new_city_country:

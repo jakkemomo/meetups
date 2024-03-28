@@ -1,9 +1,10 @@
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
+from apps.core.utils import validate_city
 from apps.events.models import Event, Tag, Category
 from apps.profiles.models import User
-from apps.profiles.serializers.cities import CityRetrieveSerializer
+from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
@@ -11,6 +12,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
     location = serializers.ListField(
         child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2
     )
+    city = CityUpdateSerializer(many=False, required=True)
 
     class Meta:
         model = Event
@@ -23,7 +25,8 @@ class EventCreateSerializer(serializers.ModelSerializer):
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
         tags = validated_data.pop("tags")
-        event = Event(**validated_data)
+        city = validate_city(validated_data.pop("city"))
+        event = Event(**validated_data, city_id=city.id)
         event.save()
         if tags:
             event.tags.set([tag.id for tag in tags])

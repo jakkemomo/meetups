@@ -249,6 +249,32 @@ class CategoryViewSet(viewsets.ModelViewSet):
             case "list":
                 return CategoryListSerializer
 
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @action(
+        methods=['post'],
+        detail=True,
+        permission_classes=[IsAuthenticatedOrReadOnly, CategoriesPermissions],
+        url_path='favorite',
+        url_name='category_favorite_add'
+    )
+    def add_category_to_favorite(self, request, category_id: int):
+        user = request.user
+        category = Category.objects.get(id=category_id)
+        user.category_favorite.add(category)
+        return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @add_category_to_favorite.mapping.delete
+    def delete_category_from_favorite(self, request, category_id: int):
+        user = request.user
+        category = Category.objects.get(id=category_id)
+        user.category_favorite.remove(category)
+        return Response(status=status.HTTP_200_OK)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """

@@ -6,7 +6,7 @@ from apps.profiles.models.city import City
 class CityUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = City
-        fields = ["name", "country"]
+        fields = ["id", "name", "country"]
 
 
 class CityRetrieveSerializer(serializers.ModelSerializer):
