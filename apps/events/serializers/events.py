@@ -2,9 +2,18 @@ from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
 from apps.core.utils import validate_city
-from apps.events.models import Event, Tag, Category
+from apps.events.models import Event, Tag, Category, Schedule
 from apps.profiles.models import User
 from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
+
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    day_of_week = serializers.ChoiceField(choices=Schedule.DayOfWeek.choices, required=True)
+    time = serializers.TimeField(required=True)
+
+    class Meta:
+        model = Schedule
+        fields = ["day_of_week", "time"]
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
@@ -13,6 +22,18 @@ class EventCreateSerializer(serializers.ModelSerializer):
         child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2
     )
     city = CityUpdateSerializer(many=False, required=True)
+    cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
+    repeatable = serializers.BooleanField(default=False)
+    participants_age = serializers.IntegerField(min_value=0, max_value=100, default=18)
+    currency = serializers.ChoiceField(choices=Event.Currency.choices, default=Event.Currency.BYN)
+    free = serializers.BooleanField(default=True)
+    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False, default=[])
+    schedule = ScheduleSerializer(many=True, required=False, allow_empty=True)
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False, default=[])
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
+    is_finished = serializers.BooleanField(default=False)
+    is_visible = serializers.BooleanField(default=True)
+
 
     class Meta:
         model = Event
@@ -25,9 +46,13 @@ class EventCreateSerializer(serializers.ModelSerializer):
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
         tags = validated_data.pop("tags")
+        schedule = validated_data.pop("schedule", [])
         city = validate_city(validated_data.pop("city"))
         event = Event(**validated_data, city_id=city.id)
         event.save()
+        for schedule_data in schedule:
+            new_schedule = Schedule.objects.create(event=event, **schedule_data)
+            event.schedule.add(new_schedule)
         if tags:
             event.tags.set([tag.id for tag in tags])
         return event
