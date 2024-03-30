@@ -30,3 +30,4 @@ from .review import (
     ReviewRetrieveSerializer
 )
 from .map import GeoJsonSerializer
+from .currency import CurrencyListSerializer

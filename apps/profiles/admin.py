@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models.city import City
 from .models.users import User
 from .models.followers import Follower
 
@@ -42,7 +41,7 @@ class UserAdmin(admin.ModelAdmin):
             count,
         )
 
-    followers_number_link.short_description = "Followers number"
+    followers_number_link.short_description = "Followers number" #
 
     def following_number_link(self, obj):
         queryset = Follower.objects.filter(follower=obj, status="ACCEPTED")
@@ -60,12 +59,6 @@ class UserAdmin(admin.ModelAdmin):
     following_number_link.short_description = "Following number"
 
 
-@admin.register(City)
-class CityAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "country", "center", "timezone")
-    search_fields = ("name", "country")
-
-
 @admin.register(Follower)
 class FollowerAdmin(admin.ModelAdmin):
     list_display = ("id", "user_link", "follower_link", "status", "created_at", "updated_at")
@@ -78,7 +71,7 @@ class FollowerAdmin(admin.ModelAdmin):
 
     def user_link(self, obj):
         link = reverse(
-            f"admin:profiles_user_change",
+            "admin:profiles_user_change",
             args=(obj.user.id,)
         )
         return format_html(
@@ -91,7 +84,7 @@ class FollowerAdmin(admin.ModelAdmin):
 
     def follower_link(self, obj):
         link = reverse(
-            f"admin:profiles_user_change",
+            "admin:profiles_user_change",
             args=(obj.follower.id,)
         )
         return format_html(
@@ -101,4 +94,3 @@ class FollowerAdmin(admin.ModelAdmin):
         )
 
     follower_link.short_description = "Follower"
-

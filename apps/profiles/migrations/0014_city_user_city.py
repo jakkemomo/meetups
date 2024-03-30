@@ -7,15 +7,15 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def populate_default_city(apps, schema_editor):
-    City = apps.get_model('profiles', 'city')
-    obj = City(
-        name="Unknown",
-        country="World",
-        center=django.contrib.gis.geos.point.Point(53.902284, 27.561831),
-        timezone="UTC"
-    )
-    obj.save()
+# def populate_default_city(apps, schema_editor):
+#     City = apps.get_model('profiles', 'city')
+#     obj = City(
+#         name="Unknown",
+#         country="World",
+#         center=django.contrib.gis.geos.point.LocationPoint(53.902284, 27.561831),
+#         timezone="UTC"
+#     )
+#     obj.save()
 
 
 class Migration(migrations.Migration):
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 'ordering': ['-name'],
             },
         ),
-        migrations.RunPython(populate_default_city),
+        # migrations.RunPython(populate_default_city),
         migrations.AddField(
             model_name='user',
             name='city',

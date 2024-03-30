@@ -1,4 +1,5 @@
 import json
+import logging
 from uuid import uuid4
 
 from django.core.serializers import serialize
@@ -9,17 +10,15 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, \
-    IsAdminUser, IsAuthenticated
+    IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from apps.core.permissions import IsOwnerOrReadOnly
+from apps.core.utils import delete_image_if_exists
 from apps.events.filters import TrigramSimilaritySearchFilter
-from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
+from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
-
-
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -41,16 +40,8 @@ from apps.events.serializers import (
     ReviewListSerializer,
     CategoryRetrieveSerializer, CategoryCreateSerializer,
     CategoryUpdateSerializer,
-    CategoryListSerializer,
+    CategoryListSerializer, CurrencyListSerializer,
 )
-
-from apps.core.utils import delete_image_if_exists
-from apps.profiles.models.users import User
-from apps.profiles.models.followers import Follower
-import logging
-
-from apps.profiles.permissions.followers import FollowerPermissions
-from apps.profiles.utils import get_user_object
 
 logger = logging.getLogger("events_app")
 
@@ -201,21 +192,6 @@ class EventViewSet(viewsets.ModelViewSet):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
-    @action(
-        methods=['get'],
-        detail=False,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path='currencies',
-        url_name='currencies',
-        filter_backends=[],
-        pagination_class=None
-    )
-    def currencies(self, request):
-        return Response(Event.Currency.values, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -380,3 +356,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewUpdateSerializer
             case "list":
                 return ReviewListSerializer
+
+
+class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    """Only get method is allowed for this viewset"""
+
+    permission_classes = [AllowAny]
+    queryset = Currency.objects.all()
+    serializer_class = CurrencyListSerializer
+
+    @swagger_auto_schema(
+        tags=['currency'],
+        operation_description="Get all currencies",
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
