@@ -221,17 +221,17 @@ class EventViewSet(viewsets.ModelViewSet):
         request_body=no_body,
     )
     @action(
-        methods=['patch'],
-        detail=True,
-        permission_classes=[IsOwnerOrReadOnly],
+        methods=['get'],
+        detail=False,
+        permission_classes=[IsAuthenticated],
         url_path='private-url',
         url_name='private_url',
+        filter_backends=[],
+        pagination_class=None
     )
-    def set_private_url(self, request, event_id: int):
-        event = self.get_object()
-        event.private_url = str(uuid4())
-        event.save()
-        return Response(event.private_url, status=status.HTTP_200_OK)
+    def set_private_url(self, request):
+        private_url = str(uuid4())
+        return Response(private_url, status=status.HTTP_200_OK)
 
 
 class RatingViewSet(viewsets.ModelViewSet):
