@@ -85,7 +85,10 @@ python_files = 'test*.py'
 # always run in parallel (requires pytest-xdist, see tests-requirements.txt)
 # and enable strict mode: require all markers
 # to be defined and raise on invalid config values
-addopts = "-nauto --strict-markers --strict-config"
+addopts = "--strict-markers --strict-config --color=yes"
+
+log_cli = true
+log_cli_level = "INFO"
 
 # treat xpasses as tests failures so they get converted to regular tests as soon as possible
 xfail_strict = true
