@@ -18,12 +18,7 @@ async def test_accept_valid(
         async_client,
         async_user_private,
         async_user_2_private,
-        city,
 ):
-    async_user_2_private = await async_user_2_private
-    async_user_private = await async_user_private
-    async_client = await async_client
-
     # create follow request
     await async_follower(
         user=async_user_2_private,

@@ -17,12 +17,7 @@ async def test_follow_valid(
         async_client,
         async_user,
         async_user_2,
-        city,
 ):
-    async_user_2 = await async_user_2
-    async_user = await async_user
-    async_client = await async_client
-
     # user_2 connecting to ws
     communicator = get_communicator(application, async_user_2)
     connected, subprotocol = await communicator.connect()
