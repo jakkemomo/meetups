@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 
 from django.core.serializers import serialize
 from django.db.models import Q, Count
@@ -12,6 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, \
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from apps.core.permissions import IsOwnerOrReadOnly
 from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
@@ -199,6 +201,37 @@ class EventViewSet(viewsets.ModelViewSet):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=['get'],
+        detail=False,
+        permission_classes=[IsAuthenticatedOrReadOnly],
+        url_path='currencies',
+        url_name='currencies',
+        filter_backends=[],
+        pagination_class=None
+    )
+    def currencies(self, request):
+        return Response(Event.Currency.values, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=['patch'],
+        detail=True,
+        permission_classes=[IsOwnerOrReadOnly],
+        url_path='private-url',
+        url_name='private_url',
+    )
+    def set_private_url(self, request, event_id: int):
+        event = self.get_object()
+        event.private_url = str(uuid4())
+        event.save()
+        return Response(event.private_url, status=status.HTTP_200_OK)
 
 
 class RatingViewSet(viewsets.ModelViewSet):

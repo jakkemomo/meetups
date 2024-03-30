@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     replaces = [('profiles', '0015_user_is_private'), ('profiles', '0016_follower'), ('profiles', '0017_alter_user_is_private')]
 
     dependencies = [
-        ('profiles', '0014_city_user_city'),
+        ('profiles', '0015_user_category_favorite'),
     ]
 
     operations = [

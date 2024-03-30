@@ -24,7 +24,7 @@ def is_participant(request, obj):
 
 
 def is_owner(request, obj):
-    return request.user == obj.created_by or request.user.is_staff
+    return request.user == obj.created_by
 
 
 def is_verified(request):
