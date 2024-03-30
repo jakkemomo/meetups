@@ -5,3 +5,4 @@ from .rating import Rating
 from .review import Review
 from .schedule import Schedule
 from .tags import Tag
+from .currency import Currency

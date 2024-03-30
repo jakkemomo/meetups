@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from apps.core.utils import delete_image_if_exists, validate_city
+from apps.core.utils import delete_image_if_exists
 from apps.events.models import Event
 from apps.events.serializers import EventListSerializer
 from apps.profiles.models import UserRating, User
@@ -83,16 +83,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
         profile_instance = self.get_object()
         delete_image_if_exists(profile_instance)
         return super().destroy(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        instance = self.get_object()
-        city = self.request.data.get("city", None)
-        if city:
-            new_city = validate_city(city)
-            if instance.city != new_city:
-                instance.city = new_city
-                instance.save()
-        serializer.save()
 
 
 class MyProfileViewSet(generics.RetrieveAPIView):
@@ -176,7 +166,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         if not instance:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
-                data={"detail": f"No such follow requests was found"}
+                data={"detail": "No such follow requests was found"}
             )
 
         if instance.status == Follower.Status.ACCEPTED:

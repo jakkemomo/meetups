@@ -1,10 +1,23 @@
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
-from apps.core.utils import validate_city
-from apps.events.models import Event, Tag, Category, Schedule
+from apps.events.models import Event, Tag, Category, Schedule, Currency
 from apps.profiles.models import User
-from apps.profiles.serializers.cities import CityRetrieveSerializer, CityUpdateSerializer
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    latitude = serializers.DecimalField(max_digits=7, decimal_places=5, write_only=True)
+    longitude = serializers.DecimalField(max_digits=7, decimal_places=5, write_only=True)
+
+    class Meta:
+        model = Event
+        fields = ["latitude", "longitude"]
+
+    def to_representation(self, value):
+        return {
+            "latitude": value.y,
+            "longitude": value.x
+        }
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -18,14 +31,15 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 class EventCreateSerializer(serializers.ModelSerializer):
     desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=1)
-    location = serializers.ListField(
-        child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2
-    )
-    city = CityUpdateSerializer(many=False, required=True)
+    location = LocationSerializer(required=True, many=False)
+    city_south_west_point = LocationSerializer(required=True, many=False)
+    city_north_east_point = LocationSerializer(required=True, many=False)
+    city = serializers.CharField(max_length=50)
+    country = serializers.CharField(max_length=50)
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
     repeatable = serializers.BooleanField(default=False)
     participants_age = serializers.IntegerField(min_value=0, max_value=100, default=18)
-    currency = serializers.ChoiceField(choices=Event.Currency.choices, default=Event.Currency.BYN)
+    currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all(), required=False)
     free = serializers.BooleanField(default=True)
     gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False, default=[])
     schedule = ScheduleSerializer(many=True, required=False, allow_empty=True)
@@ -33,22 +47,41 @@ class EventCreateSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
     is_finished = serializers.BooleanField(default=False)
     is_visible = serializers.BooleanField(default=True)
-
+    any_participant_number = serializers.BooleanField(default=False)
+    start_time = serializers.TimeField(required=True)
+    end_time = serializers.TimeField(required=False)
 
     class Meta:
         model = Event
         exclude = ["participants", "created_by", "updated_by"]
 
     def create(self, validated_data):
-        validated_data["location"] = Point(validated_data.pop("location"))
+        validated_data["location"] = Point(
+            (
+                validated_data["location"]["longitude"],
+                validated_data["location"]["latitude"]
+            )
+        )
+        validated_data["city_south_west_point"] = Point(
+            (
+                validated_data["city_south_west_point"]["longitude"],
+                validated_data["city_south_west_point"]["latitude"]
+            )
+
+        )
+        validated_data["city_north_east_point"] = Point(
+            (
+                validated_data["city_north_east_point"]["longitude"],
+                validated_data["city_north_east_point"]["latitude"]
+            )
+        )
         request = self.context["request"]
         user_id = request.user.id
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
         tags = validated_data.pop("tags")
         schedule = validated_data.pop("schedule", [])
-        city = validate_city(validated_data.pop("city"))
-        event = Event(**validated_data, city_id=city.id)
+        event = Event(**validated_data)
         event.save()
         for schedule_data in schedule:
             new_schedule = Schedule.objects.create(event=event, **schedule_data)
@@ -57,10 +90,12 @@ class EventCreateSerializer(serializers.ModelSerializer):
             event.tags.set([tag.id for tag in tags])
         return event
 
-    def to_representation(self, instance):
-        instance.location = instance.location.geojson
-        instance = super().to_representation(instance)
-        return instance
+    # def to_representation(self, instance):
+    #     instance.location = instance.location.geojson
+    #     instance.city_south_west_point = instance.city_south_west_point.geojson
+    #     instance.city_north_east_point = instance.city_north_east_point.geojson
+    #     instance = super().to_representation(instance)
+    #     return instance
 
 
 class EventUpdateSerializer(EventCreateSerializer):
@@ -145,7 +180,6 @@ class EventRetrieveSerializer(BaseEventSerializer):
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
-    city = CityRetrieveSerializer(many=False)
     participants_number = serializers.IntegerField()
 
     def get_location(self, obj):
@@ -155,7 +189,7 @@ class EventRetrieveSerializer(BaseEventSerializer):
 
     class Meta:
         model = Event
-        exclude = ["ratings", "updated_by"]
+        exclude = ["ratings", "updated_by", "city_south_west_point", "city_north_east_point"]
 
 
 class EmptySerializer(serializers.Serializer):

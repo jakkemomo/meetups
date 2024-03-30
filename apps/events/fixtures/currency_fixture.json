@@ -1,0 +1,68 @@
+[
+  {
+    "model": "events.currency",
+    "pk": 1,
+    "fields": {
+      "created_by": null,
+      "created_at": "2023-08-12T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2023-08-12T08:51:49.537Z",
+      "name": "BYN"
+    }
+  },
+  {
+    "model": "events.currency",
+    "pk": 2,
+    "fields": {
+      "created_by": null,
+      "created_at": "2023-08-12T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2023-08-12T08:51:49.537Z",
+      "name": "RUB"
+    }
+  },
+  {
+    "model": "events.currency",
+    "pk": 3,
+    "fields": {
+      "created_by": null,
+      "created_at": "2023-08-12T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2023-08-12T08:51:49.537Z",
+      "name": "UAH"
+    }
+  },
+  {
+    "model": "events.currency",
+    "pk": 4,
+    "fields": {
+      "created_by": null,
+      "created_at": "2023-08-12T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2023-08-12T08:51:49.537Z",
+      "name": "KZT"
+    }
+  },
+  {
+    "model": "events.currency",
+    "pk": 5,
+    "fields": {
+      "created_by": null,
+      "created_at": "2023-08-12T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2023-08-12T08:51:49.537Z",
+      "name": "USD"
+    }
+  },
+  {
+    "model": "events.currency",
+    "pk": 6,
+    "fields": {
+      "created_by": null,
+      "created_at": "2023-08-12T08:51:49.537Z",
+      "updated_by": null,
+      "updated_at": "2023-08-12T08:51:49.537Z",
+      "name": "EUR"
+    }
+  }
+]
