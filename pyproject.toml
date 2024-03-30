@@ -86,6 +86,7 @@ python_files = 'test*.py'
 # and enable strict mode: require all markers
 # to be defined and raise on invalid config values
 addopts = "--strict-markers --strict-config --color=yes"
+asyncio_mode = "auto"
 
 log_cli = true
 log_cli_level = "INFO"

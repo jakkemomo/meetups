@@ -11,7 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv"
+)
 DEBUG = True
 DOCKERIZED = os.environ.get("DOCKERIZED", False)
 
@@ -24,6 +27,7 @@ SERVICE_ACCOUNT = False
 
 if SERVICE_URL:
     from urllib.parse import urlparse
+
     ALLOWED_HOSTS = [str(urlparse(SERVICE_URL).netloc)]
     DEBUG = False
     DEBUG_PROPAGATE_EXCEPTIONS = True
@@ -34,7 +38,6 @@ if SERVICE_URL:
 else:
     SERVICE_URL = "http://localhost:8000/"
     ALLOWED_HOSTS = ['*']
-
 
 if DOCKERIZED:
     # Settings for docker startup
@@ -61,10 +64,10 @@ else:
         )
         SERVICE_ACCOUNT = True
     except FileNotFoundError:
-        logging.warning('No gcpCredentials.json file found. Using default credentials.')
+        logging.warning(
+            'No gcpCredentials.json file found. Using default credentials.')
 
     STATIC_URL = f'{GS_BUCKET_URL}/static/'
-
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
@@ -79,6 +82,7 @@ GEOS_LIBRARY_PATH = os.environ.get("GEOS_LIBRARY_PATH")
 INSTALLED_APPS = [
     "daphne",
     "channels",
+    "channels_postgres",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -110,7 +114,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -139,6 +142,14 @@ DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5555"),
+    },
+    'channels_postgres': {
+        'ENGINE': "django.contrib.gis.db.backends.postgis",
+        "NAME": os.getenv("POSTGRES_DB") + "_ws",
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
         "HOST": os.getenv("DB_HOST", "localhost"),
@@ -178,10 +189,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication', ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication', ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend']
 }
 
 SIMPLE_JWT = {
@@ -192,7 +205,8 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
 }
 
 # Logging
@@ -237,7 +251,8 @@ LOGGING = {
 }
 
 # Email
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND",
+                          "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
@@ -246,9 +261,16 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "information.mevent@gmail.com")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Websockets
-# Testing ver.
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+    'default': {
+        'BACKEND': 'channels_postgres.core.PostgresChannelLayer',
+        'CONFIG': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            "NAME": os.getenv("POSTGRES_DB") + "_ws",
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5555"),
+        },
+    },
 }

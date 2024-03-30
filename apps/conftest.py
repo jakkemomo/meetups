@@ -7,7 +7,7 @@ django.setup()
 import pytest
 from rest_framework.test import APIClient
 
-from apps.profiles.models import User
+from apps.profiles.models import User, City
 from apps.profiles.models.followers import Follower
 
 
@@ -121,3 +121,9 @@ def follower_user_2_declined_private(user_private, user_2_private) -> Follower:
         'status': Follower.Status.DECLINED,
     }
     return Follower.objects.create(**data)
+
+
+@pytest.fixture
+def city() -> City:
+    if not City.objects.filter(id=1):
+        return City.objects.create(id=1)

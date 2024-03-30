@@ -1,10 +1,12 @@
+import asyncio
+
 import pytest
 
 from channels.routing import URLRouter
 from channels.db import database_sync_to_async
 from django.test import AsyncClient
 
-from apps.profiles.models import User
+from apps.profiles.models import User, City
 from apps.profiles.routers import websocket_urlpatterns
 
 
@@ -19,7 +21,7 @@ async def async_client() -> AsyncClient:
 
 
 @pytest.fixture
-async def async_user() -> User:
+async def async_user(city) -> User:
     data = {
         "email": "user@example.com",
         "password": "test",
@@ -28,7 +30,7 @@ async def async_user() -> User:
 
 
 @pytest.fixture
-async def async_user_2() -> User:
+async def async_user_2(city) -> User:
     data = {
         "email": "user2@example.com",
         "password": "test",
@@ -37,7 +39,7 @@ async def async_user_2() -> User:
 
 
 @pytest.fixture
-async def async_user_private() -> User:
+async def async_user_private(city) -> User:
     data = {
         "email": "user_private@example.com",
         "password": "test",
@@ -47,10 +49,20 @@ async def async_user_private() -> User:
 
 
 @pytest.fixture
-async def async_user_2_private() -> User:
+async def async_user_2_private(city) -> User:
     data = {
         "email": "user2_private@example.com",
         "password": "test",
         "is_private": True
     }
     return await database_sync_to_async(User.objects.create)(**data)
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
