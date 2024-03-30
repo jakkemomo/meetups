@@ -34,6 +34,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
     is_finished = serializers.BooleanField(default=False)
     is_visible = serializers.BooleanField(default=True)
 
+
     class Meta:
         model = Event
         exclude = ["participants", "created_by", "updated_by"]
