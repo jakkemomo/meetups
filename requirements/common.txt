@@ -16,3 +16,8 @@ google-resumable-media==2.6.0
 googleapis-common-protos==1.61.0
 django-cors-headers==4.3.1
 django_filter==23.5
+# websockets
+channels==4.0.0
+channels-redis==4.2.0
+daphne==4.1.0
+channels-postgres==1.0.4
