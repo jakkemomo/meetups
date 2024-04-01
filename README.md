@@ -37,3 +37,12 @@ Install [docker](https://docs.docker.com/engine/install/) and [docker compose](h
 7. Click on 'New pull request'
 8. Choose your branch (new_branch) to compare with the main branch
 9. Click on 'Create pull request' button
+
+### Testing
+Our test suite includes both synchronous and asynchronous tests. 
+Due to the nature of these tests, they must be run separately:
+
+- For synchronous tests, use the command: `pytest -m "not asyncio"`
+- For asynchronous tests, use the command: `pytest -m asyncio`
+
+This ensures that the correct environment is set up for each type of test.
