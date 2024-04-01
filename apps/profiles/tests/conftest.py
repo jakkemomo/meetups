@@ -7,7 +7,7 @@ django.setup()
 import pytest
 from rest_framework.test import APIClient
 
-from apps.profiles.models import User, City
+from apps.profiles.models import User
 
 
 @pytest.fixture
@@ -41,9 +41,3 @@ def user_2_private() -> User:
         password="test2",
         is_private=True,
     )
-
-
-@pytest.fixture
-def city() -> City:
-    if not City.objects.filter(id=1):
-        return City.objects.create(id=1)

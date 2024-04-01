@@ -266,7 +266,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_postgres.core.PostgresChannelLayer',
         'CONFIG': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            "NAME": os.getenv("POSTGRES_DB") + "_ws",
+            "NAME": os.getenv("WS_DB"),
             "USER": os.getenv("POSTGRES_USER"),
             "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "localhost"),
