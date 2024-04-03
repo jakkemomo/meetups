@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from apps.core.utils import delete_image_if_exists
 from apps.events.models import Event
 from apps.events.serializers import EventListSerializer
+from apps.profiles.managers import NotificationManager
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions import (
@@ -122,14 +123,14 @@ class FollowerViewSet(viewsets.ModelViewSet):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
-        instance = Follower.objects.filter(user=user, follower=request.user).first()
-        if instance:
-            if instance.status == Follower.Status.ACCEPTED:
+        follower_object = Follower.objects.filter(user=user, follower=request.user).first()
+        if follower_object:
+            if follower_object.status == Follower.Status.ACCEPTED:
                 return Response(
                     status=status.HTTP_409_CONFLICT,
                     data={"detail": "Already following"}
                 )
-            elif instance.status in (
+            elif follower_object.status in (
                     Follower.Status.PENDING,
                     Follower.Status.DECLINED,
             ):
@@ -141,9 +142,12 @@ class FollowerViewSet(viewsets.ModelViewSet):
         data = {"user": user.id, "follower": request.user.id}
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        follower_object = serializer.save()
 
-        # WS logic
+        if user.is_private:
+            NotificationManager.follow_request(user.id, request.user.id)
+        else:
+            NotificationManager.follow(user.id, request.user.id)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -162,24 +166,24 @@ class FollowerViewSet(viewsets.ModelViewSet):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
-        instance = Follower.objects.filter(user=request.user, follower=user,).first()
-        if not instance:
+        follower_object = Follower.objects.filter(user=request.user, follower=user, ).first()
+        if not follower_object:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
                 data={"detail": "No such follow requests was found"}
             )
 
-        if instance.status == Follower.Status.ACCEPTED:
+        if follower_object.status == Follower.Status.ACCEPTED:
             return Response(
                 status=status.HTTP_409_CONFLICT,
                 data={"detail": f"{user} is already following you"},
             )
 
-        instance.status = Follower.Status.ACCEPTED
-        instance.save()
-        serializer = self.get_serializer(instance)
+        follower_object.status = Follower.Status.ACCEPTED
+        follower_object.save()
+        serializer = self.get_serializer(follower_object)
 
-        # WS logic
+        NotificationManager.accept_follow_request(request.user.id, user.id)
 
         return Response(
             status=status.HTTP_200_OK,
@@ -198,19 +202,19 @@ class FollowerViewSet(viewsets.ModelViewSet):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
-        instance = Follower.objects.filter(user=user, follower=request.user).first()
-        if not instance:
+        follower_object = Follower.objects.filter(user=user, follower=request.user).first()
+        if not follower_object:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
                 data={"detail": f"You are not following {user}"},
             )
 
-        if instance.status == Follower.Status.ACCEPTED:
+        if follower_object.status == Follower.Status.ACCEPTED:
             message = f"You are no longer following {user}"
         else:
             message = f"You canceled follow request to {user}"
 
-        instance.delete()
+        follower_object.delete()
 
         return Response(
             status=status.HTTP_200_OK,

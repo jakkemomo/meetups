@@ -6,8 +6,8 @@ from apps.profiles.models import User
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    latitude = serializers.DecimalField(max_digits=7, decimal_places=5, write_only=True)
-    longitude = serializers.DecimalField(max_digits=7, decimal_places=5, write_only=True)
+    latitude = serializers.DecimalField(max_digits=4, decimal_places=12, write_only=True)
+    longitude = serializers.DecimalField(max_digits=4, decimal_places=12, write_only=True)
 
     class Meta:
         model = Event
@@ -30,7 +30,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
-    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=1)
+    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True)
     location = LocationSerializer(required=True, many=False)
     city_south_west_point = LocationSerializer(required=True, many=False)
     city_north_east_point = LocationSerializer(required=True, many=False)
@@ -39,17 +39,20 @@ class EventCreateSerializer(serializers.ModelSerializer):
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
     repeatable = serializers.BooleanField(default=False)
     participants_age = serializers.IntegerField(min_value=0, max_value=100, default=18)
-    currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all(), required=False)
+    currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all(), required=False, allow_null=True,
+                                                  default=None)
     free = serializers.BooleanField(default=True)
-    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False, default=[])
-    schedule = ScheduleSerializer(many=True, required=False, allow_empty=True)
-    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False, default=[])
+    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False,
+                                    default=[])
+    schedule = ScheduleSerializer(many=True, required=False, allow_empty=True, allow_null=True)
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False, default=[],
+                                              allow_null=True)
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
     is_finished = serializers.BooleanField(default=False)
     is_visible = serializers.BooleanField(default=True)
     any_participant_number = serializers.BooleanField(default=False)
     start_time = serializers.TimeField(required=True)
-    end_time = serializers.TimeField(required=False)
+    end_time = serializers.TimeField(required=False, allow_null=True, default=None)
 
     class Meta:
         model = Event
