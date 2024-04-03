@@ -3,20 +3,20 @@ class MainRouter:
         """
         Reads go to a randomly-chosen replica.
         """
-        return 'primary'
+        return 'default'
 
     def db_for_write(self, model, **hints):
         """
-        Writes always go to primary.
+        Writes always go to default.
         """
-        return 'primary'
+        return 'default'
 
     def allow_relation(self, obj1, obj2, **hints):
         """
         Relations between objects are allowed if both objects are
-        in the primary/replica pool.
+        in the default/replica pool.
         """
-        db_list = ('primary',)
+        db_list = ('default',)
         if obj1._state.db in db_list and obj2._state.db in db_list:
             return True
         return None
