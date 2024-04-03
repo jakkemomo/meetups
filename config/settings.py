@@ -139,7 +139,8 @@ TEMPLATES = [
 ASGI_APPLICATION = "config.asgi.application"
 
 DATABASES = {
-    "default": {
+    "default": {},
+    "primary": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("POSTGRES_DB"),
         "USER": os.getenv("POSTGRES_USER"),
@@ -156,6 +157,8 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "5555"),
     }
 }
+
+DATABASE_ROUTERS = ["config.db_routers.WSRouter", "config.db_routers.MainRouter"]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
