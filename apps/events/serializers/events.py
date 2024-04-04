@@ -6,8 +6,10 @@ from apps.profiles.models import User
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    latitude = serializers.DecimalField(max_digits=4, decimal_places=12, write_only=True)
-    longitude = serializers.DecimalField(max_digits=4, decimal_places=12, write_only=True)
+    latitude = serializers.DecimalField(max_value=180, min_value=-180,
+                                        write_only=True, max_digits=18, decimal_places=15)
+    longitude = serializers.DecimalField(max_value=180, min_value=-180,
+                                         write_only=True, max_digits=18, decimal_places=15)
 
     class Meta:
         model = Event
