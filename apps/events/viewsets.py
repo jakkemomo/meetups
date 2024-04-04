@@ -127,13 +127,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
-            case "register_for_event":
-                return EmptySerializer
-            case "leave_from_event":
-                return EmptySerializer
-            case "add_to_favorite":
-                return EmptySerializer
-            case "delete_from_favorite":
+            case _:
                 return EmptySerializer
 
     @swagger_auto_schema(
@@ -265,6 +259,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 return CategoryUpdateSerializer
             case "list":
                 return CategoryListSerializer
+            case _:
+                return EmptySerializer
 
     @swagger_auto_schema(
         request_body=no_body
