@@ -44,11 +44,9 @@ class EventCreateSerializer(serializers.ModelSerializer):
     currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all(), required=False, allow_null=True,
                                                   default=None)
     free = serializers.BooleanField(default=True)
-    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False,
-                                    default=[])
+    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False)
     schedule = ScheduleSerializer(many=True, required=False, allow_empty=True, allow_null=True)
-    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False, default=[],
-                                              allow_null=True)
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False, allow_null=True)
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
     is_finished = serializers.BooleanField(default=False)
     is_visible = serializers.BooleanField(default=True)
