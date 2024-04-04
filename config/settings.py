@@ -278,9 +278,5 @@ CHANNEL_LAYERS = {
 }
 
 WS_ALLOWED_ORIGINS = [
-    "localhost",
-    "127.0.0.1",
-    "[::1]",
-    "https://meetups-ui-6vuzexfx2q-lm.a.run.app",
-    "*",
+    "*"
 ]
