@@ -66,4 +66,4 @@ RUN chown app:app $HOME/mediafiles
 
 # change to the app user
 USER app
-CMD ["sh", "-c", "./scripts/run.sh"]
+CMD ["sh", "-c", "deployments/app/scripts/run.sh"]
