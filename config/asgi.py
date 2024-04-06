@@ -1,9 +1,12 @@
 import os
 
+import django
 from channels.routing import ProtocolTypeRouter
 from channels.routing import URLRouter
 from channels.security.websocket import OriginValidator
 from django.core.asgi import get_asgi_application
+
+django.setup()
 
 from apps.core.middlewares import JwtAuthMiddlewareStack
 from apps.profiles.routers import websocket_urlpatterns
