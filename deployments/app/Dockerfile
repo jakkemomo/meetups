@@ -66,4 +66,5 @@ RUN chown app:app $HOME/mediafiles
 
 # change to the app user
 USER app
-CMD ["sh", "-c", "python manage.py migrate --noinput; gunicorn config.wsgi -b 0.0.0.0:8000"]
+#CMD ["sh", "-c", "python manage.py migrate --noinput; gunicorn config.wsgi -b 0.0.0.0:8000"]
+#CMD ["sh", "-c", "python manage.py migrate --noinput; daphne -b 0.0.0.0 -p 8000 config.asgi:application"]

@@ -230,6 +230,8 @@ class RatingViewSet(viewsets.ModelViewSet):
                 return RatingUpdateSerializer
             case "list":
                 return RatingListSerializer
+            case _:
+                return EmptySerializer
 
     def list(self, request, *args, **kwargs):
         queryset = Rating.objects.filter(event_id=kwargs["event_id"])
