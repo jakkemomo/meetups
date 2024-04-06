@@ -28,7 +28,8 @@ SERVICE_ACCOUNT = False
 if SERVICE_URL:
     from urllib.parse import urlparse
 
-    ALLOWED_HOSTS = [str(urlparse(SERVICE_URL).netloc)]
+    APP_URL = str(urlparse(SERVICE_URL).netloc)
+    ALLOWED_HOSTS = [APP_URL]
     DEBUG = False
     DEBUG_PROPAGATE_EXCEPTIONS = True
     CSRF_TRUSTED_ORIGINS = [SERVICE_URL]
