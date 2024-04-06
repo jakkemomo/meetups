@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
@@ -81,6 +83,8 @@ class EventCreateSerializer(serializers.ModelSerializer):
         validated_data["updated_by_id"] = user_id
         tags = validated_data.pop("tags")
         schedule = validated_data.pop("schedule", [])
+        if validated_data["type"] == "private":
+            validated_data["private_url"] = uuid4()
         event = Event(**validated_data)
         event.save()
         for schedule_data in schedule:

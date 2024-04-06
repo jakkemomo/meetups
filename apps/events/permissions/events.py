@@ -7,6 +7,8 @@ class EventPermissions(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
+            if view.action == "get_private_url":
+                return is_owner(request, obj)
             return True
         elif view.action == 'create':
             return is_verified(request)

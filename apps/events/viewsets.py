@@ -102,16 +102,29 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.kwargs.get("pk"):
-            self.queryset = Event.objects.filter(id=self.kwargs["pk"])
+            self.queryset = Event.objects.filter(
+                Q(id=self.kwargs["pk"]) & Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
+                Q(id=self.kwargs["pk"]) & Q(participants__in=[self.request.user.id]) & Q(is_finished=False) |
+                Q(id=self.kwargs["pk"]) & Q(created_by=self.request.user) & Q(type="private") |
+                Q(id=self.kwargs["pk"]) & Q(type="private") & Q(is_finished=True) & Q(is_visible=True)
+            )
+        if self.kwargs.get("token"):
+            self.queryset = Event.objects.filter(
+                Q(private_url=self.kwargs["token"]) & Q(created_by=self.request.user) |
+                Q(private_url=self.kwargs["token"] & Q(is_finished=False))
+            )
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False)
-                    | Q(participants__in=[self.request.user.id]) & Q(is_finished=False)
+                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
+                    Q(participants__in=[self.request.user.id]) & Q(is_finished=False) |
+                    Q(created_by=self.request.user) & Q(type="private") |
+                    Q(type="private") & Q(is_finished=True) & Q(is_visible=True)
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False)
+                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
+                    Q(type="private") & Q(is_finished=True) & Q(is_visible=True)
                 )
         return self.queryset.all().annotate(participants_number=Count("participants"))
 
@@ -134,6 +147,12 @@ class EventViewSet(viewsets.ModelViewSet):
             case "add_to_favorite":
                 return EmptySerializer
             case "delete_from_favorite":
+                return EmptySerializer
+            case "get_private_url":
+                return EmptySerializer
+            case "get_private_event":
+                return EmptySerializer
+            case "delete_private_event":
                 return EmptySerializer
 
     @swagger_auto_schema(
@@ -198,16 +217,37 @@ class EventViewSet(viewsets.ModelViewSet):
     )
     @action(
         methods=['get'],
-        detail=False,
-        permission_classes=[IsAuthenticated],
+        detail=True,
+        permission_classes=[IsAuthenticated, EventPermissions],
         url_path='private-url',
         url_name='private_url',
         filter_backends=[],
         pagination_class=None
     )
-    def set_private_url(self, request):
-        private_url = str(uuid4())
+    def get_private_url(self, request, event_id: int):
+        event = self.get_object()
+        private_url = event.private_url
         return Response(private_url, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=no_body
+    )
+    @action(
+        methods=['get'],
+        detail=False,
+        permission_classes=[IsAuthenticated],
+        url_path='private/<str:token>',
+        url_name='private',
+    )
+    def get_private_event(self, request, token: str):
+        Event.objects.filter(private_url=token).retrieve(request)
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @get_private_event.mapping.delete
+    def delete_private_event(self, request, token: str):
+        Event.objects.filter(private_url=token).destroy(request)
 
 
 class RatingViewSet(viewsets.ModelViewSet):
