@@ -1,48 +1,76 @@
-# Meetups App
+# Mevent
 
-## Pre requirements
-Install [docker](https://docs.docker.com/engine/install/) and [docker compose](https://docs.docker.com/compose/install/)
+Welcome to Mevent, a streamlined platform designed to facilitate the organization and discovery of meetups. Dive into a world of events tailored to your interests and locality. 
 
-## Basic setup
-1. Create `.env` file in the root dir with filled out fields from `.env.example`
-2. Run `docker-compose -f deployments/docker-compose.yml up -d`
-3. Go to `http://localhost:8000/swagger` and you should see the app running
+## Prerequisites
 
-## Local setup for easier debugging
-1. Create `.env` file in the root dir with filled out fields from `.env.example`
-2. Run your postgres db via `docker-compose -f deployments/docker-compose-db.yml up -d`
-3. For linux: install geo dependencies via `sudo apt-get install binutils libproj-dev gdal-bin`
-4. For mac: install geo dependencies via `brew install binutils proj gdal`
-5. Setup your virtual environment and install requirements via `pip install -r requirements/local.txt`
-6. Install pre-commit hooks via `pre-commit install` for code formatting and linting before commit
-7. Run migrations via `python manage.py migrate`
-8. Run server via `python manage.py runserver`
-9. Go to `http://localhost:8000/swagger` and you should see the app running
+Before diving into the setup, ensure you have the following installed:
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+## Quick Start
+
+Follow these steps to get your Meetups App running in no time:
+
+1. **Environment Setup**: Copy the `.env.example` file to `.env` in the root directory and fill it out with your specifics.
+```bash
+cp .env.example .env
+```
+2. **Launch Containers**: Run the following command to start your app.
+```bash
+docker-compose -f deployments/docker-compose.yml up -d
+```
+3. **Access App**: Open your browser and navigate to `http://localhost:8000/swagger` to see your app in action.
+
+## Development Setup
+
+For a more hands-on development environment with easier debugging:
+
+1. Set up your `.env` file as described in the Quick Start section.
+2. Start your Postgres database:
+```bash
+docker-compose -f deployments/docker-compose-db.yml up -d
+```
+3. Install geo dependencies:
+   - Linux:
+   ```bash
+   sudo apt-get install binutils libproj-dev gdal-bin
+   ```
+   - Mac:
+   ```bash
+   brew install binutils proj gdal
+   ```
+4. Set up your virtual environment and install dependencies:
+```bash
+pip install -r requirements/local.txt
+```
+5. Install pre-commit hooks with:
+```bash
+pre-commit install
+```
+6. Apply database migrations:
+```bash
+python manage.py migrate
+```
+7. Start the server:
+```bash
+python manage.py runserver
+```
+8. Visit `http://localhost:8000/swagger` to verify it's running.
 
 
-### Creating an App
-1. Create a folder with the app name in `apps`. For example: `poll`
-2. Run `python manage.py startapp poll apps/poll` from the root directory of the project
 
-### How to update from main branch
-`git stash && git checkout main && git pull && pip install -r requirements/common.txt && python manage.py migrate && git stash pop
-`
-### How to make pull request on a new branch:
-1. git checkout -b new_branch
-2. git add name_of_changed_file
-3. git commit -m "change log_description"
-4. git push -u origin new_branch
-5. Go to the Github page for the repository (e.g., https://github.com/jakkemomo/meetups)
-6. Click on 'Pull requests' tab
-7. Click on 'New pull request'
-8. Choose your branch (new_branch) to compare with the main branch
-9. Click on 'Create pull request' button
+## Testing
 
-### Testing
-Our test suite includes both synchronous and asynchronous tests. 
-Due to the nature of these tests, they must be run separately:
+Our tests are split into synchronous and asynchronous categories. Run them separately for the best results:
 
-- For synchronous tests, use the command: `pytest -m "not asyncio"`
-- For asynchronous tests, use the command: `pytest -m asyncio`
+- Synchronous tests:
+```bash
+pytest -m "not asyncio"
+```
+- Asynchronous tests:
+```bash
+pytest -m asyncio
+```
 
-This ensures that the correct environment is set up for each type of test.
+Feel free to explore, contribute, and help us make Mevent the go-to platform for discovering and organizing events!
