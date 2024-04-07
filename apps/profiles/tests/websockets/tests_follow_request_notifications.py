@@ -34,8 +34,16 @@ async def test_follow_request_valid(
 
     # notification check
     response_ws = await communicator.receive_json_from()
-    assert response_ws == {
-        "event": f"User {async_user.id} sent follow request to user {async_user_2_private.id}",
-        'from_user': async_user.id, 'type': 'follow_request',
+    assert response_ws.get("type") == "follow_request"
+    assert response_ws.get("from_user") == async_user.id
+    assert response_ws.get("to_user") == async_user_2_private.id
+    assert response_ws.get("data") == {
+        'follower_id': async_user.id,
+        'follower_image_url': async_user.image_url,
+        'follower_username': async_user.username,
+        'following_status': 'PENDING',
+        'user_id': async_user_2_private.id,
+        'user_username': async_user_2_private.username,
     }
+
     await communicator.disconnect()

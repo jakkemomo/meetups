@@ -1,13 +1,9 @@
 import pytest
 from rest_framework.reverse import reverse
 
-from apps.profiles.models.followers import Follower
-from apps.profiles.tests.followers.constants import FOLLOW_URL, ACCEPT_URL
+from apps.profiles.tests.followers.constants import FOLLOW_URL
 from apps.profiles.tests.utils import async_get_tokens
-from apps.profiles.tests.websockets.utils import (
-    async_follower,
-    get_communicator,
-)
+from apps.profiles.tests.websockets.utils import get_communicator
 
 
 @pytest.mark.django_db(transaction=True)
@@ -33,8 +29,16 @@ async def test_follow_valid(
 
     # notification check
     response_ws = await communicator.receive_json_from()
-    assert response_ws == {
-        "event": f"User {async_user.id} followed user {async_user_2.id}",
-        "from_user": async_user.id, "type": "follow",
-    }
+    assert response_ws.get("type") == "follow"
+    assert response_ws.get("from_user") == async_user.id
+    assert response_ws.get("to_user") == async_user_2.id
+    assert response_ws.get("data") == {
+            'follower_id': async_user.id,
+            'follower_image_url': async_user.image_url,
+            'follower_username': async_user.username,
+            'following_status': 'ACCEPTED',
+            'user_id': async_user_2.id,
+            'user_username': async_user_2.username,
+        }
+
     await communicator.disconnect()
