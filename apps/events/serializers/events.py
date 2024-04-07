@@ -32,7 +32,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
-    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True)
+    desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True,
+                                                           required=False)
     location = LocationSerializer(required=True, many=False)
     city_south_west_point = LocationSerializer(required=True, many=False)
     city_north_east_point = LocationSerializer(required=True, many=False)
