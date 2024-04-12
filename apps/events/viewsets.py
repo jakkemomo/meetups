@@ -1,6 +1,5 @@
 import json
 import logging
-from uuid import uuid4
 
 from django.core.serializers import serialize
 from django.db.models import Q, Count
@@ -103,23 +102,18 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.kwargs.get("pk"):
             self.queryset = Event.objects.filter(
-                Q(id=self.kwargs["pk"]) & Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                Q(id=self.kwargs["pk"]) & Q(participants__in=[self.request.user.id]) & Q(is_finished=False) |
-                Q(id=self.kwargs["pk"]) & Q(created_by=self.request.user) & Q(type="private") |
-                Q(id=self.kwargs["pk"]) & Q(type="private") & Q(is_finished=True) & Q(is_visible=True)
+                Q(id=self.kwargs["pk"]) & Q(is_visible=True) & Q(type="open") |
+                Q(id=self.kwargs["pk"]) & Q(participants__in=[self.request.user.id]) |
+                Q(id=self.kwargs["pk"]) & Q(created_by=self.request.user)
             )
         if self.kwargs.get("token"):
-            self.queryset = Event.objects.filter(
-                Q(private_url=self.kwargs["token"]) & Q(created_by=self.request.user) |
-                Q(private_url=self.kwargs["token"] & Q(is_finished=False))
-            )
+            self.queryset = Event.objects.filter(private_url=self.kwargs["token"])
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                    Q(participants__in=[self.request.user.id]) & Q(is_finished=False) |
-                    Q(created_by=self.request.user) & Q(type="private") |
-                    Q(type="private") & Q(is_finished=True) & Q(is_visible=True)
+                    Q(participants__in=[self.request.user.id]) & Q(type="private") |
+                    Q(created_by=self.request.user) & Q(type="private")
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
@@ -235,19 +229,16 @@ class EventViewSet(viewsets.ModelViewSet):
     @action(
         methods=['get'],
         detail=False,
-        permission_classes=[IsAuthenticated],
-        url_path='private/<str:token>',
-        url_name='private',
+        permission_classes=[IsAuthenticated, EventPermissions],
+        url_path='private/(?P<token>[^/.]+)',
+        url_name='private/',
+        lookup_url_kwarg="token",
+        lookup_field='private_url'
     )
-    def get_private_event(self, request, token: str):
-        Event.objects.filter(private_url=token).retrieve(request)
-
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
-    @get_private_event.mapping.delete
-    def delete_private_event(self, request, token: str):
-        Event.objects.filter(private_url=token).destroy(request)
+    def get_private_event(self, request, token):
+        event_instance = self.get_object()
+        serializer = EventRetrieveSerializer(event_instance)
+        return Response(serializer.data)
 
 
 class RatingViewSet(viewsets.ModelViewSet):

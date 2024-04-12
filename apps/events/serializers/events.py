@@ -43,7 +43,8 @@ class EventCreateSerializer(serializers.ModelSerializer):
     participants_age = serializers.IntegerField(min_value=0, max_value=100, default=18)
     currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all(), required=False)
     free = serializers.BooleanField(default=True)
-    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False, default=[])
+    gallery = serializers.ListField(child=serializers.CharField(max_length=250), allow_empty=True, required=False,
+                                    default=[])
     schedule = ScheduleSerializer(many=True, required=False, allow_empty=True)
     tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False, default=[])
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
@@ -122,6 +123,11 @@ class EventUpdateSerializer(EventCreateSerializer):
         tags = validated_data.pop("tags", None)
         if tags:
             instance.tags.set([tag.id for tag in tags])
+        event_type = validated_data.pop("type")
+        if event_type == "private":
+            instance.private_url = uuid4()
+        else:
+            instance.private_url = None
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
