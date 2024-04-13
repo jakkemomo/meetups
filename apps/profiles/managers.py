@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -13,7 +13,7 @@ class NotificationManager:
             {
                 "type": notification_type,
                 "data": data,
-                "created": datetime.now().isoformat()
+                "created": datetime.now(tz=timezone.utc).isoformat()
             }
         )
 
