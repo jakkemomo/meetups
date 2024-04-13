@@ -41,9 +41,14 @@ async def test_accept_valid(
 
     # notification check
     response_ws = await communicator.receive_json_from()
-    assert response_ws == {
-        "event": f"User {async_user_2_private.id} accepted follow request of user {async_user_private.id}",
-        "from_user": async_user_2_private.id,
-        "type": "accept_follow_request"
+    assert response_ws.get("type") == "accept_follow_request"
+    assert response_ws.get("data") == {
+        'to_user_id': async_user_private.id,
+        'to_username': async_user_private.username,
+        'from_user_id': async_user_2_private.id,
+        'from_username': async_user_2_private.username,
+        'from_user_image_url': async_user_2_private.image_url,
+        'follower_status': 'ACCEPTED',
     }
+
     await communicator.disconnect()
