@@ -1,46 +1,72 @@
+from datetime import datetime, timezone
+
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 
 class NotificationManager:
     @staticmethod
-    def send_notification(sender, recipient, event, notification_type):
+    def send_notification(recipient, data, notification_type):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             str(recipient),
             {
                 "type": notification_type,
-                "event": event,
-                "from_user": sender,
+                "data": data,
+                "created": datetime.now(tz=timezone.utc).isoformat()
             }
         )
 
     @staticmethod
-    def follow(user_id, follower_id):
-        event = f"User {follower_id} followed user {user_id}"
+    def follow(follower_object):
+        user = follower_object.user
+        follower = follower_object.follower
+        data = {
+            "to_user_id": user.id,
+            "to_username": user.username,
+            "from_user_id": follower.id,
+            "from_username": follower.username,
+            "from_user_image_url": follower.image_url,
+            "follower_status": follower_object.status,
+        }
         NotificationManager.send_notification(
-            sender=follower_id,
-            recipient=user_id,
-            event=event,
+            recipient=user.id,
+            data=data,
             notification_type="follow",
         )
 
     @staticmethod
-    def follow_request(user_id, follower_id):
-        event = f"User {follower_id} sent follow request to user {user_id}"
+    def follow_request(follower_object):
+        user = follower_object.user
+        follower = follower_object.follower
+        data = {
+            "to_user_id": user.id,
+            "to_username": user.username,
+            "from_user_id": follower.id,
+            "from_username": follower.username,
+            "from_user_image_url": follower.image_url,
+            "follower_status": follower_object.status,
+        }
         NotificationManager.send_notification(
-            sender=follower_id,
-            recipient=user_id,
-            event=event,
+            recipient=user.id,
+            data=data,
             notification_type="follow_request",
         )
 
     @staticmethod
-    def accept_follow_request(user_id, follower_id):
-        event = f"User {user_id} accepted follow request of user {follower_id}"
+    def accept_follow_request(follower_object):
+        user = follower_object.user
+        follower = follower_object.follower
+        data = {
+            "to_user_id": follower.id,
+            "to_username": follower.username,
+            "from_user_id": user.id,
+            "from_username": user.username,
+            "from_user_image_url": user.image_url,
+            "follower_status": follower_object.status,
+        }
         NotificationManager.send_notification(
-            sender=user_id,
-            recipient=follower_id,
-            event=event,
+            recipient=follower.id,
+            data=data,
             notification_type="accept_follow_request",
         )

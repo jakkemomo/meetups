@@ -145,9 +145,9 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object = serializer.save()
 
         if user.is_private:
-            NotificationManager.follow_request(user.id, request.user.id)
+            NotificationManager.follow_request(follower_object=follower_object)
         else:
-            NotificationManager.follow(user.id, request.user.id)
+            NotificationManager.follow(follower_object=follower_object)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -183,7 +183,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object.save()
         serializer = self.get_serializer(follower_object)
 
-        NotificationManager.accept_follow_request(request.user.id, user.id)
+        NotificationManager.accept_follow_request(follower_object=follower_object)
 
         return Response(
             status=status.HTTP_200_OK,

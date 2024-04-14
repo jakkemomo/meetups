@@ -21,7 +21,10 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "image_url",
             "is_email_verified",
             "is_private",
+            "bio",
+            "age",
             "category_favorite",
+            "date_of_birth",
         )
 
 
@@ -41,6 +44,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            "id",
+            "username",
             "first_name",
             "last_name",
             "email",
@@ -48,6 +53,10 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "is_email_verified",
             "city",
             "is_private",
+            "bio",
+            "age",
+            "category_favorite",
+            "date_of_birth",
         )
 
     def update(self, instance, validated_data):
