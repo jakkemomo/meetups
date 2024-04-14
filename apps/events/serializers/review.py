@@ -3,14 +3,22 @@ from rest_framework import serializers
 from apps.events.models import Review, Rating
 from apps.events.serializers import RatingCreateSerializer, RatingUpdateSerializer, RatingRetrieveSerializer, \
     RatingListSerializer
+from apps.profiles.models import User
+
+
+class CreatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "image_url"]
 
 
 class ReviewRetrieveSerializer(serializers.ModelSerializer):
     rating = RatingRetrieveSerializer()
+    created_by = CreatorSerializer(many=False)
 
     class Meta:
         model = Review
-        fields = ["review", "created_by", "event", 'rating']
+        exclude = ['updated_by', 'event']
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -49,8 +57,9 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
 
 
 class ReviewListSerializer(serializers.ModelSerializer):
-    rating = RatingListSerializer()
+    rating = serializers.IntegerField(source='rating.value')
+    created_by = CreatorSerializer(many=False)
 
     class Meta:
         model = Review
-        fields = ["review", "created_by", "event", "rating"]
+        exclude = ['updated_at', 'updated_by', 'event']
