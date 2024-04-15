@@ -36,10 +36,12 @@ class Event(AbstractBaseModel):
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
     image_url = models.CharField(max_length=250, null=True, blank=True)
-    start_date = fields.DateTimeField(null=False, blank=False, default=timezone.now)
-    end_date = fields.DateTimeField(null=True, blank=True)
-    start_time = fields.TimeField(null=False, blank=False, default=timezone.now)
-    end_time = fields.TimeField(null=True, blank=True)
+
+    start_date = fields.DateTimeField(null=True, blank=True, default=None)
+    end_date = fields.DateTimeField(null=True, blank=True, default=None)
+    start_time = fields.TimeField(null=True, blank=True, default=None)
+    end_time = fields.TimeField(null=True, blank=True, default=None)
+
     private_url = fields.CharField(max_length=250, null=True, blank=True)
 
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
