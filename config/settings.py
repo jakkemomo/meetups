@@ -198,7 +198,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 24,
     "DEFAULT_FILTER_BACKENDS": [
         'django_filters.rest_framework.DjangoFilterBackend'],
-    "DATE_INPUT_FORMATS": ["%d-%m-%Y"]
+    "DATE_INPUT_FORMATS": ["%Y-%m-%d"]
 }
 
 SIMPLE_JWT = {
