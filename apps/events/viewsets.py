@@ -50,6 +50,17 @@ class EventViewSet(viewsets.ModelViewSet):
     A simple ViewSet for viewing and editing accounts.
     """
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        response = Response(serializer.data)
+        if self.kwargs['token']:
+            response.set_cookie("private_event_key",
+                                value=self.kwargs['token'],
+                                expires=instance.end_date,
+                                httponly=True)
+        return response
+
     def destroy(self, request, *args, **kwargs):
         event_instance = self.get_object()
         delete_image_if_exists(event_instance)
@@ -100,14 +111,12 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        if self.kwargs.get("pk"):
-            self.queryset = Event.objects.filter(
-                Q(id=self.kwargs["pk"]) & Q(is_visible=True) & Q(type="open") |
-                Q(id=self.kwargs["pk"]) & Q(participants__in=[self.request.user.id]) |
-                Q(id=self.kwargs["pk"]) & Q(created_by=self.request.user)
-            )
+        if self.kwargs.get("event_id"):
+            self.queryset = Event.objects.filter(id=self.kwargs["event_id"])
+            return self.queryset.all().annotate(participants_number=Count("participants"))
         if self.kwargs.get("token"):
             self.queryset = Event.objects.filter(private_url=self.kwargs["token"])
+            return self.queryset.all().annotate(participants_number=Count("participants"))
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
@@ -145,7 +154,7 @@ class EventViewSet(viewsets.ModelViewSet):
             case "get_private_url":
                 return EmptySerializer
             case "get_private_event":
-                return EmptySerializer
+                return EventRetrieveSerializer
             case "delete_private_event":
                 return EmptySerializer
 
@@ -161,6 +170,8 @@ class EventViewSet(viewsets.ModelViewSet):
     )
     def register_for_event(self, request, event_id: int):
         event = self.get_object()
+        if event.type == 'private' and request.COOKIES.get('private_event_key') != event.private_url:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         event.participants.add(request.user.id)
         event.save()
         return Response(status=status.HTTP_200_OK)
@@ -206,22 +217,6 @@ class EventViewSet(viewsets.ModelViewSet):
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
-    @action(
-        methods=['get'],
-        detail=True,
-        permission_classes=[IsAuthenticated, EventPermissions],
-        url_path='private-url',
-        url_name='private_url',
-        filter_backends=[],
-        pagination_class=None
-    )
-    def get_private_url(self, request, event_id: int):
-        event = self.get_object()
-        private_url = event.private_url
-        return Response(private_url, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         request_body=no_body
@@ -236,9 +231,7 @@ class EventViewSet(viewsets.ModelViewSet):
         lookup_field='private_url'
     )
     def get_private_event(self, request, token):
-        event_instance = self.get_object()
-        serializer = EventRetrieveSerializer(event_instance)
-        return Response(serializer.data)
+        return self.retrieve(request, token)
 
 
 class RatingViewSet(viewsets.ModelViewSet):

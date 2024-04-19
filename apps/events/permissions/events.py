@@ -4,7 +4,7 @@ from apps.core.permissions.common import is_verified, is_owner, is_participant
 
 
 def has_access_to_private(request, obj):
-    token_pass = obj.type == 'private' and request.parser_context.get("kwargs").get("token") == obj.private_url
+    token_pass = request.parser_context.get("kwargs").get("token") == obj.private_url
     return token_pass or is_participant(request, obj) or is_owner(request, obj)
 
 
