@@ -182,6 +182,10 @@ CONFIRM_PASSWORD_RESET_URL = os.getenv(
     "CONFIRM_FORGOT_PASSWORD_URL",
     f"{SERVICE_URL}api/v1/password/reset/confirm/"
 )
+DEFAULT_USER_AVATAR_URL = os.getenv(
+    "DEFAULT_USER_AVATAR_URL",
+    "images/f4fcce125def40e7a232bb31109de9ac.webp"
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
