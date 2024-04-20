@@ -77,6 +77,8 @@ class EventViewSet(viewsets.ModelViewSet):
         'tags__name': ['exact', 'in'],
         'category__name': ['exact', 'in'],
         'city': ['exact', 'in'],
+        'free': ['exact'],
+        'participants_age': ['exact', 'gte', 'lte'],
     }
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
