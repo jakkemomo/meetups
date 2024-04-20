@@ -121,13 +121,13 @@ class EventViewSet(viewsets.ModelViewSet):
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                    Q(participants__in=[self.request.user.id]) & Q(type="private") |
-                    Q(created_by=self.request.user) & Q(type="private")
+                    Q(is_visible=True) & Q(is_finished=False) & Q(participants__in=[self.request.user.id]) & Q(
+                        type="private") |
+                    Q(is_visible=True) & Q(is_finished=False) & Q(created_by=self.request.user) & Q(type="private")
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                    Q(type="private") & Q(is_finished=True) & Q(is_visible=True)
+                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
         return self.queryset.all().annotate(participants_number=Count("participants"))
 
@@ -150,8 +150,6 @@ class EventViewSet(viewsets.ModelViewSet):
             case "add_to_favorite":
                 return EmptySerializer
             case "delete_from_favorite":
-                return EmptySerializer
-            case "get_private_url":
                 return EmptySerializer
             case "get_private_event":
                 return EventRetrieveSerializer
@@ -216,7 +214,6 @@ class EventViewSet(viewsets.ModelViewSet):
         user_id = request.user.id
         FavoriteEvent.objects.filter(user_id=user_id, event_id=event_id).delete()
         return Response(status=status.HTTP_200_OK)
-
 
     @swagger_auto_schema(
         request_body=no_body
