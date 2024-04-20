@@ -146,11 +146,9 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
-            case _:
-                return EmptySerializer
             case "get_private_event":
                 return EventRetrieveSerializer
-            case "delete_private_event":
+            case _:
                 return EmptySerializer
 
     @swagger_auto_schema(
