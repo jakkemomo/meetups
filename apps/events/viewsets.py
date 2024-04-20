@@ -73,6 +73,7 @@ class EventViewSet(viewsets.ModelViewSet):
     filterset_fields = {
         'name': ['exact', 'icontains'],
         'start_date': ['exact', 'gte', 'lte'],
+        'end_date': ['exact', 'gte', 'lte'],
         'rating': ['exact', 'gte', 'lte'],
         'tags__name': ['exact', 'in'],
         'category__name': ['exact', 'in'],
