@@ -79,14 +79,17 @@ class EventViewSet(viewsets.ModelViewSet):
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
-    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city__name']
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
     filterset_fields = {
         'name': ['exact', 'icontains'],
         'start_date': ['exact', 'gte', 'lte'],
+        'end_date': ['exact', 'gte', 'lte'],
         'rating': ['exact', 'gte', 'lte'],
         'tags__name': ['exact', 'in'],
         'category__name': ['exact', 'in'],
-        'city__name': ['exact', 'in'],
+        'city': ['exact', 'in'],
+        'free': ['exact'],
+        'participants_age': ['exact', 'gte', 'lte'],
     }
     ordering_fields = ['start_date', 'rating', 'participants_number']
     lookup_url_kwarg = "event_id"
@@ -143,13 +146,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
-            case "register_for_event":
-                return EmptySerializer
-            case "leave_from_event":
-                return EmptySerializer
-            case "add_to_favorite":
-                return EmptySerializer
-            case "delete_from_favorite":
+            case _:
                 return EmptySerializer
             case "get_private_event":
                 return EventRetrieveSerializer
@@ -257,6 +254,8 @@ class RatingViewSet(viewsets.ModelViewSet):
                 return RatingUpdateSerializer
             case "list":
                 return RatingListSerializer
+            case _:
+                return EmptySerializer
 
     def list(self, request, *args, **kwargs):
         queryset = Rating.objects.filter(event_id=kwargs["event_id"])
@@ -286,6 +285,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 return CategoryUpdateSerializer
             case "list":
                 return CategoryListSerializer
+            case _:
+                return EmptySerializer
 
     @swagger_auto_schema(
         request_body=no_body

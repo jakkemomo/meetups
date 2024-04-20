@@ -28,7 +28,8 @@ SERVICE_ACCOUNT = False
 if SERVICE_URL:
     from urllib.parse import urlparse
 
-    ALLOWED_HOSTS = [str(urlparse(SERVICE_URL).netloc)]
+    APP_URL = str(urlparse(SERVICE_URL).netloc)
+    ALLOWED_HOSTS = [APP_URL]
     DEBUG = False
     DEBUG_PROPAGATE_EXCEPTIONS = True
     CSRF_TRUSTED_ORIGINS = [SERVICE_URL]
@@ -104,9 +105,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -157,6 +158,8 @@ DATABASES = {
     }
 }
 
+DATABASE_ROUTERS = ["config.db_routers.MainRouter"]
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 password_validation = "django.contrib.auth.password_validation"
@@ -179,6 +182,10 @@ CONFIRM_PASSWORD_RESET_URL = os.getenv(
     "CONFIRM_FORGOT_PASSWORD_URL",
     f"{SERVICE_URL}api/v1/password/reset/confirm/"
 )
+DEFAULT_USER_AVATAR_URL = os.getenv(
+    "DEFAULT_USER_AVATAR_URL",
+    "images/f4fcce125def40e7a232bb31109de9ac.webp"
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -193,8 +200,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication', ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend']
+    "DEFAULT_FILTER_BACKENDS": [
+        'django_filters.rest_framework.DjangoFilterBackend'],
+    "DATE_INPUT_FORMATS": ["%Y-%m-%d"]
 }
 
 SIMPLE_JWT = {
@@ -274,3 +282,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+WS_ALLOWED_ORIGINS = [
+    "*"
+]

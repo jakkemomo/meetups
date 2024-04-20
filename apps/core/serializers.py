@@ -28,6 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data["email"].lower(),
         )
         user.set_password(validated_data["password"])
+        user.image_url = settings.DEFAULT_USER_AVATAR_URL
         user.save()
 
         try:

@@ -21,7 +21,7 @@ class Event(AbstractBaseModel):
     )
     tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
-    address = fields.CharField(max_length=250, null=True, blank=True, default="Беларусь, Минск")
+    address = fields.CharField(max_length=250, null=False, blank=False, default="Беларусь, Минск")
     city = fields.CharField(max_length=50, null=False, blank=False, default="Минск")
     country = fields.CharField(max_length=50, null=False, blank=False, default="Беларусь")
     location = PointField(default=Point(27.561831, 53.902284))
@@ -36,10 +36,12 @@ class Event(AbstractBaseModel):
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
     image_url = models.CharField(max_length=250, null=True, blank=True)
-    start_date = fields.DateTimeField(null=False, blank=False, default=timezone.now)
-    end_date = fields.DateTimeField(null=True, blank=True)
-    start_time = fields.TimeField(null=False, blank=False, default=timezone.now)
-    end_time = fields.TimeField(null=True, blank=True)
+
+    start_date = fields.DateTimeField(null=True, blank=True, default=None)
+    end_date = fields.DateTimeField(null=True, blank=True, default=None)
+    start_time = fields.TimeField(null=True, blank=True, default=None)
+    end_time = fields.TimeField(null=True, blank=True, default=None)
+
     private_url = fields.CharField(max_length=250, null=True, blank=True)
 
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
@@ -48,12 +50,12 @@ class Event(AbstractBaseModel):
     participants = models.ManyToManyField(
         user_model, blank=True, related_name="event_participants"
     )
-    desired_participants_number = models.PositiveIntegerField(default=1, null=False, blank=False)
+    desired_participants_number = models.PositiveIntegerField(default=0, null=True, blank=True)
     any_participant_number = fields.BooleanField(default=False)
     ratings = models.ManyToManyField(user_model, through=Rating, through_fields=("event", "user"))
     repeatable = fields.BooleanField(default=False)
     schedule = models.ManyToManyField(Schedule, related_name="events", blank=True)
-    participants_age = fields.PositiveSmallIntegerField(default=18)
+    participants_age = fields.PositiveSmallIntegerField(default=18, null=False, blank=False)
     cost = fields.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     free = fields.BooleanField(default=True)
     currency = models.ForeignKey("Currency", on_delete=models.SET_NULL, null=True, blank=True)
