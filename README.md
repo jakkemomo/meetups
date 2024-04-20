@@ -62,6 +62,10 @@ python manage.py runserver
 
 ## Testing
 
+**Prerequisite**
+```bash
+pip install -r requirements/testing.txt
+```
 Our tests are split into synchronous and asynchronous categories. Run them separately for the best results:
 
 - Synchronous tests:
