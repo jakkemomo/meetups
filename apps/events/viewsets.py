@@ -8,14 +8,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
-from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, \
     IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.core.utils import delete_image_if_exists
-from apps.events.filters import TrigramSimilaritySearchFilter
+from apps.events.filters import TrigramSimilaritySearchFilter, DistinctOrderingFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
@@ -68,7 +67,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
-    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    filter_backends = [TrigramSimilaritySearchFilter, DistinctOrderingFilter, DjangoFilterBackend]
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
     filterset_fields = {
         'name': ['exact', 'icontains'],
