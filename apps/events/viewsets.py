@@ -7,7 +7,7 @@ from django.db.models import Q, Count, Avg
 from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
-from rest_framework import viewsets, status, mixins
+from rest_framework import viewsets, status, mixins, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, \
@@ -207,7 +207,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
 
     model = Rating
-    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions, ]
+    permission_classes = [RatingPermissions]
     lookup_url_kwarg = "rating_id"
     http_method_names = ["post", "get", "put", "delete"]
 
@@ -235,6 +235,20 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer = RatingListSerializer(queryset, many=True, context={"request": request})
 
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        event = Event.objects.get(id=self.kwargs["event_id"])
+        self.check_object_permissions(self.request, event)
+        user = self.request.user
+        if event.ratings.filter(user=user).exists():
+            raise serializers.ValidationError("You have already rated this event")
+        rating = serializer.save(
+            user=self.request.user,
+            event=event,
+            created_by=self.request.user,
+            value=serializer.validated_data["value"],
+        )
+        event.ratings.add(rating)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

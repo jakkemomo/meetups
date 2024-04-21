@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.generics import get_object_or_404
 
 from apps.events.models import Event, Rating
 
@@ -10,14 +9,6 @@ class RatingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ["value", "user"]
-
-    def create(self, validated_data):
-        event = get_object_or_404(Event, id=self.context["view"].kwargs["event_id"])
-        user = self.context["request"].user
-        value = validated_data.pop("value")
-        rating_object = Rating.objects.create(event=event, user=user, value=value)
-
-        return rating_object
 
 
 class RatingRetrieveSerializer(serializers.ModelSerializer):
