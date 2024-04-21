@@ -184,13 +184,13 @@ class EventListSerializer(serializers.ModelSerializer):
     tags = EventTagSerializer(many=True)
     category = EventCategorySerializer(many=False)
     participants_number = serializers.IntegerField()
+    average_rating = serializers.FloatField()
 
     class Meta:
         model = Event
         fields = [
             "id",
             "name",
-            "rating",
             "image_url",
             "description",
             "start_date",
@@ -199,6 +199,7 @@ class EventListSerializer(serializers.ModelSerializer):
             "address",
             "category",
             "participants_number",
+            "average_rating"
         ]
 
 
@@ -209,6 +210,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
     participants_number = serializers.IntegerField()
+    average_rating = serializers.FloatField()
 
     def get_location(self, obj):
         if not obj.location:
