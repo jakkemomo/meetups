@@ -238,6 +238,7 @@ class RatingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         event = Event.objects.get(id=self.kwargs["event_id"])
+        self.check_object_permissions(self.request, event)
         user = self.request.user
         if event.ratings.filter(user=user).exists():
             raise serializers.ValidationError("You have already rated this event")
