@@ -180,17 +180,7 @@ class EventCategorySerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-class BaseEventSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField("get_rating")
-
-    def get_rating(self, obj):
-        ratings = obj.ratings.through.objects.filter(event=obj).values_list("value", flat=True)
-        if not ratings:
-            return None
-        return sum(ratings) / len(ratings)
-
-
-class EventListSerializer(BaseEventSerializer):
+class EventListSerializer(serializers.ModelSerializer):
     tags = EventTagSerializer(many=True)
     category = EventCategorySerializer(many=False)
     participants_number = serializers.IntegerField()
@@ -212,7 +202,7 @@ class EventListSerializer(BaseEventSerializer):
         ]
 
 
-class EventRetrieveSerializer(BaseEventSerializer):
+class EventRetrieveSerializer(serializers.ModelSerializer):
     participants = ParticipantSerializer(many=True)
     tags = EventTagSerializer(many=True)
     category = EventCategorySerializer(many=False)

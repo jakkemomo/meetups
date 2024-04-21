@@ -3,8 +3,7 @@ from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import fields
-from django.utils import timezone
+from django.db.models import fields, Avg
 
 from apps.core.models import AbstractBaseModel
 from apps.events.models.categories import Category
@@ -60,6 +59,9 @@ class Event(AbstractBaseModel):
     free = fields.BooleanField(default=True)
     currency = models.ForeignKey("Currency", on_delete=models.SET_NULL, null=True, blank=True)
     gallery = ArrayField(models.CharField(max_length=250, null=True, blank=True, default=""), default=list)
+
+    def rating(self) -> float:
+        return Rating.objects.filter(event=self).aggregate(Avg("value"))["value__avg"] or 0
 
     class Meta:
         ordering = ["start_date"]

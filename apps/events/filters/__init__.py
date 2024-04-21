@@ -1,2 +1,1 @@
-from .ordering import DistinctOrderingFilter
 from .trigram_search import TrigramSimilaritySearchFilter
