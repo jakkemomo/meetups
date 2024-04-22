@@ -127,7 +127,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
         validated_data["updated_by_id"] = user_id
 
         if validated_data["type"] == "private":
-            validated_data["private_url"] = uuid4()
+            validated_data["private_token"] = uuid4()
 
         tags = validated_data.pop("tags", None)
         schedule = validated_data.pop("schedule", None)

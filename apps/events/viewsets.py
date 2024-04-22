@@ -118,7 +118,7 @@ class EventViewSet(viewsets.ModelViewSet):
             self.queryset = Event.objects.filter(id=self.kwargs["event_id"])
             return self.queryset.all().annotate(participants_number=Count("participants"))
         if self.kwargs.get("token"):
-            self.queryset = Event.objects.filter(private_url=self.kwargs["token"])
+            self.queryset = Event.objects.filter(private_token=self.kwargs["token"])
             return self.queryset.all().annotate(participants_number=Count("participants"))
         else:
             if self.request.user.id:
@@ -219,7 +219,7 @@ class EventViewSet(viewsets.ModelViewSet):
         url_path='private/(?P<token>[^/.]+)',
         url_name='private/',
         lookup_url_kwarg="token",
-        lookup_field='private_url'
+        lookup_field='private_token'
     )
     def get_private_event(self, request, token):
         return self.retrieve(request, token)
