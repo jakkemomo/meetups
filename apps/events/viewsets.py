@@ -124,9 +124,8 @@ class EventViewSet(viewsets.ModelViewSet):
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                    Q(is_visible=True) & Q(is_finished=False) & Q(participants__in=[self.request.user.id]) & Q(
-                        type="private") |
-                    Q(is_visible=True) & Q(is_finished=False) & Q(created_by=self.request.user) & Q(type="private")
+                    Q(participants__in=[self.request.user.id]) & Q(type="private") |
+                    Q(created_by=self.request.user) & Q(type="private")
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
