@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
@@ -123,6 +125,10 @@ class EventCreateSerializer(serializers.ModelSerializer):
         user_id = request.user.id
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
+
+        if validated_data["type"] == "private":
+            validated_data["private_token"] = uuid4()
+
         tags = validated_data.pop("tags", None)
         schedule = validated_data.pop("schedule", None)
         event = Event(**validated_data)
@@ -156,6 +162,11 @@ class EventUpdateSerializer(EventCreateSerializer):
         tags = validated_data.pop("tags", None)
         if tags:
             instance.tags.set([tag.id for tag in tags])
+        event_type = validated_data.pop("type")
+        if event_type == "private":
+            instance.private_token = uuid4()
+        else:
+            instance.private_token = None
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

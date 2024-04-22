@@ -26,7 +26,6 @@ class Event(AbstractBaseModel):
         null=False,
         blank=False,
     )
-    private_url = fields.CharField(max_length=250, null=True, blank=True)
     description = fields.TextField(max_length=250, null=True, blank=True)
 
     location = PointField(default=Point(27.561831, 53.902284))
@@ -41,7 +40,7 @@ class Event(AbstractBaseModel):
     end_date = fields.DateTimeField(null=True, blank=True, default=None)
     start_time = fields.TimeField(null=True, blank=True, default=None)
     end_time = fields.TimeField(null=True, blank=True, default=None)
-
+    private_token = fields.CharField(max_length=250, null=True, blank=True)
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
     is_visible = fields.BooleanField(null=False, blank=False, default=True)
     any_participant_number = fields.BooleanField(default=False)
