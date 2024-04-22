@@ -128,7 +128,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
         if validated_data["type"] == "private":
             validated_data["private_url"] = uuid4()
-        
+
         tags = validated_data.pop("tags", None)
         schedule = validated_data.pop("schedule", None)
         event = Event(**validated_data)
@@ -164,9 +164,9 @@ class EventUpdateSerializer(EventCreateSerializer):
             instance.tags.set([tag.id for tag in tags])
         event_type = validated_data.pop("type")
         if event_type == "private":
-            instance.private_url = uuid4()
+            instance.private_token = uuid4()
         else:
-            instance.private_url = None
+            instance.private_token = None
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

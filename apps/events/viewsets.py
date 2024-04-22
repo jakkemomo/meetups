@@ -162,7 +162,7 @@ class EventViewSet(viewsets.ModelViewSet):
     )
     def register_for_event(self, request, event_id: int):
         event = self.get_object()
-        if event.type == 'private' and request.COOKIES.get('private_event_key') != event.private_url:
+        if event.type == 'private' and request.COOKIES.get('private_event_key') != event.private_token:
             return Response(status=status.HTTP_403_FORBIDDEN)
         event.participants.add(request.user.id)
         event.save()

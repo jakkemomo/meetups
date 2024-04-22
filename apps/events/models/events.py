@@ -42,7 +42,7 @@ class Event(AbstractBaseModel):
     start_time = fields.TimeField(null=True, blank=True, default=None)
     end_time = fields.TimeField(null=True, blank=True, default=None)
 
-    private_url = fields.CharField(max_length=250, null=True, blank=True)
+    private_token = fields.CharField(max_length=250, null=True, blank=True)
 
     is_finished = fields.BooleanField(null=False, blank=False, default=False)
     is_visible = fields.BooleanField(null=False, blank=False, default=True)
