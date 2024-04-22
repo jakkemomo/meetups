@@ -1,6 +1,7 @@
 import logging
 
-from django.db.models import Count
+from django.db.models import Count, Avg
+from django.db.models.functions import Coalesce
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
@@ -266,8 +267,10 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         self.queryset = (
             self.model.objects
-            .annotate(participants_number=Count("participants"))
-            .order_by("-start_date")
+            .annotate(
+                participants_number=Count("participants"),
+                average_rating=Coalesce(Avg("ratings__value"), 0.0)
+            ).order_by("-start_date")
         )
         return self.queryset.all()
 

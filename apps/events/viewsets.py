@@ -2,10 +2,11 @@ import json
 import logging
 
 from django.core.serializers import serialize
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Avg
+from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
-from rest_framework import viewsets, status, mixins
+from rest_framework import viewsets, status, mixins, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, \
@@ -14,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.core.utils import delete_image_if_exists
-from apps.events.filters import TrigramSimilaritySearchFilter
+from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
@@ -79,19 +80,9 @@ class EventViewSet(viewsets.ModelViewSet):
     model = Event
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_class = EventFilter
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
-    filterset_fields = {
-        'name': ['exact', 'icontains'],
-        'start_date': ['exact', 'gte', 'lte'],
-        'end_date': ['exact', 'gte', 'lte'],
-        'rating': ['exact', 'gte', 'lte'],
-        'tags__name': ['exact', 'in'],
-        'category__name': ['exact', 'in'],
-        'city': ['exact', 'in'],
-        'free': ['exact'],
-        'participants_age': ['exact', 'gte', 'lte'],
-    }
-    ordering_fields = ['start_date', 'rating', 'participants_number']
+    ordering_fields = ['start_date', 'average_rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
     def get_template_names(self):
@@ -131,7 +122,10 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        return self.queryset.all().annotate(participants_number=Count("participants"))
+        return self.queryset.all().annotate(
+            participants_number=Count("participants"),
+            average_rating=Coalesce(Avg("ratings__value"), 0.0)
+        )
 
     def get_serializer_class(self):
         match self.action:
@@ -231,7 +225,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     """
 
     model = Rating
-    permission_classes = [IsAuthenticatedOrReadOnly, RatingPermissions, ]
+    permission_classes = [RatingPermissions]
     lookup_url_kwarg = "rating_id"
     http_method_names = ["post", "get", "put", "delete"]
 
@@ -259,6 +253,20 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer = RatingListSerializer(queryset, many=True, context={"request": request})
 
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        event = Event.objects.get(id=self.kwargs["event_id"])
+        self.check_object_permissions(self.request, event)
+        user = self.request.user
+        if event.ratings.filter(user=user).exists():
+            raise serializers.ValidationError("You have already rated this event")
+        rating = serializer.save(
+            user=self.request.user,
+            event=event,
+            created_by=self.request.user,
+            value=serializer.validated_data["value"],
+        )
+        event.ratings.add(rating)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
