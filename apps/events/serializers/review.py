@@ -44,7 +44,7 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ["review", 'rating', ]
+        fields = ["review", 'rating', 'response']
 
     def update(self, instance, validated_data):
         instance.rating.value = validated_data.get("rating")["value"]
@@ -52,6 +52,17 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
         instance.review = validated_data.pop("review")
         instance.updated_by_id = self.context['request'].user.id
         instance.rating.save(force_update=True)
+        instance.save()
+        return instance
+
+
+class ReviewUpdateResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['response']
+
+    def partial_update(self, request, instance, validated_data):
+        instance.response = validated_data.pop('response')
         instance.save()
         return instance
 

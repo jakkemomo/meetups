@@ -27,7 +27,8 @@ from .review import (
     ReviewListSerializer,
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
-    ReviewRetrieveSerializer
+    ReviewRetrieveSerializer,
+    ReviewUpdateResponseSerializer
 )
 from .map import GeoJsonSerializer
 from .currency import CurrencyListSerializer

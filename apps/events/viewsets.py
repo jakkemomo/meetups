@@ -38,6 +38,7 @@ from apps.events.serializers import (
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
     ReviewListSerializer,
+    ReviewUpdateResponseSerializer,
     CategoryRetrieveSerializer, CategoryCreateSerializer,
     CategoryUpdateSerializer,
     CategoryListSerializer, CurrencyListSerializer,
@@ -366,7 +367,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     model = Review
     permission_classes = [IsAuthenticatedOrReadOnly, ReviewPermissions]
     lookup_url_kwarg = "review_id"
-    http_method_names = ["post", "get", "put", "delete"]
+    http_method_names = ["post", "get", "put", "delete", "patch"]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
@@ -381,6 +382,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewCreateSerializer
             case "update":
                 return ReviewUpdateSerializer
+            case 'partial_update':
+                return ReviewUpdateResponseSerializer
             case "list":
                 return ReviewListSerializer
 
