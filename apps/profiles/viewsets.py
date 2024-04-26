@@ -331,7 +331,13 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         url_name="user_finished_events",
     )
     def list_user_finished_events(self, request, user_id):
-        queryset = self.get_queryset().filter(participants__id=user_id, end_date__lt=timezone.now())
+        user = get_user_object(user_id)
+
+        if user != request.user:
+            queryset = self.get_queryset().filter(is_visible=True, participants__id=user_id, end_date__lt=timezone.now())
+        else:
+            queryset = self.get_queryset().filter(participants__id=user_id, end_date__lt=timezone.now())
+
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

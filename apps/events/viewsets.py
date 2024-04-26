@@ -19,7 +19,7 @@ from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
-from apps.events.serializers.review import CreatorSerializer
+from apps.profiles.serializers import ProfileRetrieveSerializer
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -209,15 +209,15 @@ class EventViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=True,
-        #permission_classes=[IsAuthenticated],
+        permission_classes=[IsAuthenticated],
         url_path="events_participants",
         url_name="events_participants_get_list",
     )
 
-    def list_user_planned_events(self, request, event_id):
-        event = Event.objects.get(id=event_id)
+    def list_get_events_participants(self, request, event_id):
+        event = self.get_object()
         queryset= event.participants.all()
-        serializer = CreatorSerializer(queryset, many=True)
+        serializer = ProfileRetrieveSerializer(queryset, many=True)
         return Response(serializer.data)
 
 
