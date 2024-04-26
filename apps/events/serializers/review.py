@@ -56,15 +56,10 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ReviewUpdateResponseSerializer(serializers.ModelSerializer):
+class ReviewResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['response']
-
-    def partial_update(self, request, instance, validated_data):
-        instance.response = validated_data.pop('response')
-        instance.save()
-        return instance
 
 
 class ReviewListSerializer(serializers.ModelSerializer):

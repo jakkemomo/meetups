@@ -10,9 +10,9 @@ class ReviewPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        elif view.action in ['update', 'destroy']:
+        elif view.action in ['update', 'destroy', 'partial_update']:
             return is_verified(request) and is_participant(request, obj)
-        elif view.action in ['partial_update',]:
+        elif view.action == "response_to_review":
             return is_verified(request) and is_owner(request, obj.event)
         else:
             return False
