@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists
-from apps.events.models import Event
+from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
 from apps.profiles.managers import NotificationManager
 from apps.profiles.models import UserRating, User
@@ -30,6 +30,8 @@ from apps.profiles.serializers import (
     FollowerSerializer,
 )
 from apps.profiles.utils import get_user_object, is_current_user
+from django.db.models import Subquery
+from django.utils import timezone
 
 logger = logging.getLogger("profiles_app")
 
@@ -308,6 +310,44 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         if user != request.user:
             queryset = queryset.filter(is_visible=True)
 
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsAuthenticated],
+        url_path="events/favorite_events",
+        url_name="user_favorite_events",
+    )
+    def list_user_favorite_events(self, request, user_id):
+        queryset = self.get_queryset().filter(id__in=Subquery(
+            FavoriteEvent.objects.filter(user_id=user_id).values('event_id')))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsAuthenticated],
+        url_path="events/finished_events",
+        url_name="user_finished_events",
+    )
+    def list_user_finished_events(self, request, user_id):
+        queryset = self.get_queryset().filter(participants__id=user_id, end_date__lt=timezone.now())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsAuthenticated],
+        url_path="events/planned_events",
+        url_name="user_planned_events",
+    )
+
+    def list_user_planned_events(self, request, user_id):
+        queryset = self.get_queryset().filter(participants__id=user_id, start_date__gt=timezone.now())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
