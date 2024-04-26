@@ -44,7 +44,7 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ["review", 'rating', 'response']
+        fields = ["review", 'rating']
 
     def update(self, instance, validated_data):
         instance.rating.value = validated_data.get("rating")["value"]
