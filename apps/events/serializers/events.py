@@ -62,7 +62,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = ["participants", "created_by", "updated_by"]
+        exclude = ["participants", "created_by", "updated_by", "ratings"]
 
     def validate(self, data):
         start_date = data.get('start_date')
