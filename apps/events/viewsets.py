@@ -39,10 +39,11 @@ from apps.events.serializers import (
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
     ReviewListSerializer,
-    CategoryRetrieveSerializer, CategoryCreateSerializer,
+    CategoryRetrieveSerializer,
+    CategoryCreateSerializer,
     CategoryUpdateSerializer,
-    CategoryListSerializer, CurrencyListSerializer,
-
+    CategoryListSerializer,
+    CurrencySerializer,
 )
 
 logger = logging.getLogger("events_app")
@@ -57,7 +58,7 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         response = Response(serializer.data)
-        if self.kwargs['token']:
+        if self.kwargs.get('token'):
             response.set_cookie("private_event_key",
                                 value=self.kwargs['token'],
                                 expires=instance.end_date,
@@ -109,10 +110,8 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.kwargs.get("event_id"):
             self.queryset = Event.objects.filter(id=self.kwargs["event_id"])
-            return self.queryset.all().annotate(participants_number=Count("participants"))
         if self.kwargs.get("token"):
             self.queryset = Event.objects.filter(private_token=self.kwargs["token"])
-            return self.queryset.all().annotate(participants_number=Count("participants"))
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
@@ -407,7 +406,7 @@ class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     permission_classes = [AllowAny]
     queryset = Currency.objects.all()
-    serializer_class = CurrencyListSerializer
+    serializer_class = CurrencySerializer
 
     @swagger_auto_schema(
         tags=['currency'],

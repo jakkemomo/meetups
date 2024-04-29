@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category, Schedule, Currency
 from apps.profiles.models import User
+from . import currency
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -205,7 +206,9 @@ class EventListSerializer(serializers.ModelSerializer):
             "image_url",
             "description",
             "start_date",
+            "start_time",
             "end_date",
+            "end_time",
             "tags",
             "address",
             "category",
@@ -222,6 +225,8 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField("get_location")
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()
+    currency = currency.CurrencySerializer(many=False)
+    schedule = ScheduleSerializer(many=True)
 
     def get_location(self, obj):
         if not obj.location:
