@@ -15,10 +15,7 @@ repos:
     rev: v1.0.6
     hooks:
     -   id: python-bandit-vulnerability-check
-        entry: bandit
-        args: [ '-x', '.env', 'tests' ]
-        language: system
-        pass_filenames: false
+        args: [ '-x', '.env', 'venv', 'tests' ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
