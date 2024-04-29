@@ -2,9 +2,9 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.exceptions import ErrorDetail
 
-from apps.profiles.tests.utils import *
 from apps.profiles.tests.followers.constants import LIST_FOLLOWING_URL
 from apps.profiles.models.followers import Follower
+from apps.profiles.tests.utils import get_tokens
 
 
 @pytest.mark.usefixtures(
@@ -228,4 +228,3 @@ def test_list_following_no_creds(
             code='not_authenticated',
         )
     }
-

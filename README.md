@@ -1,6 +1,6 @@
 # Mevent
 
-Welcome to Mevent, a streamlined platform designed to facilitate the organization and discovery of meetups. Dive into a world of events tailored to your interests and locality. 
+Welcome to Mevent, a streamlined platform designed to facilitate the organization and discovery of meetups. Dive into a world of events tailored to your interests and locality.
 
 ## Prerequisites
 

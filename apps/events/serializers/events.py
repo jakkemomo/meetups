@@ -1,8 +1,11 @@
+from uuid import uuid4
+
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category, Schedule, Currency
 from apps.profiles.models import User
+from . import currency
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -123,6 +126,10 @@ class EventCreateSerializer(serializers.ModelSerializer):
         user_id = request.user.id
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
+
+        if validated_data["type"] == "private":
+            validated_data["private_token"] = uuid4()
+
         tags = validated_data.pop("tags", None)
         schedule = validated_data.pop("schedule", None)
         event = Event(**validated_data)
@@ -156,6 +163,11 @@ class EventUpdateSerializer(EventCreateSerializer):
         tags = validated_data.pop("tags", None)
         if tags:
             instance.tags.set([tag.id for tag in tags])
+        event_type = validated_data.pop("type")
+        if event_type == "private":
+            instance.private_token = uuid4()
+        else:
+            instance.private_token = None
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -194,7 +206,9 @@ class EventListSerializer(serializers.ModelSerializer):
             "image_url",
             "description",
             "start_date",
+            "start_time",
             "end_date",
+            "end_time",
             "tags",
             "address",
             "category",
@@ -211,6 +225,8 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField("get_location")
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()
+    currency = currency.CurrencySerializer(many=False)
+    schedule = ScheduleSerializer(many=True)
 
     def get_location(self, obj):
         if not obj.location:

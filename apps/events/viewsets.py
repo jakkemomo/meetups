@@ -1,6 +1,5 @@
 import json
 import logging
-from uuid import uuid4
 
 from django.core.serializers import serialize
 from django.db.models import Q, Count, Avg
@@ -20,6 +19,7 @@ from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
+from apps.profiles.serializers import ProfileRetrieveSerializer
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -39,9 +39,11 @@ from apps.events.serializers import (
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
     ReviewListSerializer,
-    CategoryRetrieveSerializer, CategoryCreateSerializer,
+    CategoryRetrieveSerializer,
+    CategoryCreateSerializer,
     CategoryUpdateSerializer,
-    CategoryListSerializer, CurrencyListSerializer,
+    CategoryListSerializer,
+    CurrencySerializer,
 )
 
 logger = logging.getLogger("events_app")
@@ -51,6 +53,17 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        response = Response(serializer.data)
+        if self.kwargs.get('token'):
+            response.set_cookie("private_event_key",
+                                value=self.kwargs['token'],
+                                expires=instance.end_date,
+                                httponly=True)
+        return response
 
     def destroy(self, request, *args, **kwargs):
         event_instance = self.get_object()
@@ -95,17 +108,20 @@ class EventViewSet(viewsets.ModelViewSet):
                 return ["events/detail.html"]
 
     def get_queryset(self):
-        if self.kwargs.get("pk"):
-            self.queryset = Event.objects.filter(id=self.kwargs["pk"])
+        if self.kwargs.get("event_id"):
+            self.queryset = Event.objects.filter(id=self.kwargs["event_id"])
+        if self.kwargs.get("token"):
+            self.queryset = Event.objects.filter(private_token=self.kwargs["token"])
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False)
-                    | Q(participants__in=[self.request.user.id]) & Q(is_finished=False)
+                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
+                    Q(participants__in=[self.request.user.id]) & Q(type="private") |
+                    Q(created_by=self.request.user) & Q(type="private")
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False)
+                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
         return self.queryset.all().annotate(
             participants_number=Count("participants"),
@@ -124,6 +140,8 @@ class EventViewSet(viewsets.ModelViewSet):
                 return EventUpdateSerializer
             case "partial_update":
                 return EventUpdateSerializer
+            case "get_private_event":
+                return EventRetrieveSerializer
             case _:
                 return EmptySerializer
 
@@ -139,6 +157,8 @@ class EventViewSet(viewsets.ModelViewSet):
     )
     def register_for_event(self, request, event_id: int):
         event = self.get_object()
+        if event.type == 'private' and request.COOKIES.get('private_event_key') != event.private_token:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         event.participants.add(request.user.id)
         event.save()
         return Response(status=status.HTTP_200_OK)
@@ -185,20 +205,34 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        request_body=no_body,
+        request_body=no_body
     )
     @action(
         methods=['get'],
         detail=False,
-        permission_classes=[IsAuthenticated],
-        url_path='private-url',
-        url_name='private_url',
-        filter_backends=[],
-        pagination_class=None
+        permission_classes=[IsAuthenticated, EventPermissions],
+        url_path='private/(?P<token>[^/.]+)',
+        url_name='private/',
+        lookup_url_kwarg="token",
+        lookup_field='private_token'
     )
-    def set_private_url(self, request):
-        private_url = str(uuid4())
-        return Response(private_url, status=status.HTTP_200_OK)
+    def get_private_event(self, request, token):
+        return self.retrieve(request, token)
+
+
+    @action(
+        methods=["get"],
+        detail=True,
+        permission_classes=[IsAuthenticated],
+        url_path="events_participants",
+        url_name="events_participants_get_list",
+    )
+
+    def list_get_events_participants(self, request, event_id):
+        event = self.get_object()
+        queryset= event.participants.all()
+        serializer = ProfileRetrieveSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class RatingViewSet(viewsets.ModelViewSet):
@@ -372,7 +406,7 @@ class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     permission_classes = [AllowAny]
     queryset = Currency.objects.all()
-    serializer_class = CurrencyListSerializer
+    serializer_class = CurrencySerializer
 
     @swagger_auto_schema(
         tags=['currency'],
