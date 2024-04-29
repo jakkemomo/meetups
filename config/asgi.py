@@ -10,7 +10,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 from apps.core.middlewares import JwtAuthMiddlewareStack
-from apps.profiles.routers import websocket_urlpatterns
+from apps.websockets.urls import websocket_urlpatterns
 from config.settings import WS_ALLOWED_ORIGINS
 
 

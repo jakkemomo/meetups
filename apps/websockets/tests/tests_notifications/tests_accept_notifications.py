@@ -1,11 +1,12 @@
 import pytest
-from channels.testing import WebsocketCommunicator
+from channels.db import database_sync_to_async
 from rest_framework.reverse import reverse
 
 from apps.profiles.models.followers import Follower
-from apps.profiles.tests.followers.constants import FOLLOW_URL, ACCEPT_URL
+from apps.profiles.tests.followers.constants import ACCEPT_URL
 from apps.profiles.tests.utils import async_get_tokens
-from apps.profiles.tests.websockets.utils import (
+from apps.websockets.models import Notification
+from apps.websockets.tests.utils import (
     async_follower,
     get_communicator,
 )
@@ -33,15 +34,15 @@ async def test_accept_valid(
 
     # user_2 log_in and accept user's request
     token = await async_get_tokens(async_user_2_private)
-    data = {"Authorization": "Bearer " + token}
+    header = {"Authorization": "Bearer " + token}
     await async_client.post(
         reverse(ACCEPT_URL, args=[async_user_private.id]),
-        headers=data,
+        headers=header,
     )
 
     # notification check
     response_ws = await communicator.receive_json_from()
-    assert response_ws.get("type") == "accept_follow_request"
+    assert response_ws.get("type") == "accept_follow_request_notification"
     assert response_ws.get("data") == {
         'to_user_id': async_user_private.id,
         'to_username': async_user_private.username,
@@ -50,5 +51,12 @@ async def test_accept_valid(
         'from_user_image_url': async_user_2_private.image_url,
         'follower_status': 'ACCEPTED',
     }
+
+    notification_object = await database_sync_to_async(Notification.objects.filter)(
+        created_by=async_user_2_private,
+        recipient=async_user_private,
+        type=Notification.Type.ACCEPT,
+    )
+    assert database_sync_to_async(notification_object.first)
 
     await communicator.disconnect()

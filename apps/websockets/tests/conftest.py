@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from django.test import AsyncClient
 
 from apps.profiles.models import User
-from apps.profiles.routers import websocket_urlpatterns
+from apps.websockets.urls import websocket_urlpatterns
 
 
 @pytest.fixture
@@ -66,3 +66,21 @@ def event_loop():
         loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
+
+@pytest.fixture
+async def user_in_event(
+        async_user,
+        event,
+):
+    database_sync_to_async(event.participants.add)(async_user.id)
+
+
+@pytest.fixture
+async def user_and_user_2_in_event(
+        async_user,
+        async_user_2,
+        event,
+):
+    await database_sync_to_async(event.participants.add)(async_user.id)
+    await database_sync_to_async(event.participants.add)(async_user_2.id)

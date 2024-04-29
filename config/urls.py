@@ -25,6 +25,8 @@ urlpatterns = [
     path("", include('apps.upload.urls', namespace="upload")),
     path("", include("apps.events.urls", namespace="events")),
     path("", include("apps.profiles.urls", namespace="profiles")),
+    path("", include("apps.websockets.urls", namespace="websockets")),
+    path("__debug__/", include("debug_toolbar.urls")),
 
 ]
 
