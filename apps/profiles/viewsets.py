@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from apps.core.utils import delete_image_if_exists
 from apps.events.models import Event
 from apps.events.serializers import EventListSerializer
-from apps.profiles.managers import NotificationManager
+from apps.websockets.managers import NotificationManager
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions import (
@@ -30,6 +30,7 @@ from apps.profiles.serializers import (
     FollowerSerializer,
 )
 from apps.profiles.utils import get_user_object, is_current_user
+from apps.websockets.models import Notification
 
 logger = logging.getLogger("profiles_app")
 
@@ -124,7 +125,11 @@ class FollowerViewSet(viewsets.ModelViewSet):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
-        follower_object = Follower.objects.filter(user=user, follower=request.user).first()
+        follower_object: Follower = Follower.objects.filter(
+            user=user,
+            follower=request.user
+        ).first()
+
         if follower_object:
             if follower_object.status == Follower.Status.ACCEPTED:
                 return Response(
@@ -146,9 +151,21 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object = serializer.save()
 
         if user.is_private:
-            NotificationManager.follow_request(follower_object=follower_object)
+            notification_object = Notification.objects.create(
+                created_by=follower_object.follower,
+                recipient=follower_object.user,
+                type=Notification.Type.FOLLOW_REQUEST,
+                additional_data={"follower_status": follower_object.status},
+            )
+            NotificationManager.follow_request(notification_object=notification_object)
         else:
-            NotificationManager.follow(follower_object=follower_object)
+            notification_object = Notification.objects.create(
+                created_by=follower_object.follower,
+                recipient=follower_object.user,
+                type=Notification.Type.FOLLOW,
+                additional_data={"follower_status": follower_object.status},
+            )
+            NotificationManager.follow(notification_object=notification_object)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -167,7 +184,11 @@ class FollowerViewSet(viewsets.ModelViewSet):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
-        follower_object = Follower.objects.filter(user=request.user, follower=user, ).first()
+        follower_object = Follower.objects.filter(
+            user=request.user,
+            follower=user
+        ).first()
+
         if not follower_object:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
@@ -184,7 +205,13 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object.save()
         serializer = self.get_serializer(follower_object)
 
-        NotificationManager.accept_follow_request(follower_object=follower_object)
+        notification_object = Notification.objects.create(
+            created_by=follower_object.user,
+            recipient=follower_object.follower,
+            type=Notification.Type.ACCEPT,
+            additional_data={"follower_status": follower_object.status},
+        )
+        NotificationManager.accept_follow_request(notification_object=notification_object)
 
         return Response(
             status=status.HTTP_200_OK,

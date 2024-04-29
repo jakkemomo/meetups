@@ -4,11 +4,13 @@ from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import fields
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import AbstractBaseModel
 from apps.events.models.rating import Rating
 from apps.events.models.schedule import Schedule
 from apps.events.models.tags import Tag
+from apps.websockets.models import Chat
 
 user_model = settings.AUTH_USER_MODEL
 
@@ -67,6 +69,17 @@ class Event(AbstractBaseModel):
     )
     tags = models.ManyToManyField(
         to=Tag, related_name="events", blank=True)
+
+    # TODO: leave optional?
+    chat = models.OneToOneField(
+        to=Chat,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        default=None,
+        related_name="chat_event",
+        verbose_name=_("Chat"),
+    )
 
     class Meta:
         ordering = ["start_date"]

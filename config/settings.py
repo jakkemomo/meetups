@@ -96,12 +96,14 @@ INSTALLED_APPS = [
     "apps.permissions.apps.PermissionsConfig",
     "apps.profiles.apps.ProfilesConfig",
     "apps.upload.apps.UploadConfig",
+    "apps.websockets.apps.WebsocketsConfig",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "drf_yasg",
     'django_filters',
     "corsheaders",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -113,6 +115,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -251,6 +254,11 @@ LOGGING = {
             'propagate': True,
         },
         'events_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'profiles_ws_consumers': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
