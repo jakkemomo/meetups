@@ -384,7 +384,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     model = Review
     permission_classes = [IsAuthenticatedOrReadOnly, ReviewPermissions]
     lookup_url_kwarg = "review_id"
-    http_method_names = ["post", "get", "put", "delete", ]
+    http_method_names = ["post", "get", "put", "delete", "patch"]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
@@ -405,7 +405,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewResponseSerializer
 
     @action(
-        methods=["put"],
+        methods=["patch"],
         detail=True,
         url_path="response",
         url_name="review_response",
