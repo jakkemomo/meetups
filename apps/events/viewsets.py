@@ -2,7 +2,7 @@ import json
 import logging
 
 from django.core.serializers import serialize
-from django.db.models import Q, Count, Avg
+from django.db.models import Q, Count, Avg, Case, When, Value, BooleanField
 from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
@@ -19,7 +19,6 @@ from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
-from apps.profiles.serializers import ProfileRetrieveSerializer
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -40,11 +39,13 @@ from apps.events.serializers import (
     ReviewUpdateSerializer,
     ReviewListSerializer,
     ReviewResponseSerializer,
-    CategoryRetrieveSerializer, CategoryCreateSerializer,
+    CategoryRetrieveSerializer,
+    CategoryCreateSerializer,
     CategoryUpdateSerializer,
-    CategoryListSerializer, CurrencyListSerializer,
-
+    CategoryListSerializer,
+    CurrencySerializer,
 )
+from apps.profiles.serializers import ProfileRetrieveSerializer
 
 logger = logging.getLogger("events_app")
 
@@ -58,7 +59,7 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         response = Response(serializer.data)
-        if self.kwargs['token']:
+        if self.kwargs.get('token'):
             response.set_cookie("private_event_key",
                                 value=self.kwargs['token'],
                                 expires=instance.end_date,
@@ -110,16 +111,17 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.kwargs.get("event_id"):
             self.queryset = Event.objects.filter(id=self.kwargs["event_id"])
-            return self.queryset.all().annotate(participants_number=Count("participants"))
         if self.kwargs.get("token"):
             self.queryset = Event.objects.filter(private_token=self.kwargs["token"])
-            return self.queryset.all().annotate(participants_number=Count("participants"))
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                    Q(participants__in=[self.request.user.id]) & Q(type="private") |
-                    Q(created_by=self.request.user) & Q(type="private")
+                    Q(is_visible=True) &
+                    Q(is_finished=False) & (
+                        Q(type="open") |
+                        Q(participants__in=[self.request.user.id]) & Q(type="private") |
+                        Q(created_by=self.request.user) & Q(type="private")
+                )
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
@@ -127,7 +129,12 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
         return self.queryset.all().annotate(
             participants_number=Count("participants"),
-            average_rating=Coalesce(Avg("ratings__value"), 0.0)
+            average_rating=Coalesce(Avg("ratings__value"), 0.0),
+            is_favorite=Case(
+                When(favoriteevent__user_id=self.request.user.id, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            ) if self.request.user.id else Value(False, output_field=BooleanField()),
         )
 
     def get_serializer_class(self):
@@ -424,7 +431,7 @@ class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     permission_classes = [AllowAny]
     queryset = Currency.objects.all()
-    serializer_class = CurrencyListSerializer
+    serializer_class = CurrencySerializer
 
     @swagger_auto_schema(
         tags=['currency'],

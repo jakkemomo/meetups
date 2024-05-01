@@ -31,4 +31,4 @@ from .review import (
     ReviewResponseSerializer
 )
 from .map import GeoJsonSerializer
-from .currency import CurrencyListSerializer
+from .currency import CurrencySerializer
