@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0034_rename_private_url_event_private_token'),
+        ('events', '0035_event_favorites'),
     ]
 
     operations = [
