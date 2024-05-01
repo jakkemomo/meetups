@@ -12,6 +12,7 @@ class Review(AbstractBaseModel):
     event = models.ForeignKey("events.Event", on_delete=models.CASCADE)
     review = models.CharField(max_length=1000, null=True)
     rating = models.OneToOneField('events.Rating', related_name='rating', on_delete=models.CASCADE, null=True)
+    response = models.CharField(max_length=1000, null=True, blank=True)
 
     class Meta:
         ordering = ['event']

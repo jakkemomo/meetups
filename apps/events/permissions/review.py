@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from apps.core.permissions.common import is_verified, is_owner
+from apps.core.permissions.common import is_verified, is_owner, is_participant
 
 
 class ReviewPermissions(permissions.BasePermission):
@@ -10,7 +10,9 @@ class ReviewPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        elif view.action in ['update', 'partial_update', 'destroy']:
-            return is_verified(request) and is_owner(request, obj)
+        elif view.action in ['update', 'destroy', 'partial_update']:
+            return is_verified(request) and is_participant(request, obj)
+        elif view.action == "response_to_review":
+            return is_verified(request) and is_owner(request, obj.event)
         else:
             return False
