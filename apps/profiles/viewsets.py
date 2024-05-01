@@ -1,7 +1,9 @@
 import logging
 
 from django.db.models import Count, Avg, Q
+from django.db.models import Subquery
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
@@ -30,8 +32,6 @@ from apps.profiles.serializers import (
     FollowerSerializer,
 )
 from apps.profiles.utils import get_user_object, is_current_user
-from django.db.models import Subquery
-from django.utils import timezone
 
 logger = logging.getLogger("profiles_app")
 
@@ -269,16 +269,16 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         self.queryset = (
             self.model.objects
-            .annotate(
+                .annotate(
                 participants_number=Count("participants"),
                 average_rating=Coalesce(Avg("ratings__value"), 0.0)
             )
-            .filter(
+                .filter(
                 Q(is_visible=True) & Q(type="open") |
                 Q(participants__in=[self.request.user.id]) & Q(type="private") |
                 Q(created_by=self.request.user) & Q(type="private")
             )
-            .order_by("-start_date")
+                .order_by("-start_date")
         )
         return self.queryset.all()
 
@@ -289,7 +289,7 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
         permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="events/created_by",
+        url_path="events/created",
         url_name="event_list_created_by_user",
     )
     def list_created_by_user(self, request, user_id):
@@ -306,7 +306,7 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
         permission_classes=[IsAuthenticated, FollowerPermissions],
-        url_path="events/is_participant",
+        url_path="events/participated",
         url_name="event_list_user_is_participant",
     )
     def list_user_is_participant(self, request, user_id):
@@ -323,7 +323,7 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
         permission_classes=[IsAuthenticated],
-        url_path="events/favorite_events",
+        url_path="events/favorited",
         url_name="user_favorite_events",
     )
     def list_user_favorite_events(self, request, user_id):
@@ -336,7 +336,7 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
         permission_classes=[IsAuthenticated],
-        url_path="events/finished_events",
+        url_path="events/finished",
         url_name="user_finished_events",
     )
     def list_user_finished_events(self, request, user_id):
@@ -348,10 +348,9 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
         permission_classes=[IsAuthenticated],
-        url_path="events/planned_events",
+        url_path="events/planned",
         url_name="user_planned_events",
     )
-
     def list_user_planned_events(self, request, user_id):
         queryset = self.get_queryset().filter(participants__id=user_id, start_date__gt=timezone.now())
         serializer = self.get_serializer(queryset, many=True)
