@@ -67,6 +67,9 @@ class Event(AbstractBaseModel):
     )
     tags = models.ManyToManyField(
         to=Tag, related_name="events", blank=True)
+    favorites = models.ManyToManyField(
+        to=user_model, related_name="favorite_events", blank=True, through="FavoriteEvent"
+    )
 
     class Meta:
         ordering = ["start_date"]

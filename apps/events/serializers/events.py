@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
-from apps.events.models import Event, Tag, Category, Schedule, Currency
+from apps.events.models import Event, Tag, Category, Schedule, Currency, FavoriteEvent
 from apps.profiles.models import User
 from . import currency
 
@@ -63,7 +63,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = ["participants", "created_by", "updated_by"]
+        exclude = ["participants", "created_by", "updated_by", "ratings"]
 
     def validate(self, data):
         start_date = data.get('start_date')
@@ -197,6 +197,7 @@ class EventListSerializer(serializers.ModelSerializer):
     category = EventCategorySerializer(many=False)
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()
+    is_favorite = serializers.BooleanField(default=False)
 
     class Meta:
         model = Event
@@ -213,7 +214,8 @@ class EventListSerializer(serializers.ModelSerializer):
             "address",
             "category",
             "participants_number",
-            "average_rating"
+            "average_rating",
+            "is_favorite",
         ]
 
 
@@ -227,6 +229,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField()
     currency = currency.CurrencySerializer(many=False)
     schedule = ScheduleSerializer(many=True)
+    is_favorite = serializers.BooleanField(default=False)
 
     def get_location(self, obj):
         if not obj.location:

@@ -11,7 +11,7 @@ from apps.profiles.viewsets import (
 app_name = "profiles"
 router = routers.SimpleRouter()
 
-router.register('users/(?P<user_id>[^/.]+)/user_ratings', UserRatingViewSet, basename="UserRating")
+router.register('users/(?P<user_id>[^/.]+)/ratings', UserRatingViewSet, basename="UserRating")
 router.register("users", ProfileViewSet, basename="Profiles")
 router.register("users", FollowerViewSet, basename="Followers")
 router.register("users", ProfileEventViewSet, basename="User events")

@@ -2,7 +2,7 @@ import json
 import logging
 
 from django.core.serializers import serialize
-from django.db.models import Q, Count, Avg
+from django.db.models import Q, Count, Avg, Case, When, Value, BooleanField
 from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
@@ -19,7 +19,6 @@ from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.events.models import Event, Rating, Tag, FavoriteEvent, Category, Review, Currency
 from apps.events.permissions import RatingPermissions, EventPermissions, TagPermissions, CategoriesPermissions, \
     ReviewPermissions
-from apps.profiles.serializers import ProfileRetrieveSerializer
 from apps.events.serializers import (
     EventListSerializer,
     EventRetrieveSerializer,
@@ -39,12 +38,14 @@ from apps.events.serializers import (
     ReviewCreateSerializer,
     ReviewUpdateSerializer,
     ReviewListSerializer,
+    ReviewResponseSerializer,
     CategoryRetrieveSerializer,
     CategoryCreateSerializer,
     CategoryUpdateSerializer,
     CategoryListSerializer,
     CurrencySerializer,
 )
+from apps.profiles.serializers import ProfileRetrieveSerializer
 
 logger = logging.getLogger("events_app")
 
@@ -115,9 +116,12 @@ class EventViewSet(viewsets.ModelViewSet):
         else:
             if self.request.user.id:
                 self.queryset = self.model.objects.filter(
-                    Q(is_visible=True) & Q(is_finished=False) & Q(type="open") |
-                    Q(participants__in=[self.request.user.id]) & Q(type="private") |
-                    Q(created_by=self.request.user) & Q(type="private")
+                    Q(is_visible=True) &
+                    Q(is_finished=False) & (
+                        Q(type="open") |
+                        Q(participants__in=[self.request.user.id]) & Q(type="private") |
+                        Q(created_by=self.request.user) & Q(type="private")
+                )
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
@@ -125,7 +129,12 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
         return self.queryset.all().annotate(
             participants_number=Count("participants"),
-            average_rating=Coalesce(Avg("ratings__value"), 0.0)
+            average_rating=Coalesce(Avg("ratings__value"), 0.0),
+            is_favorite=Case(
+                When(favoriteevent__user_id=self.request.user.id, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            ) if self.request.user.id else Value(False, output_field=BooleanField()),
         )
 
     def get_serializer_class(self):
@@ -382,7 +391,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     model = Review
     permission_classes = [IsAuthenticatedOrReadOnly, ReviewPermissions]
     lookup_url_kwarg = "review_id"
-    http_method_names = ["post", "get", "put", "delete"]
+    http_method_names = ["post", "get", "put", "delete", "patch"]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
@@ -399,6 +408,22 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewUpdateSerializer
             case "list":
                 return ReviewListSerializer
+            case "response_to_review":
+                return ReviewResponseSerializer
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        url_path="response",
+        url_name="review_response",
+        permission_classes=[ReviewPermissions],
+    )
+    def response_to_review(self, request, review_id, event_id, ):
+        review = self.get_object()
+        review.response = request.data.get("response")
+        review.save()
+        serializer = ReviewRetrieveSerializer(review)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
