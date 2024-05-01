@@ -118,10 +118,10 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) &
                     Q(is_finished=False) & (
-                        Q(type="open") |
-                        Q(participants__in=[self.request.user.id]) & Q(type="private") |
-                        Q(created_by=self.request.user) & Q(type="private")
-                )
+                            Q(type="open") |
+                            Q(participants__in=[self.request.user.id]) & Q(type="private") |
+                            Q(created_by=self.request.user) & Q(type="private")
+                    )
                 ).distinct()
             else:
                 self.queryset = self.model.objects.filter(
@@ -228,18 +228,16 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_private_event(self, request, token):
         return self.retrieve(request, token)
 
-
     @action(
         methods=["get"],
         detail=True,
         permission_classes=[IsAuthenticated],
-        url_path="events_participants",
+        url_path="participants",
         url_name="events_participants_get_list",
     )
-
     def list_get_events_participants(self, request, event_id):
         event = self.get_object()
-        queryset= event.participants.all()
+        queryset = event.participants.all()
         serializer = ProfileRetrieveSerializer(queryset, many=True)
         return Response(serializer.data)
 
