@@ -241,6 +241,23 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = ProfileRetrieveSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=no_body,
+        tags=["events"]
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=[EventPermissions],
+        url_path="kick(?P<user_id>[^/.]+)",
+        url_name="kick_from_event"
+    )
+    def kick_participant_from_event(self, request, event_id, user_id):
+        event = self.get_object()
+        event.participants.remove(user_id)
+        event.save()
+        return Response(status=status.HTTP_200_OK)
+
 
 class RatingViewSet(viewsets.ModelViewSet):
     """
