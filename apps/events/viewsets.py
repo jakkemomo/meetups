@@ -231,7 +231,7 @@ class EventViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=True,
-        permission_classes=[IsAuthenticated],
+        permission_classes=[AllowAny],
         url_path="participants",
         url_name="events_participants_get_list",
     )
@@ -249,7 +249,7 @@ class EventViewSet(viewsets.ModelViewSet):
         methods=["post"],
         detail=True,
         permission_classes=[EventPermissions],
-        url_path="kick(?P<user_id>[^/.]+)",
+        url_path="kick/(?P<user_id>[^/.]+)",
         url_name="kick_from_event"
     )
     def kick_participant_from_event(self, request, event_id, user_id):
