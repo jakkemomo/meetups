@@ -17,7 +17,7 @@ class EventPermissions(permissions.BasePermission):
             return True
         elif view.action == 'create':
             return is_verified(request)
-        elif view.action in ['update', 'partial_update', 'destroy']:
+        elif view.action in ['update', 'partial_update', 'destroy', "kick_participant_from_event"]:
             return is_verified(request) and is_owner(request, obj)
         elif view.action == 'register_for_event':
             return is_verified(request) and not is_participant(request, obj)
