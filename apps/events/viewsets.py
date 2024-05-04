@@ -122,12 +122,12 @@ class EventViewSet(viewsets.ModelViewSet):
                             Q(participants__in=[self.request.user.id]) & Q(type="private") |
                             Q(created_by=self.request.user) & Q(type="private")
                     )
-                ).distinct()
+                )
             else:
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        return self.queryset.all().annotate(
+        return self.queryset.distinct().all().annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
             is_favorite=Case(
