@@ -169,7 +169,7 @@ class ReverifyEmailView(generics.CreateAPIView):
 class ChangeEmailView(APIView):
     """
     This view handles email change requests from authenticated users.
-    Validates the user's email.
+    Validates the user's email, send message to email for verification email.
     """
     permission_classes = (AllowAny,)
     serializer_class = ReverifyEmailSerializer
@@ -184,11 +184,12 @@ class ChangeEmailView(APIView):
         tags=['auth'],
         responses={
             status.HTTP_200_OK: 'Email successfully sent',
+            status.HTTP_409_CONFLICT: 'Email exist',
             status.HTTP_404_NOT_FOUND: 'User not found',
             status.HTTP_500_INTERNAL_SERVER_ERROR: 'Could not send message at the moment, try later',
         },
     )
-    def put(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         user_model = get_user_model()
         try:
             user = user_model.objects.get(id=request.user.id)
@@ -199,8 +200,10 @@ class ChangeEmailView(APIView):
                 'User not found',
                 status=status.HTTP_404_NOT_FOUND
             )
-        user.email = request.data["email"]
+        if User.objects.filter(email=request.data["email"]).exists():
+            return Response(status=status.HTTP_409_CONFLICT, data="This email has already been registered")
         user.is_email_verified = False
+        user.email = request.data["email"]
         user.save()
         try:
             helpers.send_verification_email(user)
