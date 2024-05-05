@@ -135,7 +135,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 default=Value(False),
                 output_field=BooleanField()
             ) if self.request.user.id else Value(False, output_field=BooleanField()),
-        ).distinct().all()
+        ).distinct()
 
     def get_serializer_class(self):
         match self.action:
