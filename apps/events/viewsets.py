@@ -2,7 +2,7 @@ import json
 import logging
 
 from django.core.serializers import serialize
-from django.db.models import Q, Count, Avg, Case, When, Value, BooleanField
+from django.db.models import Q, Count, Avg, Exists, OuterRef
 from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
@@ -127,15 +127,14 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        return self.queryset.annotate(
+        queryset = self.queryset.prefetch_related('category', 'tags').annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
-            is_favorite=Case(
-                When(favoriteevent__user_id=self.request.user.id, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
-            ) if self.request.user.id else Value(False, output_field=BooleanField()),
-        ).distinct()
+            is_favorite=Exists(FavoriteEvent.objects.filter(
+                event_id=OuterRef("id"), user_id=self.request.user.id
+            )),
+        )
+        return queryset
 
     def get_serializer_class(self):
         match self.action:
