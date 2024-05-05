@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 from apps.profiles.models.followers import Follower
-from apps.profiles.utils import get_user_object, is_current_user
+from apps.profiles.utils import get_user_object, is_current_user, is_follower
 
 
 class FollowerPermissions(permissions.BasePermission):
@@ -21,11 +21,7 @@ class FollowerPermissions(permissions.BasePermission):
                     or
                     user.is_private
                     and
-                    Follower.objects.filter(
-                        user=user,
-                        follower=request.user,
-                        status=Follower.Status.ACCEPTED,
-                    ).exists()
+                    is_follower(request, user)
             )
         else:
             return True
