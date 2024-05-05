@@ -127,7 +127,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        return self.queryset.distinct().all().annotate(
+        return self.queryset.annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
             is_favorite=Case(
@@ -135,7 +135,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 default=Value(False),
                 output_field=BooleanField()
             ) if self.request.user.id else Value(False, output_field=BooleanField()),
-        )
+        ).distinct().all()
 
     def get_serializer_class(self):
         match self.action:
