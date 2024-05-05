@@ -10,7 +10,7 @@ from apps.core.models import AbstractBaseModel
 from apps.events.models.rating import Rating
 from apps.events.models.schedule import Schedule
 from apps.events.models.tags import Tag
-from apps.websockets.models import Chat
+from apps.chats.models import Chat
 
 user_model = settings.AUTH_USER_MODEL
 
@@ -70,7 +70,6 @@ class Event(AbstractBaseModel):
     tags = models.ManyToManyField(
         to=Tag, related_name="events", blank=True)
 
-    # TODO: leave optional?
     chat = models.OneToOneField(
         to=Chat,
         on_delete=models.CASCADE,

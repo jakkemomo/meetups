@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from apps.core.utils import delete_image_if_exists
 from apps.events.models import Event
 from apps.events.serializers import EventListSerializer
-from apps.websockets.managers import NotificationManager
+from apps.notifications.managers import NotificationManager
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions import (
@@ -30,7 +30,7 @@ from apps.profiles.serializers import (
     FollowerSerializer,
 )
 from apps.profiles.utils import get_user_object, is_current_user
-from apps.websockets.models import Notification
+from apps.notifications.models import Notification
 
 logger = logging.getLogger("profiles_app")
 

@@ -5,13 +5,17 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 import pytest
+import asyncio
 from rest_framework.test import APIClient
+from django.test import AsyncClient
+from channels.routing import URLRouter
 from channels.db import database_sync_to_async
 
 from apps.profiles.models import User
 from apps.profiles.models.followers import Follower
 from apps.events.models import Event
-from apps.websockets.models import Chat
+from apps.chats.models import Chat
+from config.urls import websocket_urlpatterns
 
 
 @pytest.fixture
@@ -45,6 +49,7 @@ def user_2_private() -> User:
         password="test2",
         is_private=True,
     )
+
 
 @pytest.fixture
 def follower_user_accepted(user, user_2) -> Follower:
@@ -107,6 +112,17 @@ def follower_user_2_accepted_private(user_private, user_2_private) -> Follower:
 
 
 @pytest.fixture
+async def async_follower_user_accepted_private(async_user, async_user_2_private) -> Follower:
+    data = {
+        'user': async_user_2_private,
+        'follower': async_user,
+        'status': Follower.Status.ACCEPTED,
+    }
+    follower = await database_sync_to_async(Follower.objects.create)(**data)
+    return follower
+
+
+@pytest.fixture
 def follower_user_2_pending_private(user_private, user_2_private) -> Follower:
     data = {
         'user': user_private,
@@ -132,6 +148,7 @@ def event() -> Event:
     return Event.objects.create(
         name="test_event",
         chat=chat,
+        image_url="test_image_url",
     )
 
 
@@ -206,7 +223,91 @@ def event_not_visible_user_2_is_participant_private(user_2_private, event_not_vi
 
 
 @pytest.fixture
-async def chat_with_users(async_user, async_user_2) -> Chat:
+def application() -> URLRouter:
+    return URLRouter(websocket_urlpatterns)
+
+
+@pytest.fixture
+async def async_client() -> AsyncClient:
+    return AsyncClient()
+
+
+@pytest.fixture
+async def async_user() -> User:
+    data = {
+        "email": "user@example.com",
+        "username": "test_user",
+        "password": "test",
+        "image_url": "test_image_url",
+    }
+    return await database_sync_to_async(User.objects.create)(**data)
+
+
+@pytest.fixture
+async def async_user_2() -> User:
+    data = {
+        "email": "user2@example.com",
+        "username": "test_user_2",
+        "password": "test",
+        "image_url": "test_image_url_2",
+    }
+    return await database_sync_to_async(User.objects.create)(**data)
+
+
+@pytest.fixture
+async def async_user_private() -> User:
+    data = {
+        "email": "user_private@example.com",
+        "username": "test_user_private",
+        "password": "test",
+        "is_private": True,
+        "image_url": "test_image_url",
+    }
+    return await database_sync_to_async(User.objects.create)(**data)
+
+
+@pytest.fixture
+async def async_user_2_private() -> User:
+    data = {
+        "email": "user2_private@example.com",
+        "username": "test_user_2_private",
+        "password": "test",
+        "is_private": True,
+        "image_url": "test_image_url_2",
+    }
+    return await database_sync_to_async(User.objects.create)(**data)
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture
+async def user_in_event(
+        async_user,
+        event,
+):
+    database_sync_to_async(event.participants.add)(async_user.id)
+
+
+@pytest.fixture
+async def user_and_user_2_in_event(
+        async_user,
+        async_user_2,
+        event,
+):
+    await database_sync_to_async(event.participants.add)(async_user.id)
+    await database_sync_to_async(event.participants.add)(async_user_2.id)
+
+
+@pytest.fixture
+async def event_chat_with_users(async_user, async_user_2) -> Chat:
     chat = await database_sync_to_async(Chat.objects.create)(type=Chat.Type.EVENT)
     await database_sync_to_async(chat.participants.add)(async_user, async_user_2)
     return chat

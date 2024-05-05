@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category, Schedule, Currency
 from apps.profiles.models import User
+from apps.chats.models import Chat
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -126,6 +127,11 @@ class EventCreateSerializer(serializers.ModelSerializer):
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
 
+        # Create an event chats and add a creator to it
+        chat = Chat.objects.create(type=Chat.Type.EVENT)
+        chat.participants.add(request.user)
+        validated_data["chat_id"] = chat.id
+
         if validated_data["type"] == "private":
             validated_data["private_token"] = uuid4()
 
@@ -139,6 +145,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
                 event.schedule.add(new_schedule)
         if tags:
             event.tags.set([tag.id for tag in tags])
+
         return event
 
 

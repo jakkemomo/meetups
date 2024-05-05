@@ -37,3 +37,11 @@ def change_followers_if_exists(user):
             f"An error occurred while changing followers of user: {user}.\n{exc}"
         )
         raise
+
+
+def is_follower(request, user):
+    return Follower.objects.filter(
+                user=user,
+                follower=request.user,
+                status=Follower.Status.ACCEPTED,
+            ).exists()
