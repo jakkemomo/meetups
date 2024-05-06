@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-from apps.events.models import Event, Rating
+from apps.events.models import Rating
 
 
 class RatingCreateSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(min_value=0, max_value=10, default=10)
+    value = serializers.IntegerField(min_value=1, max_value=5, default=5)
 
     class Meta:
         model = Rating
@@ -18,7 +18,7 @@ class RatingRetrieveSerializer(serializers.ModelSerializer):
 
 
 class RatingUpdateSerializer(serializers.ModelSerializer):
-    value = serializers.IntegerField(min_value=0, max_value=10, default=10)
+    value = serializers.IntegerField(min_value=1, max_value=5, default=5)
 
     class Meta:
         model = Rating
