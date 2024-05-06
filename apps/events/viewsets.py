@@ -4,6 +4,7 @@ import logging
 from django.core.serializers import serialize
 from django.db.models import Q, Count, Avg, Exists, OuterRef
 from django.db.models.functions import Coalesce
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status, mixins, serializers
@@ -45,7 +46,8 @@ from apps.events.serializers import (
     CategoryListSerializer,
     CurrencySerializer,
 )
-from apps.profiles.serializers import ProfileRetrieveSerializer
+from apps.events.serializers.events import ParticipantSerializer
+from apps.profiles.models import User
 
 logger = logging.getLogger("events_app")
 
@@ -111,7 +113,7 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.kwargs.get("event_id"):
             self.queryset = Event.objects.filter(id=self.kwargs["event_id"])
-        if self.kwargs.get("token"):
+        elif self.kwargs.get("token"):
             self.queryset = Event.objects.filter(private_token=self.kwargs["token"])
         else:
             if self.request.user.id:
@@ -226,19 +228,6 @@ class EventViewSet(viewsets.ModelViewSet):
     )
     def get_private_event(self, request, token):
         return self.retrieve(request, token)
-
-    @action(
-        methods=["get"],
-        detail=True,
-        permission_classes=[AllowAny],
-        url_path="participants",
-        url_name="events_participants_get_list",
-    )
-    def list_get_events_participants(self, request, event_id):
-        event = self.get_object()
-        queryset = event.participants.all()
-        serializer = ProfileRetrieveSerializer(queryset, many=True)
-        return Response(serializer.data)
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -424,6 +413,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewListSerializer
             case "response_to_review":
                 return ReviewResponseSerializer
+            case _:
+                return EmptySerializer
 
     @action(
         methods=["patch"],
@@ -453,3 +444,30 @@ class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+
+class ParticipantViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    model = User
+    serializer_class = ParticipantSerializer
+    lookup_url_kwarg = "user_id"
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    search_fields = ["username", "email"]
+    ordering_fields = ['username', "email"]
+    permission_classes = [EventPermissions]
+
+    def get_queryset(self, *args, **kwargs):
+        if self.kwargs.get("event_id"):
+            self.queryset = Event.objects.filter(id=self.kwargs["event_id"]).first().participants.all()
+            return self.queryset
+        else:
+            raise Http404("Event not found")
+
+    @action(
+        methods=["get"],
+        detail=False,
+        url_path='(?P<event_id>[^/.]+)/participants',
+        url_name="event_list_participants",
+    )
+    def list_user_is_participant(self, request, event_id, ):
+        self.check_object_permissions(request, Event.objects.get(id=event_id))
+        return super().list(request)
