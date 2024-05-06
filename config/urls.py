@@ -29,6 +29,7 @@ urlpatterns = [
     path("", include("apps.events.urls", namespace="events")),
     path("", include("apps.profiles.urls", namespace="profiles")),
     path("", include("apps.chats.urls", namespace="chats")),
+    path("", include("apps.notifications.urls", namespace="notifications")),
     path("__debug__/", include("debug_toolbar.urls")),
 
 ]

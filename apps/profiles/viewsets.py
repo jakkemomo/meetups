@@ -156,7 +156,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
             notification_object = Notification.objects.create(
                 created_by=follower_object.follower,
                 recipient=follower_object.user,
-                type=Notification.Type.FOLLOW_REQUEST,
+                type=Notification.Type.NEW_FOLLOW_REQUEST,
                 additional_data={"follower_status": follower_object.status},
             )
             NotificationManager.follow_request(notification_object=notification_object)
@@ -164,7 +164,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
             notification_object = Notification.objects.create(
                 created_by=follower_object.follower,
                 recipient=follower_object.user,
-                type=Notification.Type.FOLLOW,
+                type=Notification.Type.NEW_FOLLOWER,
                 additional_data={"follower_status": follower_object.status},
             )
             NotificationManager.follow(notification_object=notification_object)
@@ -210,7 +210,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         notification_object = Notification.objects.create(
             created_by=follower_object.user,
             recipient=follower_object.follower,
-            type=Notification.Type.ACCEPT,
+            type=Notification.Type.ACCEPTED_FOLLOW_REQUEST,
             additional_data={"follower_status": follower_object.status},
         )
         NotificationManager.accept_follow_request(notification_object=notification_object)

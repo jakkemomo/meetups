@@ -17,18 +17,24 @@ async def test_follow_valid(
         async_user,
         async_user_2,
 ):
-    # user_2 connecting to ws
+    # user_2 connects to ws
     communicator = get_communicator(application, async_user_2)
     connected, subprotocol = await communicator.connect()
     assert connected
 
-    # user log_in and follow user_2
+    # user logs in and follows user_2
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
-    await async_client.post(
+    response = await async_client.post(
         reverse(FOLLOW_URL, args=[async_user_2.id]),
         headers=header,
     )
+    assert response.status_code == 201
+    assert response.data == {
+        'user': async_user_2.id,
+        'follower': async_user.id,
+        'status': Follower.Status.ACCEPTED
+    }
 
     # notification check
     response_ws = await communicator.receive_json_from()
@@ -46,8 +52,40 @@ async def test_follow_valid(
         Notification.objects.filter)(
         created_by=async_user,
         recipient=async_user_2,
-        type=Notification.Type.FOLLOW,
+        type=Notification.Type.NEW_FOLLOWER,
     )
     assert database_sync_to_async(notification_object.first)
 
     await communicator.disconnect()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_follow_unauthorized(
+        application,
+        async_client,
+        async_user_2,
+):
+    # someone follows user_2
+    response = await async_client.post(
+        reverse(FOLLOW_URL, args=[async_user_2.id]),
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_follow_user_not_found(
+        application,
+        async_client,
+        async_user,
+):
+    # user logs in and follows someone
+    token = await async_get_tokens(async_user)
+    header = {"Authorization": "Bearer " + token}
+    response = await async_client.post(
+        reverse(FOLLOW_URL, args=[1000]),
+        headers=header,
+    )
+
+    assert response.status_code == 404

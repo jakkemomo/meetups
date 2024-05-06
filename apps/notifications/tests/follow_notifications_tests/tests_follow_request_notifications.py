@@ -19,18 +19,25 @@ async def test_follow_request_valid(
         async_user,
         async_user_2_private,
 ):
-    # user_2 connecting to ws
+    # user_2 connects to ws
     communicator = get_communicator(application, async_user_2_private)
     connected, subprotocol = await communicator.connect()
     assert connected
 
-    # user log_in and follow user_2
+    # user logs in and follows user_2
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
-    await async_client.post(
+    response = await async_client.post(
         reverse(FOLLOW_URL, args=[async_user_2_private.id]),
         headers=header,
     )
+
+    assert response.status_code == 201
+    assert response.data == {
+        'user': async_user_2_private.id,
+        'follower': async_user.id,
+        'status': Follower.Status.PENDING
+    }
 
     # notification check
     response_ws = await communicator.receive_json_from()
@@ -48,8 +55,42 @@ async def test_follow_request_valid(
         Notification.objects.filter)(
         created_by=async_user,
         recipient=async_user_2_private,
-        type=Notification.Type.FOLLOW_REQUEST,
+        type=Notification.Type.NEW_FOLLOW_REQUEST,
     )
     assert database_sync_to_async(notification_object.first)
 
     await communicator.disconnect()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_follow_request_unauthorized(
+        application,
+        async_client,
+        async_user_2_private,
+):
+    # someone follows user_2
+    response = await async_client.post(
+        reverse(FOLLOW_URL, args=[async_user_2_private.id]),
+    )
+
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_follow_request_valid(
+        application,
+        async_client,
+        async_user,
+        async_user_2_private,
+):
+    # user logs in and follows someone
+    token = await async_get_tokens(async_user)
+    header = {"Authorization": "Bearer " + token}
+    response = await async_client.post(
+        reverse(FOLLOW_URL, args=[1000]),
+        headers=header,
+    )
+
+    assert response.status_code == 404

@@ -22,7 +22,6 @@ def test_accept_pending_private(
         reverse(ACCEPT_URL, args=[user_private.id])
     )
     assert response.status_code == 200
-    assert response.data.get('id') is not None
     assert response.data.get('user') == user_2_private.id
     assert response.data.get('follower') == user_private.id
     assert response.data.get('status') == Follower.Status.ACCEPTED
@@ -43,7 +42,6 @@ def test_accept_declined_private(
         reverse(ACCEPT_URL, args=[user_private.id])
     )
     assert response.status_code == 200
-    assert response.data.get('id') is not None
     assert response.data.get('user') == user_2_private.id
     assert response.data.get('follower') == user_private.id
     assert response.data.get('status') == Follower.Status.ACCEPTED

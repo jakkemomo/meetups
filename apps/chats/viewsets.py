@@ -35,7 +35,7 @@ class ChatViewSet(viewsets.ModelViewSet):
     model = Chat
     permission_classes = [IsAuthenticated, ChatPermissions]
     lookup_url_kwarg = "chat_id"
-    http_method_names = ["list", "get", "post"]
+    http_method_names = ["get", "post"]
 
     def get_serializer_class(self):
         match self.action:

@@ -133,6 +133,20 @@ def follower_user_2_pending_private(user_private, user_2_private) -> Follower:
 
 
 @pytest.fixture
+async def async_follower_user_pending_private(
+        async_user_private,
+        async_user_2_private
+) -> Follower:
+    data = {
+        'user': async_user_2_private,
+        'follower': async_user_private,
+        'status': Follower.Status.PENDING,
+    }
+    follower = await database_sync_to_async(Follower.objects.create)(**data)
+    return follower
+
+
+@pytest.fixture
 def follower_user_2_declined_private(user_private, user_2_private) -> Follower:
     data = {
         'user': user_private,
