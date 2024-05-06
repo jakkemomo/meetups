@@ -3,9 +3,9 @@ from uuid import uuid4
 from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
-from apps.events.models import Event, Tag, Category, Schedule, Currency, FavoriteEvent
+from apps.events.models import Event, Tag, Category, Schedule, Currency
 from apps.profiles.models import User
-from . import currency
+from . import currency, utils
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -133,6 +133,10 @@ class EventCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop("tags", None)
         schedule = validated_data.pop("schedule", None)
         event = Event(**validated_data)
+        if schedule:
+            schedule_start = utils.get_schedule_start(schedule)
+            event.start_date = schedule_start.date()
+            event.start_time = schedule_start.time()
         event.save()
         if schedule:
             for schedule_data in schedule:
@@ -220,7 +224,6 @@ class EventListSerializer(serializers.ModelSerializer):
 
 
 class EventRetrieveSerializer(serializers.ModelSerializer):
-    participants = ParticipantSerializer(many=True)
     tags = EventTagSerializer(many=True)
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
@@ -238,7 +241,13 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = ["ratings", "updated_by", "city_south_west_point", "city_north_east_point"]
+        exclude = [
+            "ratings",
+            "updated_by",
+            "city_south_west_point",
+            "city_north_east_point",
+            "participants",
+        ]
 
 
 class EmptySerializer(serializers.Serializer):
