@@ -171,7 +171,7 @@ class ChangeEmailView(APIView):
     This view handles email change requests from authenticated users.
     Validates the user's email, send message to email for verification email.
     """
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = ReverifyEmailSerializer
 
     def get_serializer(self, *args, **kwargs):
