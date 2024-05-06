@@ -8,7 +8,8 @@ from .viewsets import (
     MarkerViewSet,
     CategoryViewSet,
     ReviewViewSet,
-    CurrencyViewSet
+    CurrencyViewSet,
+    ParticipantViewSet
 )
 
 
@@ -22,6 +23,8 @@ router.register("tags", TagViewSet, basename="Tags")
 router.register("markers", MarkerViewSet, basename="Markers")
 router.register("currencies", CurrencyViewSet, basename="Currencies")
 router.register("events/(?P<event_id>[^/.]+)/review", ReviewViewSet, basename="Review")
+router.register("events", ParticipantViewSet, basename="Events participants")
+
 urlpatterns = [
     path("api/v1/", include(router.urls)),
 ]
