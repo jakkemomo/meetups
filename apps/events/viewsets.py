@@ -413,6 +413,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 return ReviewListSerializer
             case "response_to_review":
                 return ReviewResponseSerializer
+            case _:
+                return EmptySerializer
 
     @action(
         methods=["patch"],
@@ -451,7 +453,7 @@ class ParticipantViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = ["username", "email"]
     ordering_fields = ['username', "email"]
-    permission_classes = [IsAuthenticated, EventPermissions]
+    permission_classes = [EventPermissions]
 
     def get_queryset(self, *args, **kwargs):
         if self.kwargs.get("event_id"):
@@ -463,11 +465,9 @@ class ParticipantViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     @action(
         methods=["get"],
         detail=False,
-        permission_classes=[AllowAny],
         url_path='(?P<event_id>[^/.]+)/participants',
         url_name="event_list_participants",
-        lookup_url_kwarg="event_id",
-        lookup_field="id",
     )
     def list_user_is_participant(self, request, event_id, ):
+        self.check_object_permissions(request, Event.objects.get(id=event_id))
         return super().list(request)
