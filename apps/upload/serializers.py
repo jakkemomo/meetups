@@ -22,10 +22,10 @@ class UploadSerializer(serializers.Serializer):
     )
 
     def validate_file(self, file):
+        self.validate_resolution(file)
         if file.content_type != "image/webp":
             file = self.convert_to_webp(file)
         file.name = f'{uuid.uuid4().hex}.webp'
-        self.validate_resolution(file)
         return file
 
     @staticmethod
