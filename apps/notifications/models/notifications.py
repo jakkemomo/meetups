@@ -9,9 +9,9 @@ user_model = settings.AUTH_USER_MODEL
 
 class Notification(AbstractBaseModel):
     class Type(models.TextChoices):
-        FOLLOW = "NEW_FOLLOWER"
-        FOLLOW_REQUEST = "NEW_FOLLOW_REQUEST"
-        ACCEPT = "ACCEPTED_FOLLOW_REQUEST"
+        NEW_FOLLOWER = "NEW_FOLLOWER"
+        NEW_FOLLOW_REQUEST = "NEW_FOLLOW_REQUEST"
+        ACCEPTED_FOLLOW_REQUEST = "ACCEPTED_FOLLOW_REQUEST"
 
     recipient = models.ForeignKey(
         to=user_model,

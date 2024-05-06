@@ -1,14 +1,10 @@
 from rest_framework import serializers
 
 from apps.chats.models import Message
+from apps.chats.serializers.base import SendingBaseSerializer
 
 
-class MessageRetrieveSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField("get_image_url")
-
-    def get_image_url(self, obj: Message) -> str:
-        return obj.created_by.image_url
-
+class MessageRetrieveSerializer(SendingBaseSerializer):
     class Meta:
         model = Message
         fields = [

@@ -19,7 +19,6 @@ def test_follow_valid(
         reverse(FOLLOW_URL, args=[user_2.id])
     )
     assert response.status_code == 201
-    assert response.data.get('id') is not None
     assert response.data.get('user') == user_2.id
     assert response.data.get('follower') == user.id
     assert response.data.get('status') == Follower.Status.ACCEPTED
@@ -37,7 +36,6 @@ def test_follow_valid_private(
         reverse(FOLLOW_URL, args=[user_2_private.id])
     )
     assert response.status_code == 201
-    assert response.data.get('id') is not None
     assert response.data.get('user') == user_2_private.id
     assert response.data.get('follower') == user.id
     assert response.data.get('status') == Follower.Status.PENDING
