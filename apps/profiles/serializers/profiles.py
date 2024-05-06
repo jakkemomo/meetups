@@ -40,6 +40,16 @@ class ProfileListSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    bio = serializers.CharField(required=False, max_length=410)
+    username = serializers.CharField(required=False, max_length=30)
+    first_name = serializers.CharField(required=False, max_length=30)
+    last_name = serializers.CharField(required=False, max_length=30)
+    email = serializers.EmailField(required=False, max_length=40)
+    image_url = serializers.CharField(required=False, max_length=40)
+    city = serializers.CharField(required=False, max_length=30)
+    age = serializers.IntegerField(required=False, min_value=0, max_value=99)
+    date_of_birth = serializers.DateField(required=False)
+    category_favorite = serializers.ListField(child=serializers.IntegerField(), required=False)
 
     class Meta:
         model = User
