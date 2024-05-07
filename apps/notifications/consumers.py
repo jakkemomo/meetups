@@ -17,11 +17,5 @@ class NotificationConsumer(BaseConsumer):
 
         await super().connect()
 
-    async def follow_notification(self, data):
-        await self.send(text_data=json.dumps(data))
-
-    async def follow_request_notification(self, data):
-        await self.send(text_data=json.dumps(data))
-
-    async def accept_follow_request_notification(self, data):
+    async def notification(self, data):
         await self.send(text_data=json.dumps(data))
