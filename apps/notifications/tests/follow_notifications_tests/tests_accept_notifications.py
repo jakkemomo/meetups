@@ -40,8 +40,9 @@ async def test_accept_valid(
 
     # notification check
     response_ws = await communicator.receive_json_from()
-    assert response_ws.get("type") == "accept_follow_request_notification"
+    assert response_ws.get("type") == "notification"
     assert response_ws.get("data") == {
+        "notification_type": Notification.Type.ACCEPTED_FOLLOW_REQUEST,
         'to_user_id': async_user_private.id,
         'to_username': async_user_private.username,
         'from_user_id': async_user_2_private.id,
@@ -55,7 +56,7 @@ async def test_accept_valid(
         recipient=async_user_private,
         type=Notification.Type.ACCEPTED_FOLLOW_REQUEST,
     )
-    assert database_sync_to_async(notification_object.first)
+    assert await database_sync_to_async(notification_object.first)()
 
     await communicator.disconnect()
 

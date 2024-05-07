@@ -18,11 +18,6 @@ class NotificationsViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
     def get_queryset(self):
-        # TODO: is that a good approach to leave user only his notifications?
-        # in that case, if user appeals to another user's notifications
-        # he would have a 404 response
-        # i think this is not bery RESTful but more safe 'cause he can't
-        # recognise are there any other notifications besides his
         self.queryset = (
             self.model.objects
             .filter(recipient=self.request.user)

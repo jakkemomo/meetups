@@ -41,8 +41,9 @@ async def test_follow_request_valid(
 
     # notification check
     response_ws = await communicator.receive_json_from()
-    assert response_ws.get("type") == "follow_request_notification"
+    assert response_ws.get("type") == "notification"
     assert response_ws.get("data") == {
+        "notification_type": Notification.Type.NEW_FOLLOW_REQUEST,
         'to_user_id': async_user_2_private.id,
         'to_username': async_user_2_private.username,
         'from_user_id': async_user.id,
@@ -57,7 +58,7 @@ async def test_follow_request_valid(
         recipient=async_user_2_private,
         type=Notification.Type.NEW_FOLLOW_REQUEST,
     )
-    assert database_sync_to_async(notification_object.first)
+    assert await database_sync_to_async(notification_object.first)()
 
     await communicator.disconnect()
 

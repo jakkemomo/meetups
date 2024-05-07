@@ -1,5 +1,6 @@
 import logging
 
+from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.forms import model_to_dict
@@ -111,13 +112,12 @@ class ChatViewSet(viewsets.ModelViewSet):
         chat_object = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        message_object = Message.objects.create(
+
+        message_object = async_to_sync(ChatManager.chat_message)(
             created_by=request.user,
             chat=chat_object,
             message_text=serializer.validated_data.get("message_text")
         )
-
-        ChatManager.chat_message(message_object)
 
         return Response(
             status=status.HTTP_201_CREATED,

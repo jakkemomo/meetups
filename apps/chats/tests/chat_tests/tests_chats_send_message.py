@@ -66,7 +66,7 @@ async def test_send_message_valid(
         chat=event_chat_with_users,
         message_text=data.get("message_text"),
     )
-    assert database_sync_to_async(message_object.first)
+    assert await database_sync_to_async(message_object.first)()
 
     await asyncio.gather(
         communicator.disconnect(),

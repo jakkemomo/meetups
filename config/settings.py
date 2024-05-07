@@ -259,7 +259,12 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'profiles_ws_consumers': {
+        'chats_base': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'chats_consumers': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,

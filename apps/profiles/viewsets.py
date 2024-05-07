@@ -1,5 +1,6 @@
 import logging
 
+from asgiref.sync import async_to_sync
 from django.db.models import Count, Avg
 from django.db.models.functions import Coalesce
 from drf_yasg.utils import swagger_auto_schema, no_body
@@ -151,21 +152,19 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object = serializer.save()
 
         if user.is_private:
-            notification_object = Notification.objects.create(
+            async_to_sync(NotificationManager.notification)(
                 created_by=follower_object.follower,
                 recipient=follower_object.user,
-                type=Notification.Type.NEW_FOLLOW_REQUEST,
+                notification_type=Notification.Type.NEW_FOLLOW_REQUEST,
                 additional_data={"follower_status": follower_object.status},
             )
-            NotificationManager.follow_request(notification_object=notification_object)
         else:
-            notification_object = Notification.objects.create(
+            async_to_sync(NotificationManager.notification)(
                 created_by=follower_object.follower,
                 recipient=follower_object.user,
-                type=Notification.Type.NEW_FOLLOWER,
+                notification_type=Notification.Type.NEW_FOLLOWER,
                 additional_data={"follower_status": follower_object.status},
             )
-            NotificationManager.follow(notification_object=notification_object)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -205,13 +204,12 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object.save()
         serializer = self.get_serializer(follower_object)
 
-        notification_object = Notification.objects.create(
+        async_to_sync(NotificationManager.notification)(
             created_by=follower_object.user,
             recipient=follower_object.follower,
-            type=Notification.Type.ACCEPTED_FOLLOW_REQUEST,
+            notification_type=Notification.Type.ACCEPTED_FOLLOW_REQUEST,
             additional_data={"follower_status": follower_object.status},
         )
-        NotificationManager.accept_follow_request(notification_object=notification_object)
 
         return Response(
             status=status.HTTP_200_OK,

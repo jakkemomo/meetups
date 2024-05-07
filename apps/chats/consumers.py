@@ -1,8 +1,10 @@
 import json
+import logging
 
-from apps.core.utils import logger
 from apps.notifications.base import BaseConsumer
 from apps.chats.utils import get_chat_async, has_chat_permissions
+
+logger = logging.getLogger("chats_consumers")
 
 
 class ChatConsumer(BaseConsumer):

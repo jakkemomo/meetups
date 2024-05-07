@@ -1,9 +1,13 @@
+import logging
 from abc import abstractmethod
-from datetime import datetime, timezone
 
-from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
+
+from apps.chats.exceptions import ConsumerWithoutGroupNameException
+
+
+logger = logging.getLogger("chats_base")
 
 
 class BaseConsumer(AsyncWebsocketConsumer):
@@ -17,10 +21,18 @@ class BaseConsumer(AsyncWebsocketConsumer):
                 self.group_name = str(self.scope.get("user").pk)
                 await super().connect()
         """
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
+        try:
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
+        except ConsumerWithoutGroupNameException as exc:
+            logger.exception(
+                f"Consumer {self.__name__} hasn't got a group_name",
+                exc_info=exc,
+            )
+            return
+
         await self.accept()
 
     async def disconnect(self, code):
@@ -32,9 +44,9 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
 class BaseManager:
     @staticmethod
-    def send_data(type, recipient, data, created_at):
+    async def send_data(type, recipient, data, created_at):
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
+        await channel_layer.group_send(
             group=str(recipient),
             message={
                 "type": type,
