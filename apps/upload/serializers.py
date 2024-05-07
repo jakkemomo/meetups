@@ -8,6 +8,8 @@ from PIL import Image
 
 from apps.upload.utils import task_logger
 
+from django.core.exceptions import ValidationError
+
 
 class UploadSerializer(serializers.Serializer):
     allowed_extensions = ['png', 'jpg', 'jpeg', 'svg', 'webp']
@@ -20,6 +22,7 @@ class UploadSerializer(serializers.Serializer):
     )
 
     def validate_file(self, file):
+        self.validate_resolution(file)
         if file.content_type != "image/webp":
             file = self.convert_to_webp(file)
         file.name = f'{uuid.uuid4().hex}.webp'
@@ -39,3 +42,10 @@ class UploadSerializer(serializers.Serializer):
             content_type="image/webp",
         )
         return file
+
+    @staticmethod
+    def validate_resolution(file):
+        with Image.open(file) as image:
+            width, height = image.size
+            if width < 800 or height < 600:
+                raise ValidationError('The image resolution should be at least 800x600 pixels')
