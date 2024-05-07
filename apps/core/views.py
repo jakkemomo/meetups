@@ -166,6 +166,56 @@ class ReverifyEmailView(generics.CreateAPIView):
         return Response('Email successfully sent')
 
 
+class ChangeEmailView(APIView):
+    """
+    This view handles email change requests from authenticated users.
+    Validates the user's email, send message to email for verification email.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ReverifyEmailSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        This function is using to generate swagger documents.
+        """
+        return self.serializer_class(self, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=['auth'],
+        responses={
+            status.HTTP_200_OK: 'Email successfully sent',
+            status.HTTP_409_CONFLICT: 'Email exist',
+            status.HTTP_404_NOT_FOUND: 'User not found',
+            status.HTTP_500_INTERNAL_SERVER_ERROR: 'Could not send message at the moment, try later',
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        user_model = get_user_model()
+        try:
+            user = user_model.objects.get(id=request.user.id)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
+            logger.warning(f'warning: {__name__}: {exc}')
+
+            return Response(
+                'User not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+        if User.objects.filter(email=request.data["email"]).exists():
+            return Response(status=status.HTTP_409_CONFLICT, data="This email has already been registered")
+        user.is_email_verified = False
+        user.email = request.data["email"]
+        user.save()
+        try:
+            helpers.send_verification_email(user)
+        except Exception as e:
+            logging.error(e)
+            return Response(
+                'Could not send message at the moment, try later',
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return Response(status=status.HTTP_200_OK, data='Email successfully sent')
+
+
 class DecoratedTokenVerifyView(TokenVerifyView):
     @swagger_auto_schema(
         responses={
@@ -420,7 +470,7 @@ class CheckEmailExistsView(APIView):
     This view checks if a user with a certain email exists in the database.
     """
     queryset = User.objects.all()
-    permission_classes = (AllowAny,) # Allow any user (authenticated or not) to access this view
+    permission_classes = (AllowAny,)  # Allow any user (authenticated or not) to access this view
     serializer_class = EmailCheckSerializer
 
     def get_serializer(self, *args, **kwargs):
