@@ -233,11 +233,19 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     currency = currency.CurrencySerializer(many=False)
     schedule = ScheduleSerializer(many=True)
     is_favorite = serializers.BooleanField(default=False)
+    is_participant = serializers.SerializerMethodField("get_is_participant")
 
     def get_location(self, obj):
         if not obj.location:
             return None
         return obj.location.coords
+
+    def get_is_participant(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        user = request.user
+        return obj.participants.filter(id=user.id).exists()
 
     class Meta:
         model = Event
