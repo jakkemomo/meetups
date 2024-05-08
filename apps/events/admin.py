@@ -17,6 +17,7 @@ class EventAdmin(admin.ModelAdmin):
         "category",
         "created_by",
         "participants_number",
+        "chat",
         "address",
         "start_date",
         "end_date",
