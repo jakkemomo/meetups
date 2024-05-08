@@ -4,15 +4,19 @@ from django.db.models import Count, Avg, Q
 from django.db.models import Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from apps.core.utils import delete_image_if_exists
+from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
+from apps.profiles.filters import UserFilter
 from apps.profiles.managers import NotificationManager
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
@@ -113,6 +117,10 @@ class FollowerViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, FollowerPermissions)
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_class = UserFilter
+    search_fields = ['username', 'age', 'city',]
+    ordering_fields = ['username', 'age',]
 
     @swagger_auto_schema(
         request_body=no_body,
