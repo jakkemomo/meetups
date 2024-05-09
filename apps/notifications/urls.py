@@ -1,9 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from apps.notifications.viewsets import (
-    NotificationsViewSet,
-)
+from apps.notifications.viewsets.notifications import NotificationsViewSet
 
 app_name = "notifications"
 

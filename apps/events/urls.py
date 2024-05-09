@@ -1,17 +1,14 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .viewsets import (
-    EventViewSet,
-    RatingViewSet,
-    TagViewSet,
-    MarkerViewSet,
-    CategoryViewSet,
-    ReviewViewSet,
-    CurrencyViewSet,
-    ParticipantViewSet
-)
-
+from .viewsets.events import EventViewSet
+from .viewsets.ratings import RatingViewSet
+from .viewsets.tags import TagViewSet
+from .viewsets.markers import MarkerViewSet
+from .viewsets.categories import CategoryViewSet
+from .viewsets.reviews import ReviewViewSet
+from .viewsets.currencies import CurrencyViewSet
+from .viewsets.participants import ParticipantViewSet
 
 app_name = "events"
 
