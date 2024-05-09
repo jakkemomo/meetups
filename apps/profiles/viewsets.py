@@ -3,18 +3,20 @@ import logging
 from django.db.models import Count, Avg, Q
 from django.db.models import Subquery
 from asgiref.sync import async_to_sync
-from django.db.models import Count, Avg
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.filters import OrderingFilter
 
 from apps.core.utils import delete_image_if_exists
 from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
+from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.notifications.managers import NotificationManager
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
@@ -34,6 +36,7 @@ from apps.profiles.serializers import (
     FollowerSerializer,
 )
 from apps.profiles.utils import get_user_object, is_current_user
+
 from apps.notifications.models import Notification
 
 logger = logging.getLogger("profiles_app")
@@ -291,6 +294,14 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
     ]
     http_method_names = ["get"]
     lookup_url_kwarg = "user_id"
+    filter_backends = [
+        TrigramSimilaritySearchFilter,
+        OrderingFilter,
+        DjangoFilterBackend
+    ]
+    filterset_class = EventFilter
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
+    ordering_fields = ['start_date', 'average_rating', 'participants_number']
 
     def get_queryset(self):
         self.queryset = (
