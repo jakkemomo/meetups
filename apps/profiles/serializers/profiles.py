@@ -49,7 +49,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     city = serializers.CharField(required=False, max_length=30)
     age = serializers.IntegerField(required=False, min_value=0, max_value=99)
     date_of_birth = serializers.DateField(required=False)
-    category_favorite = serializers.ListField(child=serializers.IntegerField(), required=False)
+    category_favorite = CategoryListSerializer(many=True)
 
     class Meta:
         model = User

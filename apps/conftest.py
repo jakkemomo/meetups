@@ -167,10 +167,10 @@ def event() -> Event:
 
 
 @pytest.fixture
-def event_not_visible() -> Event:
+def event_private() -> Event:
     return Event.objects.create(
-        name="test_event",
-        is_visible=False,
+        name="private_event",
+        type="private",
     )
 
 
@@ -183,10 +183,10 @@ def event_created_by_user_2(user_2) -> Event:
 
 
 @pytest.fixture
-def event_not_visible_created_by_user_2(user_2) -> Event:
+def event_private_created_by_user_2(user_2) -> Event:
     return Event.objects.create(
         name="test_event",
-        is_visible=False,
+        type="private",
         created_by=user_2,
     )
 
@@ -200,10 +200,10 @@ def event_created_by_user_2_private(user_2_private) -> Event:
 
 
 @pytest.fixture
-def event_not_visible_created_by_user_2_private(user_2_private) -> Event:
+def event_private_created_by_user_2_private(user_2_private) -> Event:
     return Event.objects.create(
         name="test_event",
-        is_visible=False,
+        type="private",
         created_by=user_2_private,
     )
 
@@ -223,17 +223,17 @@ def event_user_2_is_participant_private(user_2_private, event) -> Event:
 
 
 @pytest.fixture
-def event_not_visible_user_2_is_participant(user_2, event_not_visible) -> Event:
-    event_not_visible.participants.add(user_2.id)
-    event_not_visible.save()
-    return event_not_visible
+def event_private_user_2_is_participant(user_2, event_private) -> Event:
+    event_private.participants.add(user_2.id)
+    event_private.save()
+    return event_private
 
 
 @pytest.fixture
-def event_not_visible_user_2_is_participant_private(user_2_private, event_not_visible) -> Event:
-    event_not_visible.participants.add(user_2_private.id)
-    event_not_visible.save()
-    return event_not_visible
+def event_private_user_2_is_participant_private(user_2_private, event_private) -> Event:
+    event_private.participants.add(user_2_private.id)
+    event_private.save()
+    return event_private
 
 
 @pytest.fixture

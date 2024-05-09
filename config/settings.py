@@ -212,7 +212,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
-    "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.tokens.TokenPairSerializer",
     "UPDATE_LAST_LOGIN": True,
 }
 
@@ -244,17 +244,22 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'core_app': {
+        'passwords_viewsets': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'profiles_app': {
+        'emails_viewsets': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'events_app': {
+        'profiles_viewsets': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'events_viewsets': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
@@ -268,7 +273,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
-        }
+        },
     },
 }
 

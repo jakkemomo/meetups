@@ -131,11 +131,11 @@ def test_event_is_participant_declined_private(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_is_participant_without_following(
+def test_event_private_is_participant_without_following(
         api_client,
         user,
         user_2,
-        event_not_visible_user_2_is_participant,
+        event_private_user_2_is_participant,
 ):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -147,12 +147,12 @@ def test_event_not_visible_is_participant_without_following(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_is_participant_accepted(
+def test_event_private_is_participant_accepted(
         api_client,
         user,
         user_2,
         follower_user_accepted,
-        event_not_visible_user_2_is_participant,
+        event_private_user_2_is_participant,
 ):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -164,11 +164,11 @@ def test_event_not_visible_is_participant_accepted(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_is_participant_without_following_private(
+def test_event_private_is_participant_without_following_private(
         api_client,
         user,
         user_2_private,
-        event_not_visible_user_2_is_participant_private,
+        event_private_user_2_is_participant_private,
 ):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -185,12 +185,12 @@ def test_event_not_visible_is_participant_without_following_private(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_is_participant_accepted_private(
+def test_event_private_is_participant_accepted_private(
         api_client,
         user_private,
         user_2_private,
         follower_user_accepted_private,
-        event_not_visible_user_2_is_participant_private,
+        event_private_user_2_is_participant_private,
 ):
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -202,12 +202,12 @@ def test_event_not_visible_is_participant_accepted_private(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_is_participant_pending_private(
+def test_event_private_is_participant_pending_private(
         api_client,
         user_private,
         user_2_private,
         follower_user_pending_private,
-        event_not_visible_user_2_is_participant_private,
+        event_private_user_2_is_participant_private,
 ):
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -224,12 +224,12 @@ def test_event_not_visible_is_participant_pending_private(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_created_by_declined_private(
+def test_event_private_created_by_declined_private(
         api_client,
         user_private,
         user_2_private,
         follower_user_declined_private,
-        event_not_visible_user_2_is_participant_private,
+        event_private_user_2_is_participant_private,
 ):
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -262,10 +262,10 @@ def test_event_is_participant_current_user(
 
 
 @pytest.mark.django_db
-def test_event_not_visible_is_participant_current_user(
+def test_event_private_is_participant_current_user(
         api_client,
         user_2,
-        event_not_visible_user_2_is_participant,
+        event_private_user_2_is_participant,
 ):
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -274,7 +274,7 @@ def test_event_not_visible_is_participant_current_user(
     )
     assert response.status_code == 200
     assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_not_visible_user_2_is_participant.name
+    assert response.data[0].get("name") == event_private_user_2_is_participant.name
 
 
 @pytest.mark.django_db
