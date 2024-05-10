@@ -30,7 +30,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         try:
-            helpers.send_verification_email(user)
+            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
         except Exception as e:
             user.delete()
             raise e
