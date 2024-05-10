@@ -120,9 +120,13 @@ class FollowerViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter]
-    filterset_class = UserFilter
-    search_fields = ['username', 'age', 'city', ]
-    ordering_fields = ['username', 'age', ]
+    filterset_fielde = {
+        'user__username': ['exact', 'icontains'],
+        'user__age': ['exact', 'gte', 'lte'],
+        'user__city': ['exact', 'in'],
+    }
+    search_fields = ['user__username', 'user__age', 'user__city', ]
+    ordering_fields = ['user__username', 'user__age', ]
 
     @swagger_auto_schema(
         request_body=no_body,
