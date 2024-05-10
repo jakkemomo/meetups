@@ -10,14 +10,15 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenVerifyView
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.core import helpers
+from apps.core.helpers import decode_json_data
 from apps.core.serializers import (
     RegisterSerializer,
     TokenVerifyResponseSerializer,
@@ -32,7 +33,6 @@ from apps.core.serializers import (
     EmailCheckSerializer,
 )
 from apps.profiles.models import User
-from apps.core.helpers import decode_json_data
 from config import settings
 
 logger = logging.getLogger("core_app")
@@ -58,13 +58,12 @@ class VerifyEmailView(APIView):
 
     @swagger_auto_schema(
         tags=['auth'],
-        manual_parameters=[openapi.Parameter('user_id', openapi.IN_QUERY,
-                                             description="user unique id",
-                                             type=openapi.TYPE_STRING),
-                           openapi.Parameter('confirmation_token',
-                                             openapi.IN_QUERY,
-                                             description="confirmation token",
-                                             type=openapi.TYPE_STRING)],
+        manual_parameters=[
+            openapi.Parameter('confirmation_token',
+                              openapi.IN_QUERY,
+                              description="confirmation token",
+                              type=openapi.TYPE_STRING)
+        ],
         responses={
             status.HTTP_200_OK: '{"refresh": ..., "access": ...}',
             status.HTTP_400_BAD_REQUEST: "Token is invalid or expired OR "
