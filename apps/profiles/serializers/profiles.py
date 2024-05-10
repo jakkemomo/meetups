@@ -25,6 +25,8 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "age",
             "category_favorite",
             "date_of_birth",
+            "gender",
+            "type",
         )
 
 
@@ -67,6 +69,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "age",
             "category_favorite",
             "date_of_birth",
+            "gender",
+            "type",
         )
 
     def update(self, instance, validated_data):
