@@ -1,7 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
@@ -9,6 +9,15 @@ class User(AbstractUser):
         db_table = "auth_user"
         verbose_name = "User"
         verbose_name_plural = "Users"
+
+    class Gender(models.TextChoices):
+        MALE = "MALE"
+        FEMALE = "FEMALE"
+        NONE = "NONE"
+
+    class Type(models.TextChoices):
+        INDIVIDUAL = "INDIVIDUAL"
+        COMPANY = "COMPANY"
 
     username = models.CharField(max_length=128, unique=False)
     email = models.EmailField(max_length=255, unique=True)
@@ -18,6 +27,18 @@ class User(AbstractUser):
     bio = models.CharField(max_length=1000, null=True, blank=True)
     age = models.PositiveIntegerField(default=18, validators=[MinValueValidator(1), MaxValueValidator(100)])
     date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(
+        max_length=15,
+        choices=Gender.choices,
+        verbose_name=_("Gender"),
+        default=Gender.NONE,
+    )
+    type = models.CharField(
+        max_length=15,
+        choices=Type.choices,
+        verbose_name=_("Type"),
+        default=Type.INDIVIDUAL,
+    )
     is_private = models.BooleanField(
         verbose_name="Profile private status",
         default=False,
