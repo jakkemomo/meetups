@@ -33,6 +33,7 @@ from apps.core.serializers import (
 )
 from apps.profiles.models import User
 from apps.core.helpers import decode_json_data
+from config import settings
 
 logger = logging.getLogger("core_app")
 
@@ -156,7 +157,7 @@ class ReverifyEmailView(generics.CreateAPIView):
             return Response('Email is already verified',
                             status=status.HTTP_400_BAD_REQUEST)
         try:
-            helpers.send_verification_email(user)
+            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
         except Exception as e:
             logging.error(e)
             return Response(
@@ -206,7 +207,7 @@ class ChangeEmailView(APIView):
         user.email = request.data["email"]
         user.save()
         try:
-            helpers.send_verification_email(user)
+            helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL)
         except Exception as e:
             logging.error(e)
             return Response(

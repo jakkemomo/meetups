@@ -23,6 +23,7 @@ GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
 GS_QUERYSTRING_AUTH = False
 
 SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://meetups-ui-6vuzexfx2q-lm.a.run.app")
 SERVICE_ACCOUNT = False
 
 if SERVICE_URL:
@@ -104,7 +105,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     'django_filters',
     "corsheaders",
-    "debug_toolbar",
+    # "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -116,7 +117,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -166,7 +167,7 @@ DATABASE_ROUTERS = ["config.db_routers.MainRouter"]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-password_validation = "django.contrib.auth.password_validation"
+password_validation = "django.contrib.auth.password_validation"  # nosec B105
 AUTH_PASSWORD_VALIDATORS: list[dict] = []
 
 # Internationalization
@@ -180,11 +181,15 @@ AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
 VERIFY_EMAIL_URL = os.getenv(
     "VERIFY_EMAIL_URL",
-    f"{SERVICE_URL}api/v1/verify/email/"
+    f"{FRONTEND_URL}/register/email/confirm"
 )
 CONFIRM_PASSWORD_RESET_URL = os.getenv(
     "CONFIRM_FORGOT_PASSWORD_URL",
-    f"{SERVICE_URL}api/v1/password/reset/confirm/"
+    f"{FRONTEND_URL}/password/reset/confirm"
+)
+CHANGE_EMAIL_URL = os.getenv(
+    "CHANGE_EMAIL_URL",
+    f"{FRONTEND_URL}/security/email/confirm"
 )
 DEFAULT_USER_AVATAR_URL = os.getenv(
     "DEFAULT_USER_AVATAR_URL",
