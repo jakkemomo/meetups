@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from apps.chats.viewsets import (
+from .viewsets import (
     ChatViewSet,
-    MessageViewSet,
     DirectChatViewSet,
+    MessageViewSet,
 )
 
 app_name = "chats"
