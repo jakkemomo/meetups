@@ -6,6 +6,7 @@ from asgiref.sync import async_to_sync
 from django.db.models import Count, Avg
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
@@ -18,9 +19,9 @@ from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
 from apps.notifications.managers import NotificationManager
-from apps.profiles.filters import UserFilter
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
+from apps.profiles.filters import filters_followers
 from apps.profiles.permissions import (
     UserRatingPermissions,
     ProfilePermissions,
@@ -119,12 +120,8 @@ class FollowerViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, FollowerPermissions)
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
-    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter]
-    filterset_fields = {
-        'user__username': ['exact', 'icontains'],
-        'user__age': ['exact', 'gte', 'lte'],
-        'user__city': ['exact', 'in'],
-    }
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_class = filters_followers.UserFollowersFilter
     search_fields = ['user__username', 'user__age', 'user__city', ]
     ordering_fields = ['user__username', 'user__age', ]
 
