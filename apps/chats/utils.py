@@ -15,7 +15,7 @@ def has_chat_permissions(user, chat):
 
 
 list_chats_raw = '''
-            SELECT 
+            SELECT
                 chats_chat.id,
                 chats_chat.type,
                 last_messages.message_text  as last_message_text,
@@ -26,7 +26,7 @@ list_chats_raw = '''
                     END AS last_message_is_owner
             FROM chats_chat
             LEFT JOIN (
-                SELECT 
+                SELECT
                     chats_message.id,
                     chats_message.chat_id,
                     chats_message.message_text,
@@ -43,8 +43,8 @@ list_chats_raw = '''
             ) AS last_messages
             ON chats_chat.id = last_messages.chat_id
             WHERE chats_chat.id IN (
-                SELECT chat_id 
-                FROM chats_chat_participants 
+                SELECT chat_id
+                FROM chats_chat_participants
                 WHERE user_id = %s
                 )
             ORDER BY chats_chat.id;

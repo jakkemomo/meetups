@@ -22,7 +22,7 @@ def get_chat_communicator(app, user, chat) -> WebsocketCommunicator:
 def get_wrong_chat_communicator(app, user) -> WebsocketCommunicator:
     communicator = WebsocketCommunicator(
         app,
-        f"ws/chats/1",
+        "ws/chats/1",
     )
     communicator.scope["user"] = user
     return communicator

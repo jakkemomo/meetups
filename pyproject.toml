@@ -68,6 +68,10 @@ target-version = "py311"
 combine-as-imports = true
 extra-standard-library = ["typing_extensions"]
 
+[tool.bandit]
+exclude_dirs = ["venv", "tests", "apps/conftest.py"]
+
+
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
@@ -75,8 +79,9 @@ warn_unused_configs = true
 exclude = [
     '^file1\.py$',  # TOML literal string (single-quotes, no escaping necessary)
     "^file2\\.py$",  # TOML basic string (double-quotes, backslash and other characters need escaping)
+    "tests",
+    "apps/conftest.py",
 ]
-
 
 [tool.pytest.ini_options]
 minversion = "6.0.0"

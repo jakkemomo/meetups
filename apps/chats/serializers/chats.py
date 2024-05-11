@@ -2,7 +2,7 @@ import logging
 
 from rest_framework import serializers
 
-from apps.chats.exceptions import *
+from apps.chats.exceptions import ChatWithoutEventException, ChatTypeException, DirectChatUserNotFoundException
 from apps.chats.models import Chat
 
 logger = logging.getLogger("websockets_app_serializer")
@@ -18,6 +18,8 @@ class ChatRetrieveSerializer(serializers.ModelSerializer):
             return chat_type_object.name
         elif obj.type == Chat.Type.DIRECT:
             return chat_type_object.username
+        else:
+            raise ChatTypeException("Chat type is not supported")
 
     def get_chat_image_url(self, obj: Chat) -> str:
         chat_type_object = self.get_chat_type_object(obj)

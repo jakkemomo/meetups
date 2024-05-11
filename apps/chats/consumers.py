@@ -36,6 +36,7 @@ class ChatConsumer(BaseConsumer):
             await super().connect()
 
         except Exception as exc:
+            logger.error(f"Error in connect: {exc}")
             await self.close()
 
     async def receive(self, text_data):

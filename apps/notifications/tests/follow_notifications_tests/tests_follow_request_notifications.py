@@ -80,7 +80,7 @@ async def test_follow_request_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_follow_request_valid(
+async def test_follow_request_valid_base(
         application,
         async_client,
         async_user,

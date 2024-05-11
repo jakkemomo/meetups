@@ -13,7 +13,7 @@ class ChatPermissions(permissions.BasePermission):
 
 
 class DirectChatPermissions(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj: user_model):
+    def has_object_permission(self, request, view, obj):
         if view.action == "get_or_create_user_direct_chat" and obj.is_private:
             return is_follower(request, obj)
         else:

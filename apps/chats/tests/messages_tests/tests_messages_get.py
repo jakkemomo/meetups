@@ -86,4 +86,3 @@ async def test_messages_get_nonexistent_message(
     )
 
     assert response.status_code == 404
-
