@@ -6,8 +6,11 @@ services:
       context: .
       dockerfile: db/Dockerfile
     restart: always
-    env_file:
-      - ../.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-meetups}
+      WS_DB: ${WS_DB:-meetups_ws}
     ports:
       - "5555:5432"
     volumes:
