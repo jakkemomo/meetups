@@ -120,7 +120,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter]
-    filterset_fielde = {
+    filterset_fields = {
         'user__username': ['exact', 'icontains'],
         'user__age': ['exact', 'gte', 'lte'],
         'user__city': ['exact', 'in'],
@@ -266,8 +266,8 @@ class FollowerViewSet(viewsets.ModelViewSet):
     )
     @action(
         methods=["get"],
-        detail=True,
-        url_path="followers",
+        detail=False,
+        url_path="/(?P<event_id>[^/.]+)/followers",
         url_name="list_user_followers",
     )
     def list_followers(self, request, user_id):
@@ -281,8 +281,8 @@ class FollowerViewSet(viewsets.ModelViewSet):
     )
     @action(
         methods=["get"],
-        detail=True,
-        url_path="following",
+        detail=False,
+        url_path="/(?P<event_id>[^/.]+)/following",
         url_name="list_user_following",
     )
     def list_following(self, request, user_id):
@@ -306,16 +306,16 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         self.queryset = (
             self.model.objects
-                .annotate(
+            .annotate(
                 participants_number=Count("participants"),
                 average_rating=Coalesce(Avg("ratings__value"), 0.0)
             )
-                .filter(
+            .filter(
                 Q(is_visible=True) & Q(type="open") |
                 Q(participants__in=[self.request.user.id]) & Q(type="private") |
                 Q(created_by=self.request.user) & Q(type="private")
             )
-                .order_by("-start_date")
+            .order_by("-start_date")
         )
         return self.queryset.all()
 
