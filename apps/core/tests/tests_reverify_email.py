@@ -64,7 +64,8 @@ class ReverifyEmailTestsAlreadyVerified(CoreTestsBase):
         email_data = mail.outbox[0]
         soup = BeautifulSoup(email_data.body, "html.parser")
         email_verification_link = soup.find_all('a')[1].attrs.get("href")
-        self.client.get(email_verification_link)
+        token = email_verification_link.split("token=")[1]
+        self.client.get(self.VERIFY_EMAIL_PATH + f"?token={token}")
 
     def test_email_verified(self):
         response = self.client.post(

@@ -30,13 +30,10 @@ class VerifyEmailView(APIView):
 
     @swagger_auto_schema(
         tags=['auth'],
-        manual_parameters=[openapi.Parameter('user_id', openapi.IN_QUERY,
-                                             description="user unique id",
-                                             type=openapi.TYPE_STRING),
-                           openapi.Parameter('confirmation_token',
+        manual_parameters=[openapi.Parameter('token',
                                              openapi.IN_QUERY,
-                                             description="confirmation token",
-                                             type=openapi.TYPE_STRING)],
+                                             description="token",
+                                             type=openapi.TYPE_STRING),],
         responses={
             status.HTTP_200_OK: '{"refresh": ..., "access": ...}',
             status.HTTP_400_BAD_REQUEST: "Token is invalid or expired OR "
