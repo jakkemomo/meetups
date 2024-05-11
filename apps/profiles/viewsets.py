@@ -1,9 +1,9 @@
 import logging
 
-from django.db.models import Q
-from django.db.models import Subquery
 from asgiref.sync import async_to_sync
 from django.db.models import Count, Avg
+from django.db.models import Q
+from django.db.models import Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
@@ -19,9 +19,9 @@ from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
 from apps.notifications.managers import NotificationManager
+from apps.notifications.models import Notification
 from apps.profiles.models import UserRating, User
 from apps.profiles.models.followers import Follower
-from apps.profiles.filters import filters_followers
 from apps.profiles.permissions import (
     UserRatingPermissions,
     ProfilePermissions,
@@ -38,7 +38,6 @@ from apps.profiles.serializers import (
     FollowerSerializer,
 )
 from apps.profiles.utils import get_user_object, is_current_user
-from apps.notifications.models import Notification
 
 logger = logging.getLogger("profiles_app")
 
@@ -113,17 +112,37 @@ class MyProfileViewSet(generics.RetrieveAPIView):
         return Response(serializer.data)
 
 
+from django_filters import rest_framework as filters
+
+
+class FollowerFilter(filters.FilterSet):
+    username = filters.CharFilter(lookup_expr='exact', field_name='follower__username')
+
+    class Meta:
+        model = Follower
+        fields = [
+            'username'
+        ]
+
+
 class FollowerViewSet(viewsets.ModelViewSet):
     model = Follower
     queryset = Follower.objects.all()
     serializer_class = FollowerSerializer
-    permission_classes = (IsAuthenticated, FollowerPermissions)
+    # permission_classes = (IsAuthenticated, FollowerPermissions)
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
-    filterset_class = filters_followers.UserFollowersFilter
+    filterset_class = FollowerFilter
     search_fields = ['user__username', 'user__age', 'user__city', ]
     ordering_fields = ['user__username', 'user__age', ]
+
+    def get_queryset(self):
+        if self.kwargs.get("user_id"):
+            queryset = self.queryset.filter(user_id=self.kwargs.get("user_id"), status=Follower.Status.ACCEPTED)
+        else:
+            raise ValueError("user_id is required")
+        return queryset
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -264,14 +283,11 @@ class FollowerViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=False,
-        url_path="/(?P<user_id>[^/.]+)/followers",
+        url_path="(?P<user_id>[^/.]+)/followers",
         url_name="list_user_followers",
     )
     def list_followers(self, request, user_id):
-        user = get_user_object(user_id=user_id)
-        queryset = self.queryset.filter(user=user, status=Follower.Status.ACCEPTED)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return super(FollowerViewSet, self).list(request, user_id=user_id)
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -279,7 +295,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=False,
-        url_path="/(?P<user_id>[^/.]+)/following",
+        url_path="(?P<user_id>[^/.]+)/following",
         url_name="list_user_following",
     )
     def list_following(self, request, user_id):
