@@ -34,6 +34,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends binutils libproj-dev gdal-bin
+      - name: Run database
+        run: |
+          docker-compose -f deployments/docker-compose-db.yml up -d
       - name: Test with pytest
         run: |
           pytest -m "not asyncio"
