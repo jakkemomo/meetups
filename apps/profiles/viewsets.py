@@ -264,7 +264,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=False,
-        url_path="/(?P<user_id>[^/.]+)/followers",
+        url_path="(?P<user_id>[^/.]+)/followers",
         url_name="list_user_followers",
     )
     def list_followers(self, request, user_id):
@@ -279,7 +279,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=False,
-        url_path="/(?P<user_id>[^/.]+)/following",
+        url_path="(?P<user_id>[^/.]+)/following",
         url_name="list_user_following",
     )
     def list_following(self, request, user_id):
