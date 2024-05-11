@@ -179,7 +179,7 @@ class ChangeEmailView(APIView):
         user.email = request.data["email"]
         user.save()
         try:
-            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
+            helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL)
         except Exception as e:
             logging.error(e)
             return Response(

@@ -179,18 +179,20 @@ USE_TZ = True
 
 AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
-VERIFY_EMAIL_URL = os.getenv(
+
+VERIFY_EMAIL_URL = os.getenv(  # регистрация ( не авторизован ) -> возможно редирект на главную
     "VERIFY_EMAIL_URL",
     f"{FRONTEND_URL}/register/email/confirm"
 )
-CONFIRM_PASSWORD_RESET_URL = os.getenv(
+CONFIRM_PASSWORD_RESET_URL = os.getenv(  #  забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
     "CONFIRM_FORGOT_PASSWORD_URL",
     f"{FRONTEND_URL}/password/reset/confirm"
 )
-CHANGE_EMAIL_URL = os.getenv(
+CHANGE_EMAIL_URL = os.getenv(  # забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
     "CHANGE_EMAIL_URL",
     f"{FRONTEND_URL}/security/email/confirm"
 )
+
 DEFAULT_USER_AVATAR_URL = os.getenv(
     "DEFAULT_USER_AVATAR_URL",
     "images/f4fcce125def40e7a232bb31109de9ac.webp"
