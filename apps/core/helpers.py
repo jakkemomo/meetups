@@ -77,7 +77,6 @@ def decode_json_data(token: str) -> Any:
     """
     This function decodes url-safe token to a dict with data
     """
-    token += '=' * (-len(token) % 4)
     data = json.loads(base64.urlsafe_b64decode(token).decode('utf-8'))
 
     return data
