@@ -107,7 +107,7 @@ class VerifyEmailTests(CoreTestsBase):
         self.assertEqual(response.data,"Invalid token.")
 
     def test_confirmation_token_invalid(self):
-        user_id = User.objects.filter(
+        User.objects.filter(
             email=self.DATA.get("email"),
         ).first().id
 

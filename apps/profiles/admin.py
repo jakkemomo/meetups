@@ -41,7 +41,7 @@ class UserAdmin(admin.ModelAdmin):
             count,
         )
 
-    followers_number_link.short_description = "Followers number" #
+    followers_number_link.short_description = "Followers number" # type: ignore
 
     def following_number_link(self, obj):
         queryset = Follower.objects.filter(follower=obj, status="ACCEPTED")
@@ -56,7 +56,7 @@ class UserAdmin(admin.ModelAdmin):
             count,
         )
 
-    following_number_link.short_description = "Following number"
+    following_number_link.short_description = "Following number" # type: ignore
 
 
 @admin.register(Follower)
@@ -80,7 +80,7 @@ class FollowerAdmin(admin.ModelAdmin):
             obj.user.email,
         )
 
-    user_link.short_description = "User"
+    user_link.short_description = "User" # type: ignore
 
     def follower_link(self, obj):
         link = reverse(
@@ -93,4 +93,4 @@ class FollowerAdmin(admin.ModelAdmin):
             obj.follower.email,
         )
 
-    follower_link.short_description = "Follower"
+    follower_link.short_description = "Follower" # type: ignore

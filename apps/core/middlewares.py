@@ -1,3 +1,5 @@
+import logging
+
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
@@ -24,6 +26,7 @@ class JwtAuthMiddleware(BaseMiddleware):
         try:
             UntypedToken(token_key)
         except (InvalidToken, TokenError) as e:
+            logging.error(e)
             return AnonymousUser()
         token_decoded = token_backend.decode(token_key, verify=False)
         return get_user_model().objects.get(id=token_decoded.get("user_id"))
