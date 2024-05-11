@@ -1,12 +1,13 @@
 from django.urls import path, include
 
 from rest_framework import routers
-from apps.profiles.viewsets import (
+from .viewsets import (
     ProfileViewSet,
-    UserRatingViewSet,
     MyProfileViewSet,
-    FollowerViewSet, ProfileEventViewSet,
+    FollowerViewSet,
+    UserRatingViewSet,
 )
+from apps.events.viewsets import ProfileEventViewSet
 
 app_name = "profiles"
 router = routers.SimpleRouter()

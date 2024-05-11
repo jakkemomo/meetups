@@ -179,18 +179,20 @@ USE_TZ = True
 
 AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
-VERIFY_EMAIL_URL = os.getenv(
+
+VERIFY_EMAIL_URL = os.getenv(  # регистрация ( не авторизован ) -> возможно редирект на главную
     "VERIFY_EMAIL_URL",
     f"{FRONTEND_URL}/register/email/confirm"
 )
-CONFIRM_PASSWORD_RESET_URL = os.getenv(
+CONFIRM_PASSWORD_RESET_URL = os.getenv(  #  забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
     "CONFIRM_FORGOT_PASSWORD_URL",
     f"{FRONTEND_URL}/password/reset/confirm"
 )
-CHANGE_EMAIL_URL = os.getenv(
+CHANGE_EMAIL_URL = os.getenv(  # забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
     "CHANGE_EMAIL_URL",
     f"{FRONTEND_URL}/security/email/confirm"
 )
+
 DEFAULT_USER_AVATAR_URL = os.getenv(
     "DEFAULT_USER_AVATAR_URL",
     "images/f4fcce125def40e7a232bb31109de9ac.webp"
@@ -217,7 +219,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
-    "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.TokenPairSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "apps.core.serializers.tokens.TokenPairSerializer",
     "UPDATE_LAST_LOGIN": True,
 }
 
@@ -249,17 +251,22 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'core_app': {
+        'passwords_viewsets': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'profiles_app': {
+        'emails_viewsets': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'events_app': {
+        'profiles_viewsets': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'events_viewsets': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
@@ -273,7 +280,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
-        }
+        },
     },
 }
 

@@ -4,18 +4,18 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from .views import (
+    RegisterView,
+    VerifyEmailView,
+    ReverifyEmailView,
+    CheckEmailExistsView,
+    ChangeEmailView,
     DecoratedTokenObtainPairView,
     DecoratedTokenBlacklistView,
     DecoratedTokenVerifyView,
     DecoratedTokenRefreshView,
-    RegisterView,
-    VerifyEmailView,
-    ReverifyEmailView,
     PasswordResetView,
     PasswordResetConfirmView,
     PasswordChangeView,
-    CheckEmailExistsView,
-    ChangeEmailView,
 )
 
 app_name = "core"

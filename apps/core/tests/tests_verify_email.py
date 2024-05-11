@@ -31,12 +31,12 @@ class VerifyEmailTests(CoreTestsBase):
         email_data = mail.outbox[0]
         soup = BeautifulSoup(email_data.body, "html.parser")
         email_verification_link = soup.find_all('a')[1].attrs.get("href")
-
+        token = email_verification_link.split("token=")[1]
         self.assertTrue(
             User.objects.filter(email=self.DATA.get("email")).first()
         )
 
-        response = self.client.get(email_verification_link)
+        response = self.client.get(self.VERIFY_EMAIL_PATH + f"?token={token}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             [*response.data.keys()],
@@ -112,15 +112,10 @@ class VerifyEmailTests(CoreTestsBase):
         ).first().id
 
         data = {
-            "user_id": user_id,
             "confirmation_token": "invalid",
         }
         token = encode_json_data(data)
 
         response = self.client.get(self.VERIFY_EMAIL_PATH + f"?token={token}")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.data,
-            "Token is invalid or expired. "
-            "Please request another confirmation email by signing in."
-        )
+        self.assertEqual(response.data,'Invalid token.')

@@ -4,14 +4,13 @@ from rest_framework import routers
 from .viewsets import (
     EventViewSet,
     RatingViewSet,
+    CategoryViewSet,
     TagViewSet,
     MarkerViewSet,
-    CategoryViewSet,
-    ReviewViewSet,
     CurrencyViewSet,
-    ParticipantViewSet
+    ReviewViewSet,
+    ParticipantViewSet,
 )
-
 
 app_name = "events"
 
