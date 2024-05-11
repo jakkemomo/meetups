@@ -7,10 +7,10 @@ services:
       dockerfile: db/Dockerfile
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-meetups}
-      WS_DB: ${WS_DB:-meetups_ws}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      WS_DB: ${WS_DB}
     ports:
       - "5555:5432"
     volumes:

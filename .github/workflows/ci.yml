@@ -38,6 +38,13 @@ jobs:
       - name: Run database
         run: |
           docker-compose -f deployments/docker-compose-db.yml up -d
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          WS_DB: ${{ secrets.WS_DB }}
       - name: Test with pytest
         run: |
           pytest -m "not asyncio"
