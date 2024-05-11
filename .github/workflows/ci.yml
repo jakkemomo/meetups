@@ -37,7 +37,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommendations binutils libproj-dev gdal-bin
+          sudo apt-get install -y --no-install-recommends binutils libproj-dev gdal-bin
 
   lint:
     needs: setup-dependencies
@@ -48,7 +48,7 @@ jobs:
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
 
-  build:
+  test:
     needs: setup-dependencies
     runs-on: ubuntu-latest
     steps:
