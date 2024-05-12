@@ -148,10 +148,15 @@ class DirectChatViewSet(viewsets.ModelViewSet):
                 data="You can't chat with yourself"
             )
 
-        chat_object: Chat = Chat.objects.filter(
-            participants__in=[user, request.user],
-            type=Chat.Type.DIRECT,
-        ).first()
+
+        try:
+            chat_object: Chat = Chat.objects.filter(
+                participants__in=[user, request.user],
+                type=Chat.Type.DIRECT,
+            ).first()
+        except Chat.DoesNotExist:
+            chat_object = None
+
         code = status.HTTP_200_OK
 
         if not chat_object:

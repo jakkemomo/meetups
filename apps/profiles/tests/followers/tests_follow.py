@@ -2,7 +2,7 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.exceptions import ErrorDetail
 
-from apps.profiles.tests.utils import *
+from apps.profiles.tests.utils import get_tokens
 from apps.profiles.tests.followers.constants import FOLLOW_URL
 from apps.profiles.models.followers import Follower
 

@@ -1,4 +1,5 @@
-from .events import EventViewSet, ProfileEventViewSet
+from .events import EventViewSet
+from ...profiles.viewsets.profiles import ProfileEventViewSet
 from .ratings import RatingViewSet
 from .categories import CategoryViewSet
 from .tags import TagViewSet

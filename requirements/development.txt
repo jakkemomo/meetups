@@ -1,3 +1,5 @@
 -r common.txt
 
+pre-commit
+pre-commit-hooks
 django-debug-toolbar==4.3.0

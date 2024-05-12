@@ -9,6 +9,3 @@ class Migration(migrations.Migration):
         ('events', '0035_event_chat'),
         ('events', '0036_category_image_url'),
     ]
-
-    operations = [
-    ]
