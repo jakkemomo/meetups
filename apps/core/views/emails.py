@@ -170,10 +170,13 @@ class ChangeEmailView(APIView):
                 'User not found',
                 status=status.HTTP_404_NOT_FOUND
             )
-        if User.objects.filter(email=request.data["email"]).exists():
+        if not request.data.get("email"):
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="Email is required")
+        email = request.data["email"]
+        if User.objects.filter(email=email).exists():
             return Response(status=status.HTTP_409_CONFLICT, data="This email has already been registered")
         user.is_email_verified = False
-        user.email = request.data["email"]
+        user.email = email.lower()
         user.save()
         try:
             helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL)
