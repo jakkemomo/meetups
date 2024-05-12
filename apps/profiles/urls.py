@@ -6,8 +6,8 @@ from .viewsets import (
     MyProfileViewSet,
     FollowerViewSet,
     UserRatingViewSet,
+    ProfileEventViewSet,
 )
-from apps.events.viewsets import ProfileEventViewSet
 
 app_name = "profiles"
 router = routers.SimpleRouter()
