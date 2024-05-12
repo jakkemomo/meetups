@@ -83,16 +83,6 @@ class Event(AbstractBaseModel):
         verbose_name=_("Chat"),
     )
 
-    chat = models.OneToOneField(
-        to=Chat,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        default=None,
-        related_name="chat_event",
-        verbose_name=_("Chat"),
-    )
-
     class Meta:
         ordering = ["start_date"]
         verbose_name = "Event"
