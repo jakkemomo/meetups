@@ -172,11 +172,11 @@ class ChangeEmailView(APIView):
             )
         if not request.data.get("email"):
             return Response(status=status.HTTP_400_BAD_REQUEST, data="Email is required")
-        email = request.data["email"]
+        email = request.data["email"].lower()
         if User.objects.filter(email=email).exists():
             return Response(status=status.HTTP_409_CONFLICT, data="This email has already been registered")
         user.is_email_verified = False
-        user.email = email.lower()
+        user.email = email
         user.save()
         try:
             helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL)
