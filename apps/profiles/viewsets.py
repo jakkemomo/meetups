@@ -268,23 +268,27 @@ class FollowerViewSet(viewsets.ModelViewSet):
         url_name="list_user_followers",
     )
     def list_followers(self, request, user_id):
-        return super(FollowerViewSet, self).list(request, user_id=user_id)
+        user = get_user_object(user_id=user_id)
+        queryset = self.queryset.filter(user=user)
+        filter_followers = filters_followers.UserFollowersFilter(request.query_params, queryset=queryset)
+        serializer = self.get_serializer(filter_followers.qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-@swagger_auto_schema(
-    request_body=no_body,
-)
-@action(
-    methods=["get"],
-    detail=False,
-    url_path="(?P<user_id>[^/.]+)/following",
-    url_name="list_user_following",
-)
-def list_following(self, request, user_id):
-    user = get_user_object(user_id=user_id)
-    queryset = self.queryset.filter(follower=user, status=Follower.Status.ACCEPTED)
-    serializer = self.get_serializer(queryset, many=True)
-    return Response(status=status.HTTP_200_OK, data=serializer.data)
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["get"],
+        detail=False,
+        url_path="(?P<user_id>[^/.]+)/following",
+        url_name="list_user_following",
+    )
+    def list_following(self, request, user_id):
+        user = get_user_object(user_id=user_id)
+        queryset = self.queryset.filter(follower=user, status=Follower.Status.ACCEPTED)
+        filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset)
+        serializer = self.get_serializer(filter_follows, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class ProfileEventViewSet(viewsets.ModelViewSet):
