@@ -12,6 +12,10 @@ class UserFollowersFilter(filters.FilterSet):
     age__lte = filters.NumberFilter(lookup_expr='lte', field_name='follower__age')
     city = filters.CharFilter(lookup_expr='exact', field_name='follower__city')
     city_in = filters.CharFilter(lookup_expr='in', field_name='follower__city')
+    gender = filters.CharFilter(lookup_expr='exact', field_name='follower__gender')
+    gender_contains = filters.CharFilter(lookup_expr='icontains', field_name='follower__gender')
+    type = filters.CharFilter(lookup_expr='exact', field_name='follower__type')
+    type_contains = filters.CharFilter(lookup_expr='icontains', field_name='follower__type')
 
     class Meta:
         model = Follower
@@ -23,6 +27,10 @@ class UserFollowersFilter(filters.FilterSet):
             'age__lte',
             'city',
             'city_in',
+            'gender',
+            'gender_contains',
+            'type',
+            'type_contains',
         ]
 
 
@@ -35,6 +43,10 @@ class UserFollowsFilter(filters.FilterSet):
     age__lte = filters.NumberFilter(lookup_expr='lte', field_name='user__age')
     city = filters.CharFilter(lookup_expr='exact', field_name='user__city')
     city_in = filters.CharFilter(lookup_expr='in', field_name='user__city')
+    gender = filters.CharFilter(lookup_expr='exact', field_name='user__gender')
+    gender_contains = filters.CharFilter(lookup_expr='icontains', field_name='user__gender')
+    type = filters.CharFilter(lookup_expr='exact', field_name='user__type')
+    type_contains = filters.CharFilter(lookup_expr='icontains', field_name='user__type')
 
     class Meta:
         model = Follower
@@ -46,4 +58,8 @@ class UserFollowsFilter(filters.FilterSet):
             'age__lte',
             'city',
             'city_in',
+            'gender',
+            'gender_contains',
+            'type',
+            'type_contains',
         ]
