@@ -269,9 +269,9 @@ class FollowerViewSet(viewsets.ModelViewSet):
     )
     def list_followers(self, request, user_id):
         user = get_user_object(user_id=user_id)
-        queryset = self.queryset.filter(user=user)
-        filter_followers = filters_followers.UserFollowersFilter(request.query_params, queryset=queryset)
-        serializer = self.get_serializer(filter_followers.qs, many=True)
+        queryset = self.queryset.filter(user=user, status=Follower.Status.ACCEPTED)
+        filter_followers = filters_followers.UserFollowersFilter(request.query_params, queryset=queryset).qs
+        serializer = self.get_serializer(filter_followers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -286,7 +286,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
     def list_following(self, request, user_id):
         user = get_user_object(user_id=user_id)
         queryset = self.queryset.filter(follower=user, status=Follower.Status.ACCEPTED)
-        filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset)
+        filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset).qs
         serializer = self.get_serializer(filter_follows, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
