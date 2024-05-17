@@ -1,15 +1,9 @@
-import os
-import django
 import pytest
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.reverse import reverse
 
 from apps.profiles.tests.utils import get_tokens
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()
-
-from apps.events.tests.events.constants import IS_PARTICIPANT_URL
+from apps.events.tests.events.constants import EVENTS_IS_PARTICIPANT_URL
 
 
 @pytest.mark.django_db
@@ -22,8 +16,10 @@ def test_event_is_participant_without_following(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data[0].get("id") is not None
     assert response.data[0].get("name") == event_user_2_is_participant.name
@@ -40,8 +36,10 @@ def test_event_is_participant_accepted(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data[0].get("id") is not None
     assert response.data[0].get("name") == event_user_2_is_participant.name
@@ -57,8 +55,10 @@ def test_event_is_participant_without_following_private(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 403
     assert response.data == {
         'detail': ErrorDetail(
@@ -79,8 +79,10 @@ def test_event_is_participant_accepted_private(
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data[0].get("id") is not None
     assert response.data[0].get("name") == event_user_2_is_participant_private.name
@@ -97,8 +99,10 @@ def test_event_is_participant_pending_private(
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 403
     assert response.data == {
         'detail': ErrorDetail(
@@ -119,8 +123,10 @@ def test_event_is_participant_declined_private(
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 403
     assert response.data == {
         'detail': ErrorDetail(
@@ -140,8 +146,10 @@ def test_event_private_is_participant_without_following(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data == []
 
@@ -157,8 +165,10 @@ def test_event_private_is_participant_accepted(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data == []
 
@@ -173,8 +183,10 @@ def test_event_private_is_participant_without_following_private(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 403
     assert response.data == {
         'detail': ErrorDetail(
@@ -195,8 +207,10 @@ def test_event_private_is_participant_accepted_private(
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data == []
 
@@ -212,8 +226,10 @@ def test_event_private_is_participant_pending_private(
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 403
     assert response.data == {
         'detail': ErrorDetail(
@@ -234,8 +250,10 @@ def test_event_private_created_by_declined_private(
     token = get_tokens(user_private)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2_private.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2_private.id])
     )
+
+    # assertions
     assert response.status_code == 403
     assert response.data == {
         'detail': ErrorDetail(
@@ -254,8 +272,10 @@ def test_event_is_participant_current_user(
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data[0].get("id") is not None
     assert response.data[0].get("name") == event_user_2_is_participant.name
@@ -270,8 +290,10 @@ def test_event_private_is_participant_current_user(
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 200
     assert response.data[0].get("id") is not None
     assert response.data[0].get("name") == event_private_user_2_is_participant.name
@@ -283,8 +305,10 @@ def test_event_is_participant_no_creds(
         user_2,
 ):
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[user_2.id])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[user_2.id])
     )
+
+    # assertions
     assert response.status_code == 401
     assert response.data == {
         'detail': ErrorDetail(
@@ -302,8 +326,10 @@ def test_event_is_participant_user_not_found(
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(
-        reverse(IS_PARTICIPANT_URL, args=[100])
+        reverse(EVENTS_IS_PARTICIPANT_URL, args=[100])
     )
+
+    # assertions
     assert response.status_code == 404
     assert response.data == {
         'detail': ErrorDetail(string='User not found', code='error')

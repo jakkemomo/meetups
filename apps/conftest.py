@@ -6,6 +6,7 @@ django.setup()
 
 import pytest
 import asyncio
+
 from rest_framework.test import APIClient
 from django.test import AsyncClient
 from channels.routing import URLRouter
@@ -25,12 +26,20 @@ def api_client() -> APIClient:
 
 @pytest.fixture
 def user() -> User:
-    return User.objects.create(email="user@example.com", password="test")
+    return User.objects.create(
+        email="user@example.com",
+        password="test",
+        is_email_verified=True,
+    )
 
 
 @pytest.fixture
 def user_2() -> User:
-    return User.objects.create(email="user2@example.com", password="test2")
+    return User.objects.create(
+        email="user2@example.com",
+        password="test2",
+        is_email_verified=True,
+    )
 
 
 @pytest.fixture
@@ -171,6 +180,7 @@ def event_private() -> Event:
     return Event.objects.create(
         name="private_event",
         type="private",
+        private_token="token"
     )
 
 
@@ -206,6 +216,20 @@ def event_private_created_by_user_2_private(user_2_private) -> Event:
         type="private",
         created_by=user_2_private,
     )
+
+
+@pytest.fixture
+def event_user_is_participant(user, event) -> Event:
+    event.participants.add(user.id)
+    event.save()
+    return event
+
+
+@pytest.fixture
+def event_private_user_is_participant(user, event_private) -> Event:
+    event_private.participants.add(user.id)
+    event_private.save()
+    return event_private
 
 
 @pytest.fixture

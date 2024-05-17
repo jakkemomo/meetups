@@ -1,2 +1,5 @@
-CREATED_BY_URL = "profiles:User events-event_list_created_by_user"
-IS_PARTICIPANT_URL = "profiles:User events-event_list_user_is_participant"
+EVENTS_GET_URL = "events:Events-detail"
+EVENTS_PRIVATE_GET_URL = "events:Events-private"
+EVENTS_LIST_URL = "events:Events-list"
+EVENTS_CREATED_BY_URL = "profiles:User events-event_list_created_by_user"
+EVENTS_IS_PARTICIPANT_URL = "profiles:User events-event_list_user_is_participant"
