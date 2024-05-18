@@ -115,7 +115,7 @@ def test_event_update_cost_no_currency(
     assert response.data == {
         'non_field_errors': [
             ErrorDetail(
-                string='Cost and currency be provided at the same time',
+                string='Cost and currency must be provided at the same time',
                 code='invalid'
             )
         ]

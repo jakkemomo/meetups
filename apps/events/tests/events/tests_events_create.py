@@ -101,7 +101,7 @@ def test_event_create_cost_no_currency(
     assert response.data == {
         'non_field_errors': [
             ErrorDetail(
-                string='Cost and currency be provided at the same time',
+                string='Cost and currency must be provided at the same time',
                 code='invalid'
             )
         ]
@@ -166,7 +166,7 @@ def test_event_create_repeatable_without_schedule(
     assert response.data == {
         'non_field_errors': [
             ErrorDetail(
-                string='Repeatable event must have schedule',
+                string='Repeatable event must have a schedule',
                 code='invalid'
             )
         ]
@@ -233,7 +233,7 @@ def test_event_create_repeatable_schedule_with_start_time(
     assert response.data == {
         'non_field_errors': [
             ErrorDetail(
-                string='Start date, start time and schedule cannot be provided at the same time',
+                string='Start date, start time, and schedule cannot be provided at the same time',
                 code='invalid'
             )
         ]
