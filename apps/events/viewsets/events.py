@@ -179,7 +179,7 @@ class EventViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=[IsAuthenticated, EventPermissions],
         url_path='private/(?P<token>[^/.]+)',
-        url_name='private/',
+        url_name='private',
         lookup_url_kwarg="token",
         lookup_field='private_token'
     )

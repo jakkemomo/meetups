@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.gis.geos import Point
+from django.db import transaction
 from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category, Schedule, Currency
@@ -10,10 +11,16 @@ from . import currency, utils
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    latitude = serializers.DecimalField(max_value=180, min_value=-180,
-                                        write_only=True, max_digits=18, decimal_places=15)
-    longitude = serializers.DecimalField(max_value=180, min_value=-180,
-                                         write_only=True, max_digits=18, decimal_places=15)
+    latitude = serializers.DecimalField(
+        max_value=180, min_value=-180,
+        write_only=True, max_digits=18,
+        decimal_places=15,
+    )
+    longitude = serializers.DecimalField(
+        max_value=180, min_value=-180,
+        write_only=True, max_digits=18,
+        decimal_places=15,
+    )
 
     class Meta:
         model = Event
@@ -32,7 +39,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ["day_of_week", "time"]
+        fields = ["id", "day_of_week", "time"]
 
 
 class EventCreateSerializer(serializers.ModelSerializer):
@@ -56,7 +63,6 @@ class EventCreateSerializer(serializers.ModelSerializer):
     is_finished = serializers.BooleanField(default=False)
     is_visible = serializers.BooleanField(default=True)
     any_participant_number = serializers.BooleanField(default=False)
-
     start_date = serializers.DateField(required=False, allow_null=True, default=None)
     end_date = serializers.DateField(required=False, allow_null=True, default=None)
     start_time = serializers.TimeField(required=False, allow_null=True, default=None)
@@ -64,7 +70,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = ["participants", "created_by", "updated_by", "ratings"]
+        exclude = ["participants", "created_by", "updated_by", "ratings", "chat"]
 
     def validate(self, data):
         start_date = data.get('start_date')
@@ -72,14 +78,14 @@ class EventCreateSerializer(serializers.ModelSerializer):
         schedule = data.get('schedule')
         # We validate that the start_date and start_time are not null OR schedule is not empty
         if not start_date and not start_time and not schedule:
-            raise serializers.ValidationError('Start date, start time or schedule must be provided')
+            raise serializers.ValidationError('Start date, start time, or schedule must be provided')
         if start_date and not start_time:
             raise serializers.ValidationError('Start time must be provided')
         if not start_date and start_time:
             raise serializers.ValidationError('Start date must be provided')
         if start_date and start_time and schedule:
             raise serializers.ValidationError(
-                'Start date, start time and schedule cannot be provided at the same time'
+                'Start date, start time, and schedule cannot be provided at the same time'
             )
         # We validate that we have any participant number or desired participant number
         any_participant_number = data.get('any_participant_number')
@@ -93,16 +99,23 @@ class EventCreateSerializer(serializers.ModelSerializer):
         # We validate that we have a free event or a cost
         free = data.get('free')
         cost = data.get('cost')
+        currency = data.get('currency')
         if not free and not cost:
             raise serializers.ValidationError('Free or cost must be provided')
         if free and cost:
             raise serializers.ValidationError('Free and cost cannot be provided at the same time')
+        if free and currency:
+            raise serializers.ValidationError('Free and currency cannot be provided at the same time')
+        if cost and not currency or not cost and currency:
+            raise serializers.ValidationError('Cost and currency must be provided at the same time')
+
         # We validate that we have repeatable event with schedule
         repeatable = data.get('repeatable')
         if repeatable and not schedule:
-            raise serializers.ValidationError('Repeatable event must have schedule')
+            raise serializers.ValidationError('Repeatable event must have a schedule')
         return data
 
+    @transaction.atomic
     def create(self, validated_data):
         validated_data["location"] = Point(
             (
@@ -128,17 +141,19 @@ class EventCreateSerializer(serializers.ModelSerializer):
         validated_data["created_by_id"] = user_id
         validated_data["updated_by_id"] = user_id
 
-        # Create an event chats and add a creator to it
+        # Create an event chat and add the creator to it
         chat = Chat.objects.create(type=Chat.Type.EVENT)
         chat.participants.add(request.user)
         validated_data["chat_id"] = chat.id
 
-        if validated_data["type"] == "private":
+        if validated_data.get("type") == "private":
             validated_data["private_token"] = uuid4()
 
-        tags = validated_data.pop("tags", None)
-        schedule = validated_data.pop("schedule", None)
+        tags = validated_data.pop("tags", [])
+        schedule = validated_data.pop("schedule", [])
+
         event = Event(**validated_data)
+
         if schedule:
             schedule_start = utils.get_schedule_start(schedule)
             event.start_date = schedule_start.date()
@@ -158,31 +173,89 @@ class EventUpdateSerializer(EventCreateSerializer):
     desired_participants_number = serializers.IntegerField(
         min_value=0, max_value=10000000, allow_null=True, required=False
     )
-    location = serializers.ListField(
-        child=serializers.DecimalField(max_digits=7, decimal_places=5),
-        max_length=2,
-        min_length=2,
-        required=False,
-    )
+    location = LocationSerializer(required=False, many=False)
+    city_south_west_point = LocationSerializer(required=False, many=False)
+    city_north_east_point = LocationSerializer(required=False, many=False)
 
-    # todo: move serializer logic to services
-
+    @transaction.atomic
     def update(self, instance, validated_data):
         location = validated_data.pop("location", None)
         if location:
-            instance.location = Point(location)
+            instance.location = Point(
+                (
+                    location.get("longitude"),
+                    location.get("latitude")
+                )
+            )
+        city_south_west_point = validated_data.pop(
+            "city_south_west_point", None
+        )
+        if city_south_west_point:
+            instance.city_south_west_point = Point(
+                (
+                    city_south_west_point.get("longitude"),
+                    city_south_west_point.get("latitude")
+                )
+            )
+        city_north_east_point = validated_data.pop(
+            "city_north_east_point", None
+        )
+        if city_north_east_point:
+            instance.city_north_east_point = Point(
+                (
+                    city_north_east_point.get("longitude"),
+                    city_north_east_point.get("latitude")
+                )
+            )
+
+        schedule_data = validated_data.pop("schedule", None)
         tags = validated_data.pop("tags", None)
+
         if tags:
             instance.tags.set([tag.id for tag in tags])
-        event_type = validated_data.pop("type")
-        if event_type == "private":
-            instance.private_token = uuid4()
-        else:
-            instance.private_token = None
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
+        if schedule_data:
+            schedule_start = utils.get_schedule_start(schedule_data)
+            instance.start_date = schedule_start.date()
+            instance.start_time = schedule_start.time()
+
         instance.save()
+
+        if schedule_data:
+            self.update_schedules(instance, schedule_data)
+
         return instance
+
+    def update_schedules(self, instance, schedule_data):
+        existing_schedules = instance.schedule.all()
+        incoming_schedule_ids = [item.get('id') for item in schedule_data if item.get('id')]
+
+        # Delete schedules not in the incoming data
+        for db_schedule in existing_schedules:
+            if db_schedule.id not in incoming_schedule_ids:
+                db_schedule.delete()
+
+        # Add or update schedules
+        for schedule_item in schedule_data:
+            schedule_id = schedule_item.get("id")
+            if schedule_id:
+                # Update existing schedule
+                schedule_instance = existing_schedules.filter(id=schedule_id).first()
+                if schedule_instance:
+                    schedule_instance.day_of_week = schedule_item["day_of_week"]
+                    schedule_instance.time = schedule_item["time"]
+                    schedule_instance.save()
+            else:
+                # Add new schedule
+                new_schedule = Schedule.objects.create(
+                    event=instance,
+                    day_of_week=schedule_item["day_of_week"],
+                    time=schedule_item["time"],
+                )
+                instance.schedule.add(new_schedule)
 
 
 class ParticipantSerializer(serializers.ModelSerializer):

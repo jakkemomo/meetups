@@ -1,12 +1,16 @@
 from asgiref.sync import async_to_sync
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.notifications.managers import NotificationManager
 from apps.notifications.models import Notification
+from apps.profiles.filters import filters_followers
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions.followers import FollowerPermissions
 from apps.profiles.serializers import FollowerSerializer
@@ -20,6 +24,10 @@ class FollowerViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, FollowerPermissions)
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_class = filters_followers.UserFollowersFilter
+    search_fields = ['user__username', 'user__age', 'user__city', ]
+    ordering_fields = ['user__username', 'user__age', ]
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -159,27 +167,29 @@ class FollowerViewSet(viewsets.ModelViewSet):
     )
     @action(
         methods=["get"],
-        detail=True,
-        url_path="followers",
+        detail=False,
+        url_path="(?P<user_id>[^/.]+)/followers",
         url_name="list_user_followers",
     )
     def list_followers(self, request, user_id):
         user = get_user_object(user_id=user_id)
         queryset = self.queryset.filter(user=user, status=Follower.Status.ACCEPTED)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        filter_followers = filters_followers.UserFollowersFilter(request.query_params, queryset=queryset).qs
+        serializer = self.get_serializer(filter_followers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         request_body=no_body,
     )
     @action(
         methods=["get"],
-        detail=True,
-        url_path="following",
+        detail=False,
+        url_path="(?P<user_id>[^/.]+)/following",
         url_name="list_user_following",
     )
     def list_following(self, request, user_id):
         user = get_user_object(user_id=user_id)
         queryset = self.queryset.filter(follower=user, status=Follower.Status.ACCEPTED)
-        serializer = self.get_serializer(queryset, many=True)
+        filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset).qs
+        serializer = self.get_serializer(filter_follows, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
