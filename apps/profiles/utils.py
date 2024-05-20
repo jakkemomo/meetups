@@ -3,12 +3,13 @@ import logging
 from apps.profiles.exceptions import (
     UserNotFoundException,
     UserAreCurrentException,
+    FollowersChangingException,
 )
 from apps.profiles.models import User
 from apps.profiles.models.followers import Follower
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("profiles_app")
 
 
 def get_user_object(user_id):
@@ -21,7 +22,7 @@ def get_user_object(user_id):
 def is_current_user(request, user, raise_exception=True):
     if user == request.user:
         if raise_exception:
-            raise UserAreCurrentException()
+            raise UserAreCurrentException
         return True
     return False
 
@@ -33,10 +34,10 @@ def change_followers_if_exists(user):
         (Follower.objects.filter(user=user, status=Follower.Status.DECLINED)
          .delete())
     except Exception as exc:
-        logger.error(
-            f"An error occurred while changing followers of user: {user}.\n{exc}"
-        )
-        raise
+        logger.exception(
+            f"An error occurred while changing followers of "
+            f"user: {user}, exc: {exc}")
+        raise FollowersChangingException
 
 
 def is_follower(request, user):

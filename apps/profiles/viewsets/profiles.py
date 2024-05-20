@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models import Q, Count, Avg, Exists, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
@@ -23,8 +21,6 @@ from apps.profiles.serializers import (
     ProfileListSerializer,
 )
 from apps.profiles.utils import get_user_object
-
-logger = logging.getLogger("profiles_viewsets")
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

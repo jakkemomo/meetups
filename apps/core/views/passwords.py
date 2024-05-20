@@ -19,7 +19,7 @@ from apps.core.serializers.passwords import (
 )
 from apps.profiles.models import User
 
-logger = logging.getLogger("passwords_viewsets")
+logger = logging.getLogger("core_app")
 
 
 class PasswordResetView(APIView):
@@ -66,8 +66,7 @@ class PasswordResetView(APIView):
             helpers.send_reset_password_email(user)
 
         except Exception as exc:
-            logger.error(f'Error type: {type(exc).__name__}, '
-                         f'location: {__name__}, user id: {user.id}')
+            logger.error(f'user_id = {user.id}, {exc}')
             return Response(
                 data={"detail": "An error occurred while sending an email. "
                                 "Please try again later"},
@@ -123,7 +122,7 @@ class PasswordResetConfirmView(APIView):
         try:
             data = decode_json_data(token)
         except Exception as exc:
-            logger.warning(f'Decoding failed: {exc}')
+            logger.error(f'Decoding failed: {exc}')
             data = None
 
         if not data:
@@ -143,7 +142,7 @@ class PasswordResetConfirmView(APIView):
         try:
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'Post user failed: {exc}')
+            logger.error(exc)
             user = None
 
         if not user:

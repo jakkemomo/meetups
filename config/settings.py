@@ -251,32 +251,22 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'passwords_viewsets': {
+        'core_app': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'emails_viewsets': {
+        'profiles_app': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'profiles_viewsets': {
+        'notifications_app': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'events_viewsets': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'chats_base': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'chats_consumers': {
+        'chats_app': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,

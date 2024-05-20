@@ -10,6 +10,7 @@ from rest_framework_simplejwt.state import token_backend
 from rest_framework_simplejwt.tokens import UntypedToken
 
 user_model = get_user_model()
+logger = logging.getLogger("core_app")
 
 
 class JwtAuthMiddleware(BaseMiddleware):
@@ -25,9 +26,13 @@ class JwtAuthMiddleware(BaseMiddleware):
     def get_user(self, token_key):
         try:
             UntypedToken(token_key)
-        except (InvalidToken, TokenError) as e:
-            logging.error(e)
+        except (InvalidToken, TokenError) as exc:
+            logger.warning(
+                f"Invalid JWT token in {self.__class__.__name__}: {exc}"
+            )
             return AnonymousUser()
+        except Exception as exc:
+            logger.exception(exc)
         token_decoded = token_backend.decode(token_key, verify=False)
         return get_user_model().objects.get(id=token_decoded.get("user_id"))
 

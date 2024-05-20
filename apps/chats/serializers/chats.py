@@ -30,9 +30,9 @@ class ChatRetrieveSerializer(serializers.ModelSerializer):
             try:
                 event = obj.chat_event
             except Exception as exc:
-                logger.warning(
-                    f"{__name__}: {exc}. "
-                    f"Chat {obj} with the 'Event' type has no linked Event"
+                logger.error(
+                    f"Chat {obj} with the 'Event' type has no linked Event: "
+                    f"{exc}"
                 )
                 raise ChatWithoutEventException
 
@@ -44,15 +44,15 @@ class ChatRetrieveSerializer(serializers.ModelSerializer):
             ).first()
 
             if not direct_chat_user:
-                logger.warning(
-                    f"{__name__}: Chat {obj} direct chat user error"
+                logger.error(
+                    f"Chat {obj} with the 'Direct' type has no the second user"
                 )
                 raise DirectChatUserNotFoundException
 
             return direct_chat_user
 
         else:
-            logger.warning(f"{__name__}: Chat {obj} type error")
+            logger.error(f"{self.__class__.__name__}: Chat {obj} type error")
             raise ChatTypeException
 
     class Meta:
