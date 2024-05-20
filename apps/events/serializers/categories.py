@@ -18,7 +18,6 @@ class CategoryRetrieveSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "image_url"]
 
 
-
 class CategoryUpdateSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=30)
     image_url = serializers.CharField(max_length=60, required=False)

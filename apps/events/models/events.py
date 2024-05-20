@@ -38,8 +38,8 @@ class Event(AbstractBaseModel):
     desired_participants_number = models.PositiveIntegerField(default=0, null=True, blank=True)
     cost = fields.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
 
-    start_date = fields.DateTimeField(null=True, blank=True, default=None)
-    end_date = fields.DateTimeField(null=True, blank=True, default=None)
+    start_date = fields.DateField(null=True, blank=True, default=None)
+    end_date = fields.DateField(null=True, blank=True, default=None)
     start_time = fields.TimeField(null=True, blank=True, default=None)
     end_time = fields.TimeField(null=True, blank=True, default=None)
     private_token = fields.CharField(max_length=250, null=True, blank=True)
