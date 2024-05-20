@@ -177,6 +177,36 @@ class EventUpdateSerializer(EventCreateSerializer):
     city_south_west_point = LocationSerializer(required=False, many=False)
     city_north_east_point = LocationSerializer(required=False, many=False)
 
+    def validate(self, data):
+        # We validate that we have any participant number or desired participant number
+        any_participant_number = data.get('any_participant_number')
+        desired_participants_number = data.get('desired_participants_number')
+        if any_participant_number and desired_participants_number:
+            raise serializers.ValidationError(
+                'Any participant number and desired participant number cannot be provided at the same time'
+            )
+
+        # We validate that we have a free event or a cost
+        free = data.get('free')
+        cost = data.get('cost')
+        currency = data.get('currency')
+        if free and cost:
+            raise serializers.ValidationError('Free and cost cannot be provided at the same time')
+        if free and currency:
+            raise serializers.ValidationError('Free and currency cannot be provided at the same time')
+        if 'cost' in data and 'currency' in data and (not cost and currency or cost and not currency):
+            raise serializers.ValidationError('Cost and currency must be provided at the same time')
+        elif (not cost and not currency) and (cost and not self.instance.currency or not self.instance.cost and currency):
+            raise serializers.ValidationError('Cost and currency must be provided at the same time')
+
+        # We validate that we have repeatable event with schedule
+        repeatable = data.get('repeatable')
+        schedule = data.get('schedule')
+        if repeatable and not schedule:
+            raise serializers.ValidationError('Repeatable event must have a schedule')
+
+        return data
+
     @transaction.atomic
     def update(self, instance, validated_data):
         location = validated_data.pop("location", None)

@@ -15,6 +15,7 @@ class EventsConfig(AppConfig):
         Thread(target=self.update_event_state, daemon=True).start()
 
     def update_event_state(self):
+        time.sleep(60)
         while True:
             call_command("update_event_state")
             time.sleep(settings.EVENTS_UPDATE_INTERVAL)
