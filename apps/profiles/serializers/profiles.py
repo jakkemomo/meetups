@@ -47,7 +47,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=False, max_length=30)
     last_name = serializers.CharField(required=False, max_length=30)
     email = serializers.EmailField(required=False, max_length=40)
-    image_url = serializers.CharField(required=False, max_length=40)
+    image_url = serializers.CharField(required=False, max_length=100)
     city = serializers.CharField(required=False, max_length=30)
     age = serializers.IntegerField(required=False, min_value=0, max_value=99)
     date_of_birth = serializers.DateField(required=False)
