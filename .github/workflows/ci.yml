@@ -46,15 +46,15 @@ jobs:
         run: |
           docker-compose -f deployments/docker-compose-db.yml up -d
           for i in {1..10}; do
-            if nc -z "${{ secrets.DB_HOST }}" "${{ secrets.DB_PORT }}"; then
-              echo "Database started successfully."
+            if pg_isready -h "${{ secrets.DB_HOST }}" -p "${{ secrets.DB_PORT }}"; then
+              echo "Database is ready to accept connections."
               break
             fi
             if [ $i -eq 10 ]; then
               echo "Database failed to start after ${i} attempts."
               exit 1
             fi
-            echo "Waiting for database to start..."
+            echo "Waiting for database to be ready..."
             sleep 10
           done
         env:
