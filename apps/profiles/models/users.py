@@ -25,7 +25,6 @@ class User(AbstractUser):
     city = models.CharField(max_length=50, null=True, blank=True)
     is_email_verified = models.BooleanField(default=False)
     bio = models.CharField(max_length=1000, null=True, blank=True)
-    age = models.PositiveIntegerField(default=18, validators=[MinValueValidator(1), MaxValueValidator(100)])
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(
         max_length=15,
