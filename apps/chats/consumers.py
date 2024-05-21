@@ -4,40 +4,34 @@ import logging
 from apps.notifications.base import BaseConsumer
 from apps.chats.utils import get_chat_async, has_chat_permissions
 
-logger = logging.getLogger("chats_consumers")
+logger = logging.getLogger("chats_app")
 
 
 class ChatConsumer(BaseConsumer):
     async def connect(self):
-        try:
-            user = self.scope.get("user")
-            if not user or user.is_anonymous:
-                logger.warning(f"Anonymous user request in {__name__}")
-                await self.close()
-                return
-
-            chat_id = self.scope.get("url_route").get("kwargs").get("chat_id")
-            chat = await get_chat_async(chat_id)
-            if not chat:
-                logger.warning(
-                    f"Chat not found in {__name__}"
-                )
-                await self.close()
-                return
-
-            if not await has_chat_permissions(user=user, chat=chat):
-                logger.warning(
-                    f"User not authorised in {__name__}"
-                )
-                await self.close()
-                return
-
-            self.group_name = chat_id
-            await super().connect()
-
-        except Exception as exc:
-            logger.error(f"Error in connect: {exc}")
+        user = self.scope.get("user")
+        if not user or user.is_anonymous:
+            logger.warning(
+                f"Anonymous user request in {self.__class__.__name__}"
+            )
             await self.close()
+
+        chat_id = self.scope.get("url_route").get("kwargs").get("chat_id")
+        chat = await get_chat_async(chat_id)
+        if not chat:
+            logger.warning(
+                f"Chat not found in {self.__class__.__name__}"
+            )
+            await self.close()
+
+        if not await has_chat_permissions(user=user, chat=chat):
+            logger.warning(
+                f"User not authorised in {self.__class__.__name__}"
+            )
+            await self.close()
+
+        self.group_name = chat_id
+        await super().connect()
 
     async def receive(self, text_data):
         data = json.loads(text_data)

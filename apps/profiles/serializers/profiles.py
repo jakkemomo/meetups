@@ -22,7 +22,6 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "is_email_verified",
             "is_private",
             "bio",
-            "age",
             "category_favorite",
             "date_of_birth",
             "gender",
@@ -49,7 +48,6 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=False, max_length=40)
     image_url = serializers.CharField(required=False, max_length=100)
     city = serializers.CharField(required=False, max_length=30)
-    age = serializers.IntegerField(required=False, min_value=0, max_value=99)
     date_of_birth = serializers.DateField(required=False)
     category_favorite = CategoryListSerializer(many=True)
     gender = serializers.ChoiceField(choices=User.Gender.choices, required=False)
@@ -68,7 +66,6 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "city",
             "is_private",
             "bio",
-            "age",
             "category_favorite",
             "date_of_birth",
             "gender",
