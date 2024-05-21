@@ -4,10 +4,7 @@ from abc import abstractmethod
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 
-from apps.chats.exceptions import ConsumerWithoutGroupNameException
-
-
-logger = logging.getLogger("chats_base")
+logger = logging.getLogger("notifications_app")
 
 
 class BaseConsumer(AsyncWebsocketConsumer):
@@ -16,7 +13,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
         """
         This method needs a defined self.group_name in each subclass.
 
-        For example, NotificationConsumer works with user's own groups:
+        For example, NotificationConsumer works with user's own group – it's id:
              async def connect(self):
                 self.group_name = str(self.scope.get("user").pk)
                 await super().connect()
@@ -26,12 +23,14 @@ class BaseConsumer(AsyncWebsocketConsumer):
                 self.group_name,
                 self.channel_name
             )
-        except ConsumerWithoutGroupNameException as exc:
+        except AttributeError as exc:
+            logger.error(exc)
+            await self.close()
+        except Exception as exc:
             logger.exception(
-                f"Consumer {self.__name__} hasn't got a group_name",
-                exc_info=exc,
+                f"Connection error in {self.__class__.__name__}: {exc}"
             )
-            return
+            await self.close()
 
         await self.accept()
 

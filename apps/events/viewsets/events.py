@@ -25,8 +25,6 @@ from apps.events.serializers import (
     EmptySerializer,
 )
 
-logger = logging.getLogger("events_viewsets")
-
 
 class EventViewSet(viewsets.ModelViewSet):
     model = Event

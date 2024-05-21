@@ -2,7 +2,7 @@ import logging
 
 from django.core.files.storage import default_storage
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("upload_app")
 
 
 def delete_image_if_exists(instance):
@@ -13,6 +13,6 @@ def delete_image_if_exists(instance):
                 default_storage.delete(image_url)
         except Exception as exc:
             logger.error(
-                f"An error occurred while deleting a file: {image_url}.\n{exc}"
+                f"An error occurred while deleting a file: {image_url}: {exc}"
             )
             raise

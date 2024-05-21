@@ -11,7 +11,8 @@ def task_logger(func):
         try:
             result = func(*args, **kwargs)
         except Exception as exc:
-            logger.error(f'error: {func.__name__}: {exc}')
+            logger.exception(
+                f'{func.__name__}: {exc}')
         else:
             return result
 

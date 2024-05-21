@@ -22,7 +22,7 @@ from apps.profiles.models import User
 from apps.core.helpers import decode_json_data
 from config import settings
 
-logger = logging.getLogger("emails_viewsets")
+logger = logging.getLogger("core_app")
 
 
 class VerifyEmailView(APIView):
@@ -48,7 +48,7 @@ class VerifyEmailView(APIView):
         try:
             data = decode_json_data(token)
         except Exception as exc:
-            logger.warning(f'Decoding failed: {exc}')
+            logger.error(f'Decoding failed: {exc}')
 
             return Response(
                 'Invalid payload.',
@@ -59,7 +59,7 @@ class VerifyEmailView(APIView):
             user_id = data['user_id']
             confirmation_token = data['confirmation_token']
         except KeyError as exc:
-            logger.warning(f'Data not found: {exc}')
+            logger.error(f'Data not found: {exc}')
 
             return Response(
                 'Invalid token.',
@@ -71,7 +71,7 @@ class VerifyEmailView(APIView):
         try:
             user = user_model.objects.get(id=user_id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'warning: {__name__}: {exc}')
+            logger.error(exc)
 
             return Response(
                 'User not found',
@@ -164,7 +164,7 @@ class ChangeEmailView(APIView):
         try:
             user = user_model.objects.get(id=request.user.id)
         except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
-            logger.warning(f'warning: {__name__}: {exc}')
+            logger.error(exc)
 
             return Response(
                 'User not found',
