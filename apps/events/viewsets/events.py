@@ -56,7 +56,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        self.queryset = self.queryset.prefetch_related('category', 'tags').annotate(
+        queryset = self.queryset.prefetch_related('category', 'tags').annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
             is_favorite=Exists(
@@ -65,7 +65,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
             ),
         ).order_by("-start_date")
-        return self.queryset.all()
+        return queryset.all()
 
     def get_serializer_class(self):
         match self.action:
