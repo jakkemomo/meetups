@@ -5,7 +5,7 @@ from rest_framework import serializers
 from apps.chats.exceptions import ChatWithoutEventException, ChatTypeException, DirectChatUserNotFoundException
 from apps.chats.models import Chat
 
-logger = logging.getLogger("websockets_app_serializer")
+logger = logging.getLogger("chats_app")
 
 
 class ChatRetrieveSerializer(serializers.ModelSerializer):

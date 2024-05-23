@@ -271,6 +271,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'core_websockets': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 

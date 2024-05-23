@@ -12,6 +12,7 @@ class Notification(AbstractBaseModel):
         NEW_FOLLOWER = "NEW_FOLLOWER"
         NEW_FOLLOW_REQUEST = "NEW_FOLLOW_REQUEST"
         ACCEPTED_FOLLOW_REQUEST = "ACCEPTED_FOLLOW_REQUEST"
+        NEW_MESSAGE = "NEW_MESSAGE"
 
     recipient = models.ForeignKey(
         to=user_model,

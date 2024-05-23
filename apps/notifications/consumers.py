@@ -1,12 +1,12 @@
 import json
 import logging
 
-from apps.notifications.base import BaseConsumer
+from apps.core.websockets.base import AbstractConsumer
 
-logger = logging.getLogger("notifications_consumers")
+logger = logging.getLogger("notifications_app")
 
 
-class NotificationConsumer(BaseConsumer):
+class NotificationConsumer(AbstractConsumer):
     async def connect(self):
         user = self.scope.get("user")
         if not user or user.is_anonymous:

@@ -8,7 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.events.filters import TrigramSimilaritySearchFilter
-from apps.notifications.managers import NotificationManager
+from apps.notifications.handlers.email import EmailNotificationsHandler
+from apps.notifications.handlers.notifications import InAppNotificationsHandler
+from apps.notifications.managers.chain import NotificationsChainManager
 from apps.notifications.models import Notification
 from apps.profiles.filters import filters_followers
 from apps.profiles.models.followers import Follower
@@ -28,6 +30,13 @@ class FollowerViewSet(viewsets.ModelViewSet):
     filterset_class = filters_followers.UserFollowersFilter
     search_fields = ['user__username', 'user__age', 'user__city', ]
     ordering_fields = ['user__username', 'user__age', ]
+
+    # Notifications
+    handlers = (
+        InAppNotificationsHandler(),
+        EmailNotificationsHandler(),
+    )
+    notifications_manager = NotificationsChainManager(handlers)
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -67,14 +76,14 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object = serializer.save()
 
         if user.is_private:
-            async_to_sync(NotificationManager.notification)(
+            async_to_sync(self.notifications_manager.handle)(
                 created_by=follower_object.follower,
                 recipient=follower_object.user,
                 notification_type=Notification.Type.NEW_FOLLOW_REQUEST,
                 additional_data={"follower_status": follower_object.status},
             )
         else:
-            async_to_sync(NotificationManager.notification)(
+            async_to_sync(self.notifications_manager.handle)(
                 created_by=follower_object.follower,
                 recipient=follower_object.user,
                 notification_type=Notification.Type.NEW_FOLLOWER,
@@ -119,7 +128,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object.save()
         serializer = self.get_serializer(follower_object)
 
-        async_to_sync(NotificationManager.notification)(
+        async_to_sync(self.notifications_manager.handle)(
             created_by=follower_object.user,
             recipient=follower_object.follower,
             notification_type=Notification.Type.ACCEPTED_FOLLOW_REQUEST,

@@ -1,13 +1,13 @@
 import logging
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 
-logger = logging.getLogger("notifications_app")
+logger = logging.getLogger("core_websockets")
 
 
-class BaseConsumer(AsyncWebsocketConsumer):
+class AbstractConsumer(AsyncWebsocketConsumer, ABC):
     @abstractmethod
     async def connect(self):
         """
@@ -42,6 +42,11 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
 
 class BaseManager:
+    """
+    The child of this class must have a method for handling some unique data,
+    for example - notification data, and then call ChildManager.send_data
+    to send them
+    """
     @staticmethod
     async def send_data(type, recipient, data, created_at):
         channel_layer = get_channel_layer()

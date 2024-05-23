@@ -1,7 +1,7 @@
 from asgiref.sync import sync_to_async
 
 from apps.chats.models import Message
-from apps.notifications.base import BaseManager
+from apps.core.websockets.base import BaseManager
 
 
 class ChatManager(BaseManager):
