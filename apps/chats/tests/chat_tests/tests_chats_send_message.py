@@ -1,14 +1,17 @@
 import asyncio
 
 import pytest
+from bs4 import BeautifulSoup
 from channels.db import database_sync_to_async
+from django.core import mail
 from rest_framework.reverse import reverse
 
 from apps.chats.models import Message
 from apps.chats.tests.constants import CHATS_SEND_MESSAGE_URL
+from apps.notifications.models import Notification
 from apps.profiles.tests.utils import async_get_tokens
 from apps.notifications.tests.utils import (
-    get_chat_communicator, get_wrong_chat_communicator,
+    get_chat_communicator, get_wrong_chat_communicator, get_communicator,
 )
 
 
@@ -26,21 +29,28 @@ async def test_send_message_valid(
     header = {"Authorization": "Bearer " + token}
 
     # user connects to ws
-    communicator = get_chat_communicator(
+    message_communicator = get_chat_communicator(
         application,
         async_user,
         event_chat_with_users
     )
-    connected, subprotocol = await communicator.connect()
+    connected, subprotocol = await message_communicator.connect()
     assert connected
 
     # user_2 connects to ws
-    communicator_2 = get_chat_communicator(
+    message_communicator_2 = get_chat_communicator(
         application,
         async_user_2,
         event_chat_with_users
     )
-    connected, subprotocol = await communicator_2.connect()
+    connected, subprotocol = await message_communicator_2.connect()
+    assert connected
+
+    notification_communicator_2 = get_communicator(
+        application,
+        async_user_2
+    )
+    connected, subprotocol = await notification_communicator_2.connect()
     assert connected
 
     # user sends message to chat
@@ -52,8 +62,8 @@ async def test_send_message_valid(
     )
 
     # both users checks message
-    response_ws_1 = await communicator.receive_json_from()
-    response_ws_2 = await communicator_2.receive_json_from()
+    response_ws_1 = await message_communicator.receive_json_from()
+    response_ws_2 = await message_communicator_2.receive_json_from()
     assert response_ws_1 == response_ws_2
     assert response_ws_1.get("type") == "chat_message"
     assert response_ws_1.get("data") == {
@@ -66,12 +76,30 @@ async def test_send_message_valid(
         chat=event_chat_with_users,
         message_text=data.get("message_text"),
     )
-    assert await database_sync_to_async(message_object.first)()
+    message_object = await database_sync_to_async(message_object.first)()
+    assert message_object
+
+    # notifications check
+    email_data = mail.outbox[0]
+    soup = BeautifulSoup(email_data.body, "html.parser")
+    assert async_user.username in soup.text
+    notifications_response_ws_2 = await notification_communicator_2.receive_json_from()
+    assert notifications_response_ws_2.get("data") == {
+        'additional_data': {'message_text': message_object.message_text},
+        'from_user_id': async_user.id,
+        'from_user_image_url': async_user.image_url,
+        'from_username': async_user.username,
+        'notification_type': Notification.Type.NEW_MESSAGE,
+        'to_user_id': async_user_2.id,
+        'to_username': async_user_2.username
+    }
 
     await asyncio.gather(
-        communicator.disconnect(),
-        communicator_2.disconnect(),
+        message_communicator.disconnect(),
+        message_communicator_2.disconnect(),
     )
+
+    # TODO: other tests + add new if needs
 
 
 @pytest.mark.django_db(transaction=True)

@@ -9,6 +9,10 @@ from rest_framework.response import Response
 
 from apps.events.serializers import EmptySerializer
 from apps.events.serializers.events import ParticipantSerializer
+from apps.notifications.handlers.email import EmailNotificationsHandler
+from apps.notifications.handlers.notifications import InAppNotificationsHandler
+from apps.notifications.managers.chain import NotificationsChainManager
+from apps.notifications.models import Notification
 from apps.profiles.models import User
 from apps.chats.managers import ChatManager
 from apps.chats.models import Chat, Message
@@ -31,6 +35,13 @@ class ChatViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, ChatPermissions]
     lookup_url_kwarg = "chat_id"
     http_method_names = ["get", "post"]
+
+    # Notifications
+    handlers = (
+        InAppNotificationsHandler(),
+        EmailNotificationsHandler(),
+    )
+    notifications_manager = NotificationsChainManager(handlers)
 
     def get_serializer_class(self):
         match self.action:
@@ -112,6 +123,16 @@ class ChatViewSet(viewsets.ModelViewSet):
             chat=chat_object,
             message_text=serializer.validated_data.get("message_text")
         )
+        # TODO: maybe to do this cycle in handler?
+        #  Because we need to send it for all users of the chat
+        #  (who turned notifications on)
+        for participant in chat_object.participants.exclude(pk=request.user.id):
+            async_to_sync(self.notifications_manager.handle)(
+                created_by=request.user,
+                recipient=participant,
+                notification_type=Notification.Type.NEW_MESSAGE,
+                additional_data={"message_text": message_object.message_text}
+            )
 
         return Response(
             status=status.HTTP_201_CREATED,

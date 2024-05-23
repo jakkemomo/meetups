@@ -46,6 +46,20 @@ class User(AbstractUser):
     )
     category_favorite = models.ManyToManyField(to="events.Category", db_table="user_category_favorite",
                                                related_name="categories_favorite")
+    # TODO: make this more complex like:
+    #           | InApp | Email |
+    # messages  |   +   |   -   |
+    # followers |   -   |   -   |
+
+    in_app_notifications_allowed = models.BooleanField(
+        verbose_name="In app notifications allowing status",
+        default=True,
+    )
+    email_notifications_allowed = models.BooleanField(
+        verbose_name="Email notifications allowing status",
+        default=True,
+    )
+
     # These fields are using in AbstractUser model
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", ]
