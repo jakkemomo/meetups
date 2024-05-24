@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from apps.events.models import Event
+from apps.events.models import Event, Tag, Category
 
 
 class EventFilter(filters.FilterSet):
@@ -19,11 +19,13 @@ class EventFilter(filters.FilterSet):
     average_rating__gte = filters.NumberFilter(lookup_expr='gte', field_name='average_rating')
     average_rating__lte = filters.NumberFilter(lookup_expr='lte', field_name='average_rating')
 
-    tags = filters.CharFilter(lookup_expr='exact', field_name='tags__name')
-    tags_in = filters.CharFilter(lookup_expr='in', field_name='tags__name')
+    tags = filters.CharFilter(lookup_expr='exact', field_name='tags')
+    tags_in = filters.ModelMultipleChoiceFilter(field_name='tags', queryset=Tag.objects.all(),
+                                                conjoined=False)
 
-    category = filters.CharFilter(lookup_expr='exact', field_name='category__name')
-    category_in = filters.CharFilter(lookup_expr='in', field_name='category__name')
+    category = filters.CharFilter(lookup_expr='iexact', field_name='category')
+    category_in = filters.ModelMultipleChoiceFilter(field_name='category', queryset=Category.objects.all(),
+                                                    conjoined=False)
 
     city = filters.CharFilter(lookup_expr='exact', field_name='city')
     city_in = filters.CharFilter(lookup_expr='in', field_name='city')

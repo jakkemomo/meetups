@@ -28,13 +28,14 @@ class Command(BaseCommand):
                     "time": schedule.time
                 } for schedule in event.schedule.all()
             ]
-            schedule_start = utils.get_schedule_start(schedules)
-            event.start_date = schedule_start.date()
-            event.start_time = schedule_start.time()
-            event.save()
-            self.stdout.write(
-                self.style.SUCCESS('Successfully updated repeated event "%s"' % event.id)
-            )
+            if schedules:
+                schedule_start = utils.get_schedule_start(schedules)
+                event.start_date = schedule_start.date()
+                event.start_time = schedule_start.time()
+                event.save()
+                self.stdout.write(
+                    self.style.SUCCESS('Successfully updated repeated event "%s"' % event.id)
+                )
 
     @staticmethod
     def is_finished(event):
