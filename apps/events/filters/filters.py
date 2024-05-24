@@ -23,7 +23,7 @@ class EventFilter(filters.FilterSet):
     tags_in = filters.ModelMultipleChoiceFilter(field_name='tags', queryset=Tag.objects.all(),
                                                 conjoined=False)
 
-    category = filters.CharFilter(lookup_expr='iexact', field_name='category')
+    category = filters.CharFilter(lookup_expr='exact', field_name='category')
     category_in = filters.ModelMultipleChoiceFilter(field_name='category', queryset=Category.objects.all(),
                                                     conjoined=False)
 
