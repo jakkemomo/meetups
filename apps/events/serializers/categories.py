@@ -28,6 +28,9 @@ class CategoryUpdateSerializer(serializers.ModelSerializer):
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=30)
+    image_url = serializers.CharField(max_length=60, required=False, allow_null=True)
 
     class Meta:
         model = Category
