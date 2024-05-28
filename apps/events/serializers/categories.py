@@ -27,7 +27,7 @@ class CategoryUpdateSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "image_url"]
 
 
-class CategoryListSerializer(serializers.ModelSerializer):\
+class CategoryListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category

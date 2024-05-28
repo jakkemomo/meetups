@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.events.models import Category
 from apps.events.serializers import CategoryListSerializer
 from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists
@@ -49,7 +50,9 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     image_url = serializers.CharField(required=False, max_length=100)
     city = serializers.CharField(required=False, max_length=30)
     date_of_birth = serializers.DateField(required=False)
-    category_favorite = CategoryListSerializer(many=True)
+    category_favorite = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Category.objects.all(),
+        required=False, allow_null=True)
     gender = serializers.ChoiceField(choices=User.Gender.choices, required=False)
     type = serializers.ChoiceField(choices=User.Type.choices, required=False)
 
@@ -80,4 +83,11 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         if is_private is False:
             change_followers_if_exists(instance)
 
-        return super().update(instance, validated_data)
+        categories = validated_data.pop("category_favorite", [])
+
+        profile: User = super().update(instance, validated_data)
+
+        if categories:
+            profile.category_favorite.set([category.id for category in categories])
+
+        return profile
