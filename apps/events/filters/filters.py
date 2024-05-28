@@ -1,3 +1,6 @@
+
+from django.contrib.gis.geos import Polygon
+
 from django_filters import rest_framework as filters, Filter
 
 from apps.events.models import Event
@@ -56,6 +59,11 @@ class EventFilter(filters.FilterSet):
     participants_age__gte = filters.NumberFilter(lookup_expr='gte', field_name='participants_age')
     participants_age__lte = filters.NumberFilter(lookup_expr='lte', field_name='participants_age')
 
+    min_lat = filters.NumberFilter(method='filter_bbox')
+    max_lat = filters.NumberFilter(method='filter_bbox')
+    min_lng = filters.NumberFilter(method='filter_bbox')
+    max_lng = filters.NumberFilter(method='filter_bbox')
+
     class Meta:
         model = Event
         fields = [
@@ -79,5 +87,20 @@ class EventFilter(filters.FilterSet):
             'free',
             'participants_age',
             'participants_age__gte',
-            'participants_age__lte'
+            'participants_age__lte',
+            'min_lat',
+            'max_lat',
+            'min_lng',
+            'max_lng',
         ]
+
+    def filter_bbox(self, queryset, *lat_lng):
+        min_lat = self.data.get('min_lat')
+        max_lat = self.data.get('max_lat')
+        min_lng = self.data.get('min_lng')
+        max_lng = self.data.get('max_lng')
+
+        if min_lat and max_lat and min_lng and max_lng:
+            bbox = (float(min_lng), float(min_lat), float(max_lng), float(max_lat))
+            area = Polygon.from_bbox(bbox)
+            return queryset.filter(location__within=area)
