@@ -43,7 +43,7 @@ class User(AbstractUser):
         default=False,
         help_text="Designates is user profile is private.",
     )
-    category_favorite = models.ManyToManyField("events.Category", db_table="user_category_favorite",
+    category_favorite = models.ManyToManyField(to="events.Category", db_table="user_category_favorite",
                                                related_name="categories_favorite")
     # These fields are using in AbstractUser model
     USERNAME_FIELD = "email"

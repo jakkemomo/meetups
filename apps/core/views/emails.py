@@ -59,7 +59,7 @@ class VerifyEmailView(APIView):
             user_id = data['user_id']
             confirmation_token = data['confirmation_token']
         except KeyError as exc:
-            logger.error(f'Data not found: {exc}')
+            logger.warning(f'Data not found: {exc}')
 
             return Response(
                 'Invalid token.',

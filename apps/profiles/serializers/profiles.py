@@ -80,4 +80,13 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         if is_private is False:
             change_followers_if_exists(instance)
 
-        return super().update(instance, validated_data)
+        categories = validated_data.pop("category_favorite", [])
+
+        profile: User = super().update(instance, validated_data)
+
+        if categories:
+            profile.category_favorite.set([category.get('id') for category in categories])
+        else:
+            profile.category_favorite.clear()
+
+        return profile
