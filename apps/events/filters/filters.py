@@ -1,5 +1,5 @@
 from django.contrib.gis.geos import Polygon
-from django_filters import rest_framework as filters
+from django_filters import rest_framework as filters, Filter
 
 from apps.events.models import Event
 
