@@ -10,5 +10,5 @@ class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = CitySerializer
-    http_method_names = ["get", "put", "patch", "delete", ]
-    lookup_url_kwarg = "user_id"
+    http_method_names = ["get", "put", "post", "delete", ]
+    lookup_url_kwarg = "place_id"
