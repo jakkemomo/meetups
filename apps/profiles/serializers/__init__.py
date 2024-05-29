@@ -12,3 +12,4 @@ from .user_ratings import (
 from .followers import (
     FollowerSerializer,
 )
+from .city import CitySerializer

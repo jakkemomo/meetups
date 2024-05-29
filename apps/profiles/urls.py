@@ -7,6 +7,7 @@ from .viewsets import (
     FollowerViewSet,
     UserRatingViewSet,
     ProfileEventViewSet,
+    CityViewSet,
 )
 
 app_name = "profiles"
@@ -16,6 +17,7 @@ router.register('users/(?P<user_id>[^/.]+)/ratings', UserRatingViewSet, basename
 router.register("users", ProfileViewSet, basename="Profiles")
 router.register("users", FollowerViewSet, basename="Followers")
 router.register("users", ProfileEventViewSet, basename="User events")
+router.register("city", CityViewSet, basename="City")
 
 
 urlpatterns = [
