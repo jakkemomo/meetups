@@ -5,7 +5,7 @@ from django.db import models
 from apps.core.models import AbstractBaseModel
 
 
-class City(AbstractBaseModel):
+class CityLocation(AbstractBaseModel):
     """
     Object for storing place data.
     REST Resources of places from Google MAPS Platform Places API. Response JSON-represented:
@@ -50,15 +50,10 @@ class City(AbstractBaseModel):
           }
         }
     """
-    city_name = models.CharField(max_length=50)
-    # Google : id
-    place_id = models.CharField(max_length=256, default="ChIJ02oeW9PP20YR2XC13VO4YQs")
-    # Yandex : response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos
-    # Google : location.latitude&longitude
-    location = PointField(default=Point(27.561831, 53.902284))
+    location = PointField(default=Point(27.561831, 53.902284), unique=True)
     # Yandex : response.GeoObjectCollection.featureMember[0].GeoObject.boundedBy.Envelope.lowerCorner
     # Google : viewport.low.latitude&longitude
-    city_south_west_point = PointField(default=Point(27.38909, 53.82427)) # "low" or "lowerCorner"
+    city_south_west_point = PointField(default=Point(27.38909, 53.82427))  # "low" or "lowerCorner"
     # Yandex : response.GeoObjectCollection.featureMember[0].GeoObject.boundedBy.Envelope.upperCorner
     # Google : viewport.high.latitude&longitude
     city_north_east_point = PointField(default=Point(27.76125, 53.97800))
@@ -66,4 +61,4 @@ class City(AbstractBaseModel):
     class Meta:
         verbose_name = "City"
         verbose_name_plural = "Cities"
-        db_table = "city"
+        db_table = "city_location"
