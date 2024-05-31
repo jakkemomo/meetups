@@ -19,15 +19,11 @@ def test_create_city_valid(api_client,
         location=Point(city_location_data["location"]["longitude"], city_location_data["location"]["latitude"]))
 
 
-"""
-This test depends on is object in database yet. It will be correct only in thread, not as single test
-"""
-
-
 @pytest.mark.django_db
 def test_create_city_not_unic_point(api_client,
                                     user, city_location_data):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
-    response_2 = api_client.post(reverse(CITY_LIST_URL), data=city_location_data, format="json")
-    assert response_2.status_code == 403
+    api_client.post(reverse(CITY_LIST_URL), data=city_location_data, format="json")
+    response = api_client.post(reverse(CITY_LIST_URL), data=city_location_data, format="json")
+    assert response.status_code == 403
