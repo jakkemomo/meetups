@@ -1,6 +1,7 @@
 from django.db.models import Q, Count, Avg, Exists, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
@@ -8,10 +9,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, \
     IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.filters import OrderingFilter
 
 from apps.core.utils import delete_image_if_exists
 from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
+from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.profiles.models import User
 from apps.profiles.permissions import ProfilePermissions
 from apps.profiles.permissions.followers import FollowerPermissions
@@ -71,6 +74,10 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         IsAuthenticated,
         FollowerPermissions,
     ]
+    filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_class = EventFilter
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
+    ordering_fields = ['start_date', 'average_rating', 'participants_number']
     http_method_names = ["get"]
     lookup_url_kwarg = "user_id"
 
@@ -123,9 +130,9 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=["get"],
-        detail=True,
+        detail=False,
         permission_classes=[IsAuthenticated, FollowerPermissions],
-        url_path="events/participated",
+        url_path='(?P<user_id>[^/.]+)/events/participants',
         url_name="event_list_user_is_participant",
     )
     def list_user_is_participant(self, request, user_id):
