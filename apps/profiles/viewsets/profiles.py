@@ -1,20 +1,21 @@
+from typing import Any
+
 from django.db.models import Q, Count, Avg, Exists, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, \
     IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.filters import OrderingFilter
 
 from apps.core.utils import delete_image_if_exists
+from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.events.models import Event, FavoriteEvent
 from apps.events.serializers import EventListSerializer
-from apps.events.filters import TrigramSimilaritySearchFilter, EventFilter
 from apps.profiles.models import User
 from apps.profiles.permissions import ProfilePermissions
 from apps.profiles.permissions.followers import FollowerPermissions
@@ -69,11 +70,11 @@ class MyProfileViewSet(generics.RetrieveAPIView):
 class ProfileEventViewSet(viewsets.ModelViewSet):
     model = Event
     serializer_class = EventListSerializer
-    permission_classes = [
-        IsAuthenticatedOrReadOnly,
-        IsAuthenticated,
-        FollowerPermissions,
-    ]
+    # permission_classes = [
+    #     IsAuthenticatedOrReadOnly,
+    #     IsAuthenticated,
+    #     FollowerPermissions,
+    # ]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     filterset_class = EventFilter
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
@@ -91,10 +92,18 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
                         Q(created_by=self.request.user) & Q(type="private")
                 )
             )
+
         else:
             self.queryset = self.model.objects.filter(
                 Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
             )
+
+        user_id = self.request.parser_context.get('kwargs', {}).get('user_id')
+
+        if self.action == 'list_user_is_participant' and user_id:
+            user = get_user_object(user_id)
+            self.check_object_permissions(self.request, user)
+            self.queryset = self.queryset.filter(participants__id=user.id)
 
         self.queryset = self.queryset.prefetch_related('category',
                                                        'tags').annotate(
@@ -131,19 +140,12 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=False,
-        permission_classes=[IsAuthenticated, FollowerPermissions],
+        # permission_classes=[IsAuthenticated, FollowerPermissions],
         url_path='(?P<user_id>[^/.]+)/events/participants',
         url_name="event_list_user_is_participant",
     )
     def list_user_is_participant(self, request, user_id):
-        user = get_user_object(user_id)
-        queryset = self.get_queryset().filter(participants__id=user_id)
-
-        if user != request.user:
-            queryset = queryset.filter(is_visible=True)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
     @action(
         methods=["get"],
@@ -183,9 +185,9 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @swagger_auto_schema(auto_schema=None)
-    def retrieve(self, request):
-        pass
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
-    def list(self, request):
-        pass
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
