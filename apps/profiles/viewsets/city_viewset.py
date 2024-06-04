@@ -4,14 +4,14 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from apps.profiles.models import CityLocation
-from apps.profiles.serializers import CityLocationSerializer
+from apps.profiles.serializers import CitySerializer
 
 
-class CityLocationViewSet(viewsets.ModelViewSet):
+class CityViewSet(viewsets.ModelViewSet):
     model = CityLocation
     queryset = CityLocation.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = CityLocationSerializer
+    serializer_class = CitySerializer
     http_method_names = ["get", "put", "post", "delete", ]
 
     def create(self, request, *args, **data):

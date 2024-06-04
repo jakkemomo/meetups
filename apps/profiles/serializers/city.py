@@ -18,7 +18,7 @@ class LocationCitySerializer(LocationSerializer):
         }
 
 
-class CityLocationSerializer(serializers.ModelSerializer):
+class CitySerializer(serializers.ModelSerializer):
     location = LocationCitySerializer(required=True, many=False)
     city_south_west_point = LocationCitySerializer(required=True, many=False)
     city_north_east_point = LocationCitySerializer(required=True, many=False)
