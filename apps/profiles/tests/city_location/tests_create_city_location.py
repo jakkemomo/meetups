@@ -1,10 +1,19 @@
 import pytest
 from django.contrib.gis.geos import Point
 from rest_framework.reverse import reverse
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.profiles.models import CityLocation
 from apps.profiles.tests.city_location.constants import CITY_LIST_URL
 from apps.profiles.tests.utils import get_tokens
+from rest_framework.test import APIClient
+
+
+@pytest.fixture()
+def authenticated_user(api_client, user) -> APIClient:
+    refresh = RefreshToken.for_user(user)
+    token = refresh.access_token
+    return api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
 
 
 @pytest.mark.django_db
