@@ -352,7 +352,7 @@ async def event_chat_with_users(async_user, async_user_2) -> Chat:
 
 
 @pytest.fixture
-def city_location_data() -> dict:
+def city_location_default_data() -> dict:
     return {
         "location": {
             "latitude": 53.902284,
@@ -367,3 +367,8 @@ def city_location_data() -> dict:
             "longitude": 27.76125
         },
     }
+
+
+@pytest.fixture()
+def city_location_default() -> CityLocation:
+    return CityLocation.objects.create()
