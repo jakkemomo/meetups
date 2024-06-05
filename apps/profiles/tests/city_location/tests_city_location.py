@@ -58,3 +58,11 @@ def test_get_city(authenticated_user, city_location_default, city_location_defau
     assert response.data.get('location') == city_location_default_data.get('location')
     assert response.data.get('city_south_west_point') == city_location_default_data.get('city_south_west_point')
     assert response.data.get('city_north_east_point') == city_location_default_data.get('city_north_east_point')
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('city_location_default')
+def test_get_city_list(authenticated_user, city_location_default, city_location_default_data):
+    response = authenticated_user.get(reverse(CITY_LIST_URL))
+    assert response.status_code == 200
+    assert response.data.get('count') == 1
