@@ -6,7 +6,7 @@ from apps.core.models import AbstractBaseModel
 
 
 class CityLocation(AbstractBaseModel):
-    place_id = models.CharField(max_length=255, unique=True, null=True, default=None)
+    place_id = models.CharField(max_length=255, unique=True, blank=True, default=None, null=True)
     location = PointField(default=Point(27.561831, 53.902284), unique=True)
     # Yandex : response.GeoObjectCollection.featureMember[0].GeoObject.boundedBy.Envelope.lowerCorner
     # Google : viewport.low.latitude&longitude

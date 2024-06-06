@@ -28,19 +28,19 @@ def test_create_city_valid_user(city_location_minsk_google_data, authenticated_u
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('city_location_default')
-def test_create_default_city(city_location_default_data_data):
+def test_create_default_city(city_location_default_data):
     assert CityLocation.objects.all().first
-    assert CityLocation.objects.filter(location=Point(city_location_default_data_data["location"]["longitude"],
-                                                      city_location_default_data_data["location"]["latitude"]),
-                                       city_id=city_location_default_data_data["city_id"])
+    assert CityLocation.objects.filter(location=Point(city_location_default_data["location"]["longitude"],
+                                                      city_location_default_data["location"]["latitude"]),
+                                       place_id=city_location_default_data["place_id"]).first
 
 
 @pytest.mark.django_db
 def test_create_google_city_when_google_city_exist(city_location_minsk_google_data, authenticated_user):
     authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_minsk_google_data, format="json")
     response = authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_minsk_google_data, format="json")
-    assert response.status_code == 400
-    assert response.content == b'{"place_id":["City with this place id already exists."]}'
+    assert response.status_code == 409
+    assert response.data == ["This city already exist"]
 
 
 @pytest.mark.django_db
@@ -48,7 +48,8 @@ def test_create_google_city_when_yandex_city_exist(city_location_minsk_google_da
                                                    authenticated_user):
     authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_minsk_yandex_data, format="json")
     response = authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_minsk_google_data, format="json")
-    assert response.status_code == 403
+    assert response.status_code == 409
+    assert response.data == ["This city already exist"]
 
 
 @pytest.mark.django_db
