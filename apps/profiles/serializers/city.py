@@ -25,7 +25,7 @@ class CitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CityLocation
-        fields = ["id", "location", "city_south_west_point", "city_north_east_point", ]
+        fields = '__all__'
 
     @transaction.atomic
     def create(self, validated_data):

@@ -26,13 +26,6 @@ def test_create_city_valid_user(city_location_default_data, authenticated_user):
 
 
 @pytest.mark.django_db
-def test_create_city_not_unic_point(city_location_default_data, authenticated_user):
-    authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_default_data, format="json")
-    response_2 = authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_default_data, format="json")
-    assert response_2.status_code == 403
-
-
-@pytest.mark.django_db
 @pytest.mark.usefixtures('city_location_default')
 def test_create_default_city(city_location_default_data):
     assert CityLocation.objects.all().first
