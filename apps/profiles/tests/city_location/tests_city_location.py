@@ -8,68 +8,6 @@ from apps.profiles.tests.utils import get_tokens
 from rest_framework.test import APIClient
 
 
-@pytest.fixture
-def city_location_minsk_google_data() -> dict:
-    return {
-        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "city_south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "city_north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture
-def city_location_minsk_yandex_data() -> dict:
-    return {
-        "place_id": "",
-        "location": {
-            "latitude": 53.906284,
-            "longitude": 27.556831
-        },
-        "city_south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "city_north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture
-def city_location_default_data() -> dict:
-    return {
-        "place_id": "",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "city_south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "city_north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture()
-def city_location_default():
-    return CityLocation.objects.create()
-
-
 @pytest.fixture()
 def authenticated_user(api_client, user) -> APIClient:
     token = get_tokens(user)
@@ -89,8 +27,8 @@ def test_create_city_valid_user(city_location_minsk_google_data, authenticated_u
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures('city_location_default')
 def test_create_default_city(city_location_default_data):
+    CityLocation.objects.create()
     assert CityLocation.objects.all().first
     assert CityLocation.objects.filter(location=Point(city_location_default_data["location"]["longitude"],
                                                       city_location_default_data["location"]["latitude"]),
@@ -115,8 +53,9 @@ def test_create_google_city_when_yandex_city_exist(city_location_minsk_google_da
 
 
 @pytest.mark.django_db
-def test_delete_city(authenticated_user, city_location_default):
-    city_id = city_location_default.id
+def test_delete_city(authenticated_user):
+    city_location = CityLocation.objects.create()
+    city_id = city_location.id
     response_1 = authenticated_user.delete(reverse(CITY_GET_URL, args=[city_id]))
     response_2 = authenticated_user.get(reverse(CITY_GET_URL, args=[city_id]))
     assert response_1.status_code == 204
@@ -125,8 +64,9 @@ def test_delete_city(authenticated_user, city_location_default):
 
 
 @pytest.mark.django_db
-def test_get_city(authenticated_user, city_location_default, city_location_minsk_google_data):
-    city_id = city_location_default.id
+def test_get_city(authenticated_user, city_location_minsk_google_data):
+    city_location = CityLocation.objects.create()
+    city_id = city_location.id
     response = authenticated_user.get(reverse(CITY_GET_URL, args=[city_id]))
     assert response.status_code == 200
     assert response.data.get('location') == city_location_minsk_google_data.get('location')
@@ -135,8 +75,8 @@ def test_get_city(authenticated_user, city_location_default, city_location_minsk
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures('city_location_default')
-def test_get_city_list(authenticated_user, city_location_default, city_location_minsk_google_data):
+def test_get_city_list(authenticated_user, city_location_minsk_google_data):
+    CityLocation.objects.create()
     response = authenticated_user.get(reverse(CITY_LIST_URL))
     assert response.status_code == 200
     assert response.data.get('count') == 1
