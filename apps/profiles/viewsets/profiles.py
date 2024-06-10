@@ -70,11 +70,11 @@ class MyProfileViewSet(generics.RetrieveAPIView):
 class ProfileEventViewSet(viewsets.ModelViewSet):
     model = Event
     serializer_class = EventListSerializer
-    # permission_classes = [
-    #     IsAuthenticatedOrReadOnly,
-    #     IsAuthenticated,
-    #     FollowerPermissions,
-    # ]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        IsAuthenticated,
+        FollowerPermissions,
+     ]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     filterset_class = EventFilter
     search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
@@ -105,6 +105,32 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
             self.check_object_permissions(self.request, user)
             self.queryset = self.queryset.filter(participants__id=user.id)
 
+        if self.action == 'list_user_finished_events' and user_id:
+            user = get_user_object(user_id)
+            self.check_object_permissions(self.request, user)
+            self.queryset = self.queryset.filter(
+                end_date__lt=timezone.now()
+            )
+
+        if self.action == 'list_created_by_user' and user_id:
+            user = get_user_object(user_id)
+            self.check_object_permissions(self.request, user)
+            self.queryset = self.queryset.filter(created_by=user)
+
+        if self.action == 'list_user_planned_events' and user_id:
+            user = get_user_object(user_id)
+            self.check_object_permissions(self.request, user)
+            self.queryset = self.queryset.filter(
+                start_date__gt=timezone.now()
+            )
+
+        if self.action == 'list_user_favorite_events' and user_id:
+            user = get_user_object(user_id)
+            self.check_object_permissions(self.request, user)
+            self.queryset = self.queryset.filter(
+                id__in=Subquery(FavoriteEvent.objects.filter(user_id=user_id).values('event_id'))
+            )
+
         self.queryset = self.queryset.prefetch_related('category',
                                                        'tags').annotate(
             participants_number=Count("participants"),
@@ -122,25 +148,18 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
     )
     @action(
         methods=["get"],
-        detail=True,
+        detail=False,
         permission_classes=[IsAuthenticatedOrReadOnly],
-        url_path="events/created",
+        url_path="(?P<user_id>[^/.]+)/events/created",
         url_name="event_list_created_by_user",
     )
     def list_created_by_user(self, request, user_id):
-        user = get_user_object(user_id)
-        queryset = self.get_queryset().filter(created_by=user)
-
-        if user != request.user:
-            queryset = queryset.filter(is_visible=True)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
     @action(
         methods=["get"],
         detail=False,
-        # permission_classes=[IsAuthenticated, FollowerPermissions],
+        permission_classes=[IsAuthenticated, FollowerPermissions],
         url_path='(?P<user_id>[^/.]+)/events/participants',
         url_name="event_list_user_is_participant",
     )
@@ -149,40 +168,33 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=["get"],
-        detail=True,
+        detail=False,
         permission_classes=[IsAuthenticated],
-        url_path="events/favorited",
+        url_path="(?P<user_id>[^/.]+)/events/favorited",
         url_name="user_favorite_events",
     )
     def list_user_favorite_events(self, request, user_id):
-        queryset = self.get_queryset().filter(id__in=Subquery(
-            FavoriteEvent.objects.filter(user_id=user_id).values('event_id')))
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
     @action(
         methods=["get"],
-        detail=True,
+        detail=False,
         permission_classes=[IsAuthenticated],
-        url_path="events/finished",
+        url_path="(?P<user_id>[^/.]+)/events/finished",
         url_name="user_finished_events",
     )
     def list_user_finished_events(self, request, user_id):
-        queryset = self.get_queryset().filter(participants__id=user_id, end_date__lt=timezone.now())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
     @action(
         methods=["get"],
-        detail=True,
+        detail=False,
         permission_classes=[IsAuthenticated],
-        url_path="events/planned",
+        url_path="(?P<user_id>[^/.]+)/events/planned",
         url_name="user_planned_events",
     )
     def list_user_planned_events(self, request, user_id):
-        queryset = self.get_queryset().filter(participants__id=user_id, start_date__gt=timezone.now())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.list(request)
 
     @swagger_auto_schema(auto_schema=None)
     def retrieve(self, request, *args, **kwargs):
