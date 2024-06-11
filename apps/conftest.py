@@ -12,7 +12,7 @@ from django.test import AsyncClient
 from channels.routing import URLRouter
 from channels.db import database_sync_to_async
 
-from apps.profiles.models import User, CityLocation
+from apps.profiles.models import User
 from apps.profiles.models.followers import Follower
 from apps.events.models import Event
 from apps.chats.models import Chat
@@ -349,60 +349,3 @@ async def event_chat_with_users(async_user, async_user_2) -> Chat:
     chat = await database_sync_to_async(Chat.objects.create)(type=Chat.Type.EVENT)
     await database_sync_to_async(chat.participants.add)(async_user, async_user_2)
     return chat
-
-
-@pytest.fixture
-def city_location_minsk_google_data() -> dict:
-    return {
-        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "city_south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "city_north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture
-def city_location_minsk_yandex_data() -> dict:
-    return {
-        "place_id": "",
-        "location": {
-            "latitude": 53.906284,
-            "longitude": 27.556831
-        },
-        "city_south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "city_north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture
-def city_location_default_data() -> dict:
-    return {
-        "place_id": "",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "city_south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "city_north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }

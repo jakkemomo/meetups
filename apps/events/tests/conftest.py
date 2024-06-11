@@ -8,6 +8,8 @@ import pytest
 from django.utils import timezone
 
 from apps.events.models import Event, Category, Tag, Currency
+from apps.events.models.city import City
+from apps.profiles.tests.utils import get_tokens
 
 
 @pytest.fixture
@@ -18,8 +20,10 @@ def hundred_events() -> List:
 
         start_date = timezone.now() + datetime.timedelta(days=i)
         end_date = start_date + datetime.timedelta(hours=random.randint(1, 5))
-        start_time = (datetime.datetime.combine(datetime.date.today(), datetime.time()) + datetime.timedelta(minutes=random.randint(1, 1440))).time()
-        end_time = (datetime.datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(hours=random.randint(1, 5))).time()
+        start_time = (datetime.datetime.combine(datetime.date.today(), datetime.time()) + datetime.timedelta(
+            minutes=random.randint(1, 1440))).time()
+        end_time = (datetime.datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(
+            hours=random.randint(1, 5))).time()
 
         event = Event.objects.create(
             name=name,
@@ -49,7 +53,12 @@ def currency() -> Currency:
 
 
 @pytest.fixture
-def event_data(currency, tag, category) -> dict:
+def city_location(city_location_default_data) -> City:
+    return City.objects.create(city_location_default_data)
+
+
+@pytest.fixture
+def event_data(currency, tag, category, city_location) -> dict:
     return {
         "name": "Test Event",
         "address": "123 Test St",
@@ -57,18 +66,8 @@ def event_data(currency, tag, category) -> dict:
         "country": "Test Country",
         "type": "open",
         "description": "This is an example event.",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "city_south_west_point": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "city_north_east_point": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
+        "city_location": city_location,
+        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
         "cost": 10.99,
         "repeatable": False,
         "participants_age": 25,
@@ -90,3 +89,67 @@ def event_data(currency, tag, category) -> dict:
 @pytest.fixture
 def event_from_data_created_by_user_2(event_data, user_2):
     return Event.objects.create(**event_data, created_by=user_2)
+
+
+@pytest.fixture
+def city_location_minsk_google_data() -> dict:
+    return {
+        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
+        "location": {
+            "latitude": 53.902284,
+            "longitude": 27.561831
+        },
+        "city_south_west_point": {
+            "latitude": 53.82427,
+            "longitude": 27.38909
+        },
+        "city_north_east_point": {
+            "latitude": 53.97800,
+            "longitude": 27.76125
+        },
+    }
+
+
+@pytest.fixture
+def city_location_minsk_yandex_data() -> dict:
+    return {
+        "place_id": "",
+        "location": {
+            "latitude": 53.906284,
+            "longitude": 27.556831
+        },
+        "city_south_west_point": {
+            "latitude": 53.82427,
+            "longitude": 27.38909
+        },
+        "city_north_east_point": {
+            "latitude": 53.97800,
+            "longitude": 27.76125
+        },
+    }
+
+
+@pytest.fixture
+def city_location_default_data() -> dict:
+    return {
+        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
+        "location": {
+            "latitude": 53.902284,
+            "longitude": 27.561831
+        },
+        "city_south_west_point": {
+            "latitude": 53.82427,
+            "longitude": 27.38909
+        },
+        "city_north_east_point": {
+            "latitude": 53.97800,
+            "longitude": 27.76125
+        },
+    }
+
+
+@pytest.fixture()
+def authenticated_user(api_client, user):
+    token = get_tokens(user)
+    api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
+    return api_client

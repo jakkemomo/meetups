@@ -1,14 +1,24 @@
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, Polygon
 from django.db import transaction
 from rest_framework import serializers
 
-from apps.events.serializers.events import LocationSerializer
-from apps.profiles.models import CityLocation
+from apps.events.models.city import City
 
 
-class LocationCitySerializer(LocationSerializer):
+class LocationSerializer(serializers.ModelSerializer):
+    latitude = serializers.DecimalField(
+        max_value=180, min_value=-180,
+        write_only=True, max_digits=18,
+        decimal_places=15,
+    )
+    longitude = serializers.DecimalField(
+        max_value=180, min_value=-180,
+        write_only=True, max_digits=18,
+        decimal_places=15,
+    )
+
     class Meta:
-        model = CityLocation
+        model = City
         fields = ["latitude", "longitude"]
 
     def to_representation(self, value):
@@ -19,13 +29,14 @@ class LocationCitySerializer(LocationSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
-    location = LocationCitySerializer(required=True, many=False)
-    city_south_west_point = LocationCitySerializer(required=True, many=False)
-    city_north_east_point = LocationCitySerializer(required=True, many=False)
+    place_id = serializers.CharField(max_length=255)
+    location = LocationSerializer(required=True, many=False)
+    city_south_west_point = LocationSerializer(required=True, many=False)
+    city_north_east_point = LocationSerializer(required=True, many=False)
 
     class Meta:
-        model = CityLocation
-        fields = '__all__'
+        model = City
+        fields = ["id", "place_id", "location", "city_south_west_point", "city_north_east_point"]
 
     @transaction.atomic
     def create(self, validated_data):
@@ -48,6 +59,6 @@ class CitySerializer(serializers.ModelSerializer):
                 validated_data["city_north_east_point"]["latitude"]
             )
         )
-        city_location = CityLocation(**validated_data)
+        city_location = City(**validated_data)
         city_location.save()
         return city_location

@@ -2,25 +2,16 @@ import pytest
 from django.contrib.gis.geos import Point
 from rest_framework.reverse import reverse
 
-from apps.profiles.models import CityLocation
-from apps.profiles.tests.city_location.constants import CITY_LIST_URL, CITY_GET_URL
-from apps.profiles.tests.utils import get_tokens
-from rest_framework.test import APIClient
-
-
-@pytest.fixture()
-def authenticated_user(api_client, user) -> APIClient:
-    token = get_tokens(user)
-    api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
-    return api_client
+from apps.events.models.city import City
+from apps.events.tests.city_location.constants import CITY_LIST_URL, CITY_GET_URL
 
 
 @pytest.mark.django_db
 def test_create_city_valid_user(city_location_minsk_google_data, authenticated_user):
     response = authenticated_user.post(reverse(CITY_LIST_URL), data=city_location_minsk_google_data, format="json")
     assert response.status_code == 201
-    assert CityLocation.objects.all().first
-    assert CityLocation.objects.filter(
+    assert City.objects.all().first
+    assert City.objects.filter(
         location=Point(city_location_minsk_google_data["location"]["longitude"],
                        city_location_minsk_google_data["location"]["latitude"]),
         place_id=city_location_minsk_google_data["place_id"])
@@ -28,11 +19,11 @@ def test_create_city_valid_user(city_location_minsk_google_data, authenticated_u
 
 @pytest.mark.django_db
 def test_create_default_city(city_location_default_data):
-    CityLocation.objects.create()
-    assert CityLocation.objects.all().first
-    assert CityLocation.objects.filter(location=Point(city_location_default_data["location"]["longitude"],
-                                                      city_location_default_data["location"]["latitude"]),
-                                       place_id=city_location_default_data["place_id"]).first
+    City.objects.create()
+    assert City.objects.all().first
+    assert City.objects.filter(location=Point(city_location_default_data["location"]["longitude"],
+                                              city_location_default_data["location"]["latitude"]),
+                               place_id=city_location_default_data["place_id"]).first
 
 
 @pytest.mark.django_db
@@ -54,18 +45,18 @@ def test_create_google_city_when_yandex_city_exist(city_location_minsk_google_da
 
 @pytest.mark.django_db
 def test_delete_city(authenticated_user):
-    city_location = CityLocation.objects.create()
+    city_location = City.objects.create()
     city_id = city_location.id
     response_1 = authenticated_user.delete(reverse(CITY_GET_URL, args=[city_id]))
     response_2 = authenticated_user.get(reverse(CITY_GET_URL, args=[city_id]))
     assert response_1.status_code == 204
-    assert not CityLocation.objects.filter(id=city_id).first()
+    assert not City.objects.filter(id=city_id).first()
     assert response_2.status_code == 404
 
 
 @pytest.mark.django_db
 def test_get_city(authenticated_user, city_location_minsk_google_data):
-    city_location = CityLocation.objects.create()
+    city_location = City.objects.create()
     city_id = city_location.id
     response = authenticated_user.get(reverse(CITY_GET_URL, args=[city_id]))
     assert response.status_code == 200
@@ -76,7 +67,7 @@ def test_get_city(authenticated_user, city_location_minsk_google_data):
 
 @pytest.mark.django_db
 def test_get_city_list(authenticated_user, city_location_minsk_google_data):
-    CityLocation.objects.create()
+    City.objects.create()
     response = authenticated_user.get(reverse(CITY_LIST_URL))
     assert response.status_code == 200
     assert response.data.get('count') == 1

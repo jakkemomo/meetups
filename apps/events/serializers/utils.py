@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Any
 
+from django.contrib.gis.geos import Polygon
+
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 
@@ -33,3 +35,17 @@ def get_schedule_start(schedules: list[dict[str, Any]]) -> datetime:
         microsecond=0
     )
     return closest_datetime
+
+
+def area_bbox(location: dict):
+    """
+    Return Poligon area approximately 1 km radius around specified koordinates
+    """
+    r = 0.01
+    min_lat = float(location['latitude']) - r
+    max_lat = float(location['latitude']) + r
+    min_lng = float(location['longitude']) - r
+    max_lng = float(location['longitude']) + r
+
+    bbox = (min_lng, min_lat, max_lng, max_lat)
+    return Polygon.from_bbox(bbox)

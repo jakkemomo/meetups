@@ -1,12 +1,11 @@
 from django.conf import settings
-from django.contrib.gis.db.models import PointField
-from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import fields
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import AbstractBaseModel
+from apps.events.models.city import City
 from apps.events.models.rating import Rating
 from apps.events.models.schedule import Schedule
 from apps.events.models.tags import Tag
@@ -29,10 +28,8 @@ class Event(AbstractBaseModel):
         blank=False,
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
-
-    location = PointField(default=Point(27.561831, 53.902284))
-    city_south_west_point = PointField(default=Point(27.561831, 53.902284))
-    city_north_east_point = PointField(default=Point(27.561831, 53.902284))
+    city_location = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
+    place_id = fields.CharField(max_length=255, default="ChIJ02oeW9PP20YR2XC13VO4YQs", null=True, blank=True)
 
     participants_age = fields.PositiveSmallIntegerField(default=18, null=False, blank=False)
     desired_participants_number = models.PositiveIntegerField(default=0, null=True, blank=True)
