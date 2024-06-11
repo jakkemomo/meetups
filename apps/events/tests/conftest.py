@@ -53,8 +53,8 @@ def currency() -> Currency:
 
 
 @pytest.fixture
-def city_location(city_location_default_data) -> City:
-    return City.objects.create(city_location_default_data)
+def city_location() -> City:
+    return City.objects.create()
 
 
 @pytest.fixture

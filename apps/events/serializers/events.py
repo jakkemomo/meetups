@@ -99,7 +99,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
         ).first
         if not city:
             city = City.objects.create(validated_data)
-        validated_data['city_location'] = city.id
+        validated_data['city_location'] = city
         request = self.context["request"]
         user_id = request.user.id
         validated_data["created_by_id"] = user_id

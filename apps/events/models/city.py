@@ -1,6 +1,7 @@
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.db import models
+from rest_framework.utils import json
 
 from apps.core.models import AbstractBaseModel
 
@@ -20,4 +21,4 @@ class City(AbstractBaseModel):
         constraints = [models.UniqueConstraint(fields=['place_id', 'location'], name='unique_location')]
         verbose_name = "City"
         verbose_name_plural = "Cities"
-        db_table = "city"
+        db_table = "city_location"
