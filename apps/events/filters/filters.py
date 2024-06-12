@@ -1,9 +1,9 @@
-
 from django.contrib.gis.geos import Polygon
 
 from django_filters import rest_framework as filters, Filter
 
 from apps.events.models import Event
+from apps.events.models.city import City
 
 
 class M2MFilter(Filter):
@@ -24,7 +24,6 @@ class M2MFilter(Filter):
 
 
 class EventFilter(filters.FilterSet):
-
     name_contains = filters.CharFilter(lookup_expr='icontains', field_name='name')
     name = filters.CharFilter(lookup_expr='exact', field_name='name')
 
@@ -103,4 +102,5 @@ class EventFilter(filters.FilterSet):
         if min_lat and max_lat and min_lng and max_lng:
             bbox = (float(min_lng), float(min_lat), float(max_lng), float(max_lat))
             area = Polygon.from_bbox(bbox)
-            return queryset.filter(location__within=area)
+            city_queryset = City.objects.filter(location__within=area)
+            return queryset.filter(city_location__in=city_queryset)

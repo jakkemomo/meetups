@@ -31,12 +31,12 @@ class LocationSerializer(serializers.ModelSerializer):
 class CitySerializer(serializers.ModelSerializer):
     place_id = serializers.CharField(max_length=255)
     location = LocationSerializer(required=True, many=False)
-    city_south_west_point = LocationSerializer(required=True, many=False)
-    city_north_east_point = LocationSerializer(required=True, many=False)
+    south_west_point = LocationSerializer(required=True, many=False)
+    north_east_point = LocationSerializer(required=True, many=False)
 
     class Meta:
         model = City
-        fields = ["id", "place_id", "location", "city_south_west_point", "city_north_east_point"]
+        fields = ["id", "place_id", "location", "south_west_point", "north_east_point"]
 
     @transaction.atomic
     def create(self, validated_data):
@@ -46,17 +46,17 @@ class CitySerializer(serializers.ModelSerializer):
                 validated_data["location"]["latitude"]
             )
         )
-        validated_data["city_south_west_point"] = Point(
+        validated_data["south_west_point"] = Point(
             (
-                validated_data["city_south_west_point"]["longitude"],
-                validated_data["city_south_west_point"]["latitude"]
+                validated_data["south_west_point"]["longitude"],
+                validated_data["south_west_point"]["latitude"]
             )
 
         )
-        validated_data["city_north_east_point"] = Point(
+        validated_data["north_east_point"] = Point(
             (
-                validated_data["city_north_east_point"]["longitude"],
-                validated_data["city_north_east_point"]["latitude"]
+                validated_data["north_east_point"]["longitude"],
+                validated_data["north_east_point"]["latitude"]
             )
         )
         city_location = City(**validated_data)

@@ -5,6 +5,7 @@ from random import choices
 from typing import List
 
 import pytest
+from django.contrib.gis.geos import Point
 from django.utils import timezone
 
 from apps.events.models import Event, Category, Tag, Currency
@@ -13,11 +14,11 @@ from apps.profiles.tests.utils import get_tokens
 
 
 @pytest.fixture
-def hundred_events() -> List:
+def hundred_events(city_location_yandex) -> List:
     events = []
     for i in range(100):
         name = ''.join(choices(string.ascii_uppercase + string.digits, k=20))
-
+        city_location = city_location_yandex
         start_date = timezone.now() + datetime.timedelta(days=i)
         end_date = start_date + datetime.timedelta(hours=random.randint(1, 5))
         start_time = (datetime.datetime.combine(datetime.date.today(), datetime.time()) + datetime.timedelta(
@@ -31,6 +32,7 @@ def hundred_events() -> List:
             end_date=end_date,
             start_time=start_time,
             end_time=end_time,
+            city_location=city_location
         )
         events.append(event)
 
@@ -53,12 +55,18 @@ def currency() -> Currency:
 
 
 @pytest.fixture
-def city_location() -> City:
-    return City.objects.create()
+def city_location_yandex(city_location_minsk_yandex_data):
+    city = City.objects.create(
+        location=Point(city_location_minsk_yandex_data["location"]["longitude"],
+                       city_location_minsk_yandex_data["location"]["latitude"]),
+        place_id=city_location_minsk_yandex_data["place_id"],
+    )
+    # city.save()
+    return city
 
 
 @pytest.fixture
-def event_data(currency, tag, category, city_location) -> dict:
+def event_data(currency, tag, category, city_location_default_data) -> dict:
     return {
         "name": "Test Event",
         "address": "123 Test St",
@@ -66,7 +74,7 @@ def event_data(currency, tag, category, city_location) -> dict:
         "country": "Test Country",
         "type": "open",
         "description": "This is an example event.",
-        "city_location": city_location,
+        "city_location": city_location_default_data,
         "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
         "cost": 10.99,
         "repeatable": False,
@@ -99,11 +107,11 @@ def city_location_minsk_google_data() -> dict:
             "latitude": 53.902284,
             "longitude": 27.561831
         },
-        "city_south_west_point": {
+        "south_west_point": {
             "latitude": 53.82427,
             "longitude": 27.38909
         },
-        "city_north_east_point": {
+        "north_east_point": {
             "latitude": 53.97800,
             "longitude": 27.76125
         },
@@ -118,11 +126,11 @@ def city_location_minsk_yandex_data() -> dict:
             "latitude": 53.906284,
             "longitude": 27.556831
         },
-        "city_south_west_point": {
+        "south_west_point": {
             "latitude": 53.82427,
             "longitude": 27.38909
         },
-        "city_north_east_point": {
+        "north_east_point": {
             "latitude": 53.97800,
             "longitude": 27.76125
         },
@@ -137,11 +145,11 @@ def city_location_default_data() -> dict:
             "latitude": 53.902284,
             "longitude": 27.561831
         },
-        "city_south_west_point": {
+        "south_west_point": {
             "latitude": 53.82427,
             "longitude": 27.38909
         },
-        "city_north_east_point": {
+        "north_east_point": {
             "latitude": 53.97800,
             "longitude": 27.76125
         },

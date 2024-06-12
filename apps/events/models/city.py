@@ -1,7 +1,6 @@
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.db import models
-from rest_framework.utils import json
 
 from apps.core.models import AbstractBaseModel
 

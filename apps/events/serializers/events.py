@@ -94,11 +94,12 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        location = validated_data['city_location']["location"]
         city = City.objects.filter(
-            city_location__within=utils.area_bbox(validated_data["location"])
-        ).first
+            location__within=utils.area_bbox(location)
+        ).first()
         if not city:
-            city = City.objects.create(validated_data)
+            city = city_serializers.CitySerializer().create(validated_data['city_location'])
         validated_data['city_location'] = city
         request = self.context["request"]
         user_id = request.user.id
@@ -205,10 +206,10 @@ class EventUpdateSerializer(EventCreateSerializer):
             #     )
 
             city = City.objects.create(
-                city_north_east_point=...,
-                city_south_west_point=...,
-                city_location=...,
-                place_id=...
+                # city_north_east_point=...,
+                # city_south_west_point=...,
+                # city_location=...,
+                # place_id=...
             )
             instance.city = city
 
