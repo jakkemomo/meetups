@@ -1,6 +1,8 @@
+from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
-from apps.events.serializers import CategoryListSerializer, city as city_serializers
+from apps.events.models.city import City
+from apps.events.serializers import CategoryListSerializer, city as city_serializers, utils
 from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists
 from apps.profiles.utils import change_followers_if_exists
@@ -82,8 +84,28 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             change_followers_if_exists(instance)
 
         categories = validated_data.pop("category_favorite", [])
-        city_location = validated_data.pop("city_location")
-
+        if validated_data.get("city_location"):
+            city_location = validated_data.pop("city_location")
+            city = City.objects.filter(
+                location__within=utils.area_bbox(city_location["location"])
+            ).first()
+            if not city:
+                city = City.objects.create(
+                    place_id=city_location["place_id"],
+                    north_east_point=Point((
+                        city_location["north_east_point"]["longitude"],
+                        city_location["north_east_point"]["latitude"]
+                    )),
+                    south_west_point=Point((
+                        city_location["south_west_point"]["longitude"],
+                        city_location["south_west_point"]["latitude"],
+                    )),
+                    location=Point((
+                        city_location["location"]["longitude"],
+                        city_location["location"]["latitude"],
+                    )),
+                )
+                instance.city_location = city
         profile: User = super().update(instance, validated_data)
 
         if categories:
@@ -91,14 +113,4 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         else:
             profile.category_favorite.clear()
 
-        if city_location:
-            profile.city_location.set(city_location.get('id'))
-
-        if city_location:
-            profile.city_location.set(city_location.get('id'))
-            city = None
-        # city = City.objects.filter(
-        #     location=
-        # )
-        profile.city = city
         return profile
