@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from django.contrib.gis.geos import Point
 from django.db import transaction
 from rest_framework import serializers
 
@@ -172,46 +173,27 @@ class EventUpdateSerializer(EventCreateSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        # location = validated_data.pop("location", None)
-        # if location:
-        #     instance.location = Point(
-        #         (
-        #             location.get("longitude"),
-        #             location.get("latitude")
-        #         )
-        #     )
+        city_location = validated_data.pop('city_location')
         city = City.objects.filter(
-            location__bbox=...
-        )
+            location__within=utils.area_bbox(city_location["location"])
+        ).first()
         if not city:
-            # city_south_west_point = validated_data.pop(
-            #     "city_south_west_point", None
-            # )
-            # if city_south_west_point:
-            #     instance.city_south_west_point = Point(
-            #         (
-            #             city_south_west_point.get("longitude"),
-            #             city_south_west_point.get("latitude")
-            #         )
-            #     )
-            # city_north_east_point = validated_data.pop(
-            #     "city_north_east_point", None
-            # )
-            # if city_north_east_point:
-            #     instance.city_north_east_point = Point(
-            #         (
-            #             city_north_east_point.get("longitude"),
-            #             city_north_east_point.get("latitude")
-            #         )
-            #     )
-
             city = City.objects.create(
-                # city_north_east_point=...,
-                # city_south_west_point=...,
-                # city_location=...,
-                # place_id=...
+                place_id=city_location["place_id"],
+                north_east_point=Point((
+                    city_location["north_east_point"]["longitude"],
+                    city_location["north_east_point"]["latitude"]
+                )),
+                south_west_point=Point((
+                    city_location["south_west_point"]["longitude"],
+                    city_location["south_west_point"]["latitude"],
+                )),
+                location=Point((
+                    city_location["location"]["longitude"],
+                    city_location["location"]["latitude"],
+                )),
             )
-            instance.city = city
+            instance.city_location = city
 
         schedule_data = validated_data.pop("schedule", None)
         tags = validated_data.pop("tags", None)
