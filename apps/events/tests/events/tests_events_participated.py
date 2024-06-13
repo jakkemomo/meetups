@@ -21,8 +21,8 @@ def test_event_is_participant_without_following(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_user_2_is_participant.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_user_2_is_participant.name
 
 
 @pytest.mark.django_db
@@ -41,8 +41,8 @@ def test_event_is_participant_accepted(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_user_2_is_participant.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_user_2_is_participant.name
 
 
 @pytest.mark.django_db
@@ -84,8 +84,8 @@ def test_event_is_participant_accepted_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_user_2_is_participant_private.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_user_2_is_participant_private.name
 
 
 @pytest.mark.django_db
@@ -151,7 +151,7 @@ def test_event_private_is_participant_without_following(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -170,7 +170,7 @@ def test_event_private_is_participant_accepted(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -212,7 +212,7 @@ def test_event_private_is_participant_accepted_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -277,8 +277,8 @@ def test_event_is_participant_current_user(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_user_2_is_participant.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_user_2_is_participant.name
 
 
 @pytest.mark.django_db
@@ -295,8 +295,8 @@ def test_event_private_is_participant_current_user(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_private_user_2_is_participant.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_private_user_2_is_participant.name
 
 
 @pytest.mark.django_db

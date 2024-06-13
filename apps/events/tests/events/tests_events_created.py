@@ -21,8 +21,8 @@ def test_event_created_by_without_following(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2.name
 
 
 @pytest.mark.django_db
@@ -41,8 +41,8 @@ def test_event_created_by_accepted(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2.name
 
 
 @pytest.mark.django_db
@@ -60,8 +60,8 @@ def test_event_created_by_without_following_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2_private.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2_private.name
 
 
 @pytest.mark.django_db
@@ -80,8 +80,8 @@ def test_event_created_by_accepted_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2_private.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2_private.name
 
 
 @pytest.mark.django_db
@@ -100,8 +100,8 @@ def test_event_created_by_pending_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2_private.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2_private.name
 
 
 @pytest.mark.django_db
@@ -120,8 +120,8 @@ def test_event_created_by_declined_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2_private.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2_private.name
 
 
 @pytest.mark.django_db
@@ -139,7 +139,7 @@ def test_event_private_created_by_without_following(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -158,7 +158,7 @@ def test_event_private_created_by_accepted(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -177,7 +177,7 @@ def test_event_private_created_by_accepted_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -196,7 +196,7 @@ def test_event_private_created_by_pending_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -215,7 +215,7 @@ def test_event_private_created_by_declined_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -232,8 +232,8 @@ def test_event_created_by_current_user(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2.name
 
 
 @pytest.mark.django_db
@@ -250,8 +250,8 @@ def test_event_private_created_by_current_user(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_private_created_by_user_2.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_private_created_by_user_2.name
 
 
 @pytest.mark.django_db
@@ -266,8 +266,8 @@ def test_event_created_by_no_creds(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2.name
 
 
 @pytest.mark.django_db
@@ -282,8 +282,8 @@ def test_event_created_by_no_creds_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data[0].get("id") is not None
-    assert response.data[0].get("name") == event_created_by_user_2_private.name
+    assert response.data['results'][0].get("id") is not None
+    assert response.data['results'][0].get("name") == event_created_by_user_2_private.name
 
 
 @pytest.mark.django_db
@@ -298,7 +298,7 @@ def test_event_private_created_by_no_creds(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
@@ -313,7 +313,7 @@ def test_event_private_created_by_no_creds_private(
 
     # assertions
     assert response.status_code == 200
-    assert response.data == []
+    assert response.data['results'] == []
 
 
 @pytest.mark.django_db
