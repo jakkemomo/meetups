@@ -11,6 +11,7 @@ from django.utils import timezone
 from apps.events.models import Event, Category, Tag, Currency
 from apps.events.models.city import City
 from apps.profiles.tests.utils import get_tokens
+from rest_framework.test import APIClient
 
 
 @pytest.fixture
@@ -61,7 +62,18 @@ def city_location_yandex(city_location_minsk_yandex_data):
                        city_location_minsk_yandex_data["location"]["latitude"]),
         place_id=city_location_minsk_yandex_data["place_id"],
     )
-    # city.save()
+    return city
+
+
+@pytest.fixture
+def city_location_default(city_location_default_data):
+    city = City.objects.create(
+        location=Point(city_location_default_data["location"]["longitude"],
+                       city_location_default_data["location"]["latitude"]),
+        place_id=city_location_default_data["place_id"],
+        south_west_point=city_location_default_data['south_west_point'],
+        north_east_point=city_location_default_data['north_east_point']
+    )
     return city
 
 
@@ -75,6 +87,35 @@ def event_data(currency, tag, category, city_location_default_data) -> dict:
         "type": "open",
         "description": "This is an example event.",
         "city_location": city_location_default_data,
+        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
+        "cost": 10.99,
+        "repeatable": False,
+        "participants_age": 25,
+        "currency": currency.id,
+        "free": False,
+        "gallery": ["image1.jpg", "image2.jpg"],
+        "tags": [tag.id],
+        "category": category.id,
+        "is_finished": False,
+        "is_visible": True,
+        "any_participant_number": True,
+        "start_date": "2024-05-15",
+        "end_date": "2024-05-20",
+        "start_time": "08:00:00",
+        "end_time": "18:00:00"
+    }
+
+
+@pytest.fixture
+def event_yandex_city_location_data(currency, tag, category, city_location_minsk_yandex_data) -> dict:
+    return {
+        "name": "Test Event",
+        "address": "123 Test St",
+        "city": "Test City",
+        "country": "Test Country",
+        "type": "open",
+        "description": "This is an example event.",
+        "city_location": city_location_minsk_yandex_data,
         "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
         "cost": 10.99,
         "repeatable": False,
@@ -157,7 +198,7 @@ def city_location_default_data() -> dict:
 
 
 @pytest.fixture()
-def authenticated_user(api_client, user):
+def authenticated_user(api_client, user) -> APIClient:
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     return api_client

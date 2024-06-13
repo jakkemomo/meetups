@@ -1,6 +1,5 @@
 from uuid import uuid4
 
-from django.contrib.gis.geos import Point
 from django.db import transaction
 from rest_framework import serializers
 
