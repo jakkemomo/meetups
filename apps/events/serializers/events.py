@@ -24,7 +24,6 @@ class EventCreateSerializer(serializers.ModelSerializer):
     desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True,
                                                            required=False)
     city = serializers.CharField(max_length=50)
-    place_id = serializers.CharField(max_length=255)
     city_location = city_serializers.CitySerializer()
     country = serializers.CharField(max_length=50)
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)

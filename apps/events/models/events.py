@@ -29,7 +29,6 @@ class Event(AbstractBaseModel):
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
     city_location = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
-    place_id = fields.CharField(max_length=255, default="ChIJ02oeW9PP20YR2XC13VO4YQs", null=True, blank=True)
 
     participants_age = fields.PositiveSmallIntegerField(default=18, null=False, blank=False)
     desired_participants_number = models.PositiveIntegerField(default=0, null=True, blank=True)

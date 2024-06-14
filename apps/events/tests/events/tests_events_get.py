@@ -21,7 +21,6 @@ def test_event_get_unauthorised_valid(
         'tags': list(event.tags.all()),
         'category': event.category,
         'created_by': event.created_by,
-        'place_id': event.place_id,
         'city_location': None,
         'participants_number': event.participants.count(),
         'average_rating': sum(event.ratings.values_list("value", flat=True)) / len(event.ratings.all()) if len(
@@ -78,7 +77,6 @@ def test_event_get_authorised_valid(
         'tags': list(event.tags.all()),
         'category': event.category,
         'created_by': event.created_by,
-        'place_id': event.place_id,
         'city_location': None,
         'participants_number': event.participants.count(),
         'average_rating': sum(event.ratings.values_list("value", flat=True)) / len(event.ratings.all()) if len(
