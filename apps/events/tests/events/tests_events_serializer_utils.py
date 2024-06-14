@@ -17,60 +17,65 @@ def test_area_bbox(city_location_default_data):
 
 
 @pytest.mark.django_db
-def test_data_update_city_if_not_exist(event, event_data,
-                                       city_location_default_data,
-                                       api_client):
-    response_1 = api_client.get(reverse(EVENTS_GET_URL, args=[event.id]))
-    event = utils.update_city_if_exist(event, event_data)
-    event.save()
-    response_2 = api_client.get(reverse(EVENTS_GET_URL, args=[event.id]))
-
-    assert not response_1.data == response_2.data
-    assert response_2.data['city_location']['place_id'] == city_location_default_data['place_id']
-    assert response_2.data['city_location']['location'] == city_location_default_data['location']
-
-
-@pytest.mark.django_db
-def test_data_update_city_exist(event_created_by_user_2, event_data,
-                                event_yandex_city_location_data,
-                                api_client,
-                                user_2):
+def test_data_update_city_not_exist(event_created_by_user_2, event_data,
+                                    city_location_default_data,
+                                    api_client,
+                                    user_2):
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
 
-    api_client.put(
+    response = api_client.put(
         reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]),
         data=event_data,
         format='json',
     )
-    response_1 = api_client.get(reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]))
-    instance = Event.objects.get(id=event_created_by_user_2.id)
-    event = utils.update_city_if_exist(instance, event_yandex_city_location_data)
-    event.save()
-    response_2 = api_client.get(reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]))
+
+    assert response.data['city_location'] is not None
+    assert response.data['city_location']['place_id'] == city_location_default_data['place_id']
+    assert response.data['city_location']['location'] == city_location_default_data['location']
+
+
+@pytest.mark.django_db
+def test_data_update_city_exist_place_id_not_empty(event_created_by_user_2, event_data,
+                                                   event_yandex_city_location_data,
+                                                   api_client,
+                                                   user_2):
+    token = get_tokens(user_2)
+    api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
+
+    response_1 = api_client.put(
+        reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]),
+        data=event_data,
+        format='json',
+    )
+    response_2 = api_client.put(
+        reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]),
+        data=event_yandex_city_location_data,
+        format='json',
+    )
 
     assert response_2.data['city_location']['place_id'] == response_1.data['city_location']['place_id']
     assert response_2.data['city_location']['location'] == response_1.data['city_location']['location']
 
 
 @pytest.mark.django_db
-def tests_update_place_id(event_created_by_user_2, event_data,
-                          event_yandex_city_location_data,
-                          api_client,
-                          user_2):
+def tests_update_city_exist_place_id_is_empty(event_created_by_user_2, event_data,
+                                              event_yandex_city_location_data,
+                                              api_client,
+                                              user_2):
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
-    api_client.put(
+    response_1 = api_client.put(
         reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]),
         data=event_yandex_city_location_data,
         format='json',
     )
-    api_client.get(reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]))
-    instance = Event.objects.get(id=event_created_by_user_2.id)
-    event = utils.update_city_if_exist(instance, event_data)
-    event.save()
-    api_client.get(reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]))
-    pass
-    # assert response_1.data['city_location']['place_id'] == ''
-    # assert response_2.data['city_location']['place_id'] != response_1.data['city_location']['place_id']
-    # assert response_2.data['city_location']['place_id'] != ''
+    response_2 = api_client.put(
+        reverse(EVENTS_GET_URL, args=[event_created_by_user_2.id]),
+        data=event_data,
+        format='json',
+    )
+
+    assert response_1.data['city_location']['place_id'] == ''
+    assert response_2.data['city_location']['place_id'] != response_1.data['city_location']['place_id']
+    assert response_2.data['city_location']['place_id'] != ''

@@ -29,7 +29,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
-    place_id = serializers.CharField(max_length=255)
+    place_id = serializers.CharField(max_length=255, allow_null=True, allow_blank=True)
     location = LocationSerializer(required=True, many=False)
     south_west_point = LocationSerializer(required=True, many=False)
     north_east_point = LocationSerializer(required=True, many=False)

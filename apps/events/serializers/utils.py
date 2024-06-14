@@ -53,7 +53,7 @@ def area_bbox(location: dict):
     return Polygon.from_bbox(bbox)
 
 
-def update_city_if_exist(instance:City, validated_data):
+def update_city_if_exist(instance, validated_data):
     city_location = validated_data.pop("city_location")
     city = City.objects.filter(
         location__within=area_bbox(city_location["location"])
@@ -75,8 +75,7 @@ def update_city_if_exist(instance:City, validated_data):
             )),
         )
         instance.city_location = city
-    if (instance.place_id != city_location["place_id"]
-            and city_location["place_id"] != ""
-            and city_location["place_id"] != ""):
-        instance.place_id = city_location["place_id"]
+        return instance
+    if city.place_id != city_location["place_id"] and city_location["place_id"] != "":
+        instance.city_location.place_id = city_location["place_id"]
     return instance
