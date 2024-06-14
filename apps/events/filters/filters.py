@@ -102,5 +102,4 @@ class EventFilter(filters.FilterSet):
         if min_lat and max_lat and min_lng and max_lng:
             bbox = (float(min_lng), float(min_lat), float(max_lng), float(max_lat))
             area = Polygon.from_bbox(bbox)
-            city_queryset = City.objects.filter(location__within=area)
-            return queryset.filter(city_location__in=city_queryset)
+            return queryset.filter(location__within=area)
