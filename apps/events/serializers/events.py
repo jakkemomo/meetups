@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from django.contrib.gis.geos import Point
 from django.db import transaction
 from rest_framework import serializers
 
@@ -8,6 +9,7 @@ from apps.events.serializers import city as city_serializers
 from apps.profiles.models import User
 from apps.chats.models import Chat
 from . import currency, utils
+from .city import LocationSerializer
 from ..models.city import City
 
 
@@ -23,6 +25,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class EventCreateSerializer(serializers.ModelSerializer):
     desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True,
                                                            required=False)
+    location = LocationSerializer(required=True, many=False)
     city = serializers.CharField(max_length=50)
     city_location = city_serializers.CitySerializer()
     country = serializers.CharField(max_length=50)
@@ -93,9 +96,15 @@ class EventCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        location = validated_data['city_location']["location"]
+        validated_data["location"] = Point(
+            (
+                validated_data["location"]["longitude"],
+                validated_data["location"]["latitude"]
+            )
+        )
+        city_location = validated_data['city_location']["location"]
         city = City.objects.filter(
-            location__within=utils.area_bbox(location)
+            location__within=utils.area_bbox(city_location)
         ).first()
         if not city:
             city = city_serializers.CitySerializer().create(validated_data['city_location'])
@@ -137,6 +146,7 @@ class EventUpdateSerializer(EventCreateSerializer):
     desired_participants_number = serializers.IntegerField(
         min_value=0, max_value=10000000, allow_null=True, required=False
     )
+    location = LocationSerializer(required=False, many=False)
 
     def validate(self, data):
         # We validate that we have any participant number or desired participant number
@@ -171,6 +181,14 @@ class EventUpdateSerializer(EventCreateSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        location = validated_data.pop("location", None)
+        if location:
+            instance.location = Point(
+                (
+                    location.get("longitude"),
+                    location.get("latitude")
+                )
+            )
         if validated_data.get("city_location"):
             utils.update_city_if_exist(instance=instance, validated_data=validated_data)
 
@@ -273,6 +291,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     tags = EventTagSerializer(many=True)
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
+    location = serializers.SerializerMethodField("get_location")
     city_location = city_serializers.CitySerializer()
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()

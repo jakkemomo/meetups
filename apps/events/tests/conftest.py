@@ -86,6 +86,10 @@ def event_data(currency, tag, category, city_location_default_data) -> dict:
         "country": "Test Country",
         "type": "open",
         "description": "This is an example event.",
+        "location": {
+            "latitude": 53.902284,
+            "longitude": 27.561831
+        },
         "city_location": city_location_default_data,
         "cost": 10.99,
         "repeatable": False,
@@ -114,6 +118,10 @@ def event_yandex_city_location_data(currency, tag, category, city_location_minsk
         "country": "Test Country",
         "type": "open",
         "description": "This is an example event.",
+        "location": {
+            "latitude": 53.902284,
+            "longitude": 27.561831
+        },
         "city_location": city_location_minsk_yandex_data,
         "cost": 10.99,
         "repeatable": False,
