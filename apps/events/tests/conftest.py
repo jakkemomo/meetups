@@ -22,6 +22,7 @@ def hundred_events(city_location_yandex) -> List:
         city_location = city_location_yandex
         start_date = timezone.now() + datetime.timedelta(days=i)
         end_date = start_date + datetime.timedelta(hours=random.randint(1, 5))
+        # todo: change time handling to freezegun or mock
         start_time = (datetime.datetime.combine(datetime.date.today(), datetime.time()) + datetime.timedelta(
             minutes=random.randint(1, 1440))).time()
         end_time = (datetime.datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(
