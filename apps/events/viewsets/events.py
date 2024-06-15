@@ -31,7 +31,8 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, EventPermissions]
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     filterset_class = EventFilter
-    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city']
+    search_fields = ['name', 'description', 'address', 'tags__name', 'category__name', 'city_location__place_id',
+                     'city_location__location']
     ordering_fields = ['start_date', 'average_rating', 'participants_number']
     lookup_url_kwarg = "event_id"
 
@@ -56,7 +57,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        self.queryset = self.queryset.prefetch_related('category', 'tags').annotate(
+        queryset = self.queryset.prefetch_related('category', 'tags').annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
             is_favorite=Exists(
@@ -65,7 +66,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
             ),
         ).order_by("-start_date")
-        return self.queryset.all()
+        return queryset.all()
 
     def get_serializer_class(self):
         match self.action:

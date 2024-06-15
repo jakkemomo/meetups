@@ -5,32 +5,12 @@ from django.db import transaction
 from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category, Schedule, Currency
+from apps.events.serializers import city as city_serializers
 from apps.profiles.models import User
 from apps.chats.models import Chat
 from . import currency, utils
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    latitude = serializers.DecimalField(
-        max_value=180, min_value=-180,
-        write_only=True, max_digits=18,
-        decimal_places=15,
-    )
-    longitude = serializers.DecimalField(
-        max_value=180, min_value=-180,
-        write_only=True, max_digits=18,
-        decimal_places=15,
-    )
-
-    class Meta:
-        model = Event
-        fields = ["latitude", "longitude"]
-
-    def to_representation(self, value):
-        return {
-            "latitude": value.y,
-            "longitude": value.x
-        }
+from .city import LocationSerializer
+from ..models.city import City
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -46,9 +26,8 @@ class EventCreateSerializer(serializers.ModelSerializer):
     desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True,
                                                            required=False)
     location = LocationSerializer(required=True, many=False)
-    city_south_west_point = LocationSerializer(required=True, many=False)
-    city_north_east_point = LocationSerializer(required=True, many=False)
     city = serializers.CharField(max_length=50)
+    city_location = city_serializers.CitySerializer()
     country = serializers.CharField(max_length=50)
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
     repeatable = serializers.BooleanField(default=False)
@@ -123,19 +102,13 @@ class EventCreateSerializer(serializers.ModelSerializer):
                 validated_data["location"]["latitude"]
             )
         )
-        validated_data["city_south_west_point"] = Point(
-            (
-                validated_data["city_south_west_point"]["longitude"],
-                validated_data["city_south_west_point"]["latitude"]
-            )
-
-        )
-        validated_data["city_north_east_point"] = Point(
-            (
-                validated_data["city_north_east_point"]["longitude"],
-                validated_data["city_north_east_point"]["latitude"]
-            )
-        )
+        city_location = validated_data['city_location']["location"]
+        city = City.objects.filter(
+            location__within=utils.area_bbox(city_location)
+        ).first()
+        if not city:
+            city = city_serializers.CitySerializer().create(validated_data['city_location'])
+        validated_data['city_location'] = city
         request = self.context["request"]
         user_id = request.user.id
         validated_data["created_by_id"] = user_id
@@ -174,8 +147,6 @@ class EventUpdateSerializer(EventCreateSerializer):
         min_value=0, max_value=10000000, allow_null=True, required=False
     )
     location = LocationSerializer(required=False, many=False)
-    city_south_west_point = LocationSerializer(required=False, many=False)
-    city_north_east_point = LocationSerializer(required=False, many=False)
 
     def validate(self, data):
         # We validate that we have any participant number or desired participant number
@@ -196,7 +167,8 @@ class EventUpdateSerializer(EventCreateSerializer):
             raise serializers.ValidationError('Free and currency cannot be provided at the same time')
         if 'cost' in data and 'currency' in data and (not cost and currency or cost and not currency):
             raise serializers.ValidationError('Cost and currency must be provided at the same time')
-        elif (not cost and not currency) and (cost and not self.instance.currency or not self.instance.cost and currency):
+        elif (not cost and not currency) and (
+                cost and not self.instance.currency or not self.instance.cost and currency):
             raise serializers.ValidationError('Cost and currency must be provided at the same time')
 
         # We validate that we have repeatable event with schedule
@@ -217,26 +189,8 @@ class EventUpdateSerializer(EventCreateSerializer):
                     location.get("latitude")
                 )
             )
-        city_south_west_point = validated_data.pop(
-            "city_south_west_point", None
-        )
-        if city_south_west_point:
-            instance.city_south_west_point = Point(
-                (
-                    city_south_west_point.get("longitude"),
-                    city_south_west_point.get("latitude")
-                )
-            )
-        city_north_east_point = validated_data.pop(
-            "city_north_east_point", None
-        )
-        if city_north_east_point:
-            instance.city_north_east_point = Point(
-                (
-                    city_north_east_point.get("longitude"),
-                    city_north_east_point.get("latitude")
-                )
-            )
+        if validated_data.get("city_location"):
+            utils.update_city_if_exist(instance=instance, validated_data=validated_data)
 
         schedule_data = validated_data.pop("schedule", None)
         tags = validated_data.pop("tags", None)
@@ -338,6 +292,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
+    city_location = city_serializers.CitySerializer()
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()
     currency = currency.CurrencySerializer(many=False)
@@ -362,8 +317,6 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
         exclude = [
             "ratings",
             "updated_by",
-            "city_south_west_point",
-            "city_north_east_point",
             "participants",
         ]
 

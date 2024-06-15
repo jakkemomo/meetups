@@ -17,7 +17,6 @@ router.register("users", ProfileViewSet, basename="Profiles")
 router.register("users", FollowerViewSet, basename="Followers")
 router.register("users", ProfileEventViewSet, basename="User events")
 
-
 urlpatterns = [
     path("api/v1/", include(router.urls)),
     path("api/v1/me", MyProfileViewSet.as_view(), name="me"),

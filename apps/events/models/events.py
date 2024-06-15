@@ -7,6 +7,7 @@ from django.db.models import fields
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import AbstractBaseModel
+from apps.events.models.city import City
 from apps.events.models.rating import Rating
 from apps.events.models.schedule import Schedule
 from apps.events.models.tags import Tag
@@ -29,10 +30,8 @@ class Event(AbstractBaseModel):
         blank=False,
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
-
+    city_location = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
     location = PointField(default=Point(27.561831, 53.902284))
-    city_south_west_point = PointField(default=Point(27.561831, 53.902284))
-    city_north_east_point = PointField(default=Point(27.561831, 53.902284))
 
     participants_age = fields.PositiveSmallIntegerField(default=18, null=False, blank=False)
     desired_participants_number = models.PositiveIntegerField(default=0, null=True, blank=True)

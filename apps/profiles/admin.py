@@ -14,15 +14,15 @@ class FollowerInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("id", "username", "email", "first_name", "last_name", "followers_number_link", "following_number_link", "city", "is_staff", "is_private")
-    search_fields = ("username", "email", "first_name", "last_name", "city")
+    list_display = ("id", "username", "email", "first_name", "last_name", "followers_number_link", "following_number_link", "is_staff", "is_private")
+    search_fields = ("username", "email", "first_name", "last_name",)
     readonly_fields = ("date_joined",)
 
     filter_horizontal = ()
     list_filter = ()
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        ("Personal info", {"fields": ("first_name", "last_name", "email", "city", "image_url")}),
+        ("Personal info", {"fields": ("first_name", "last_name", "email", "image_url")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "is_email_verified", "is_private")}),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
