@@ -49,8 +49,7 @@ class EventFilter(filters.FilterSet):
     # category_in = filters.ModelMultipleChoiceFilter(field_name='category', queryset=Category.objects.all(),
     #                                                 conjoined=False)
 
-    city = filters.CharFilter(lookup_expr='exact', field_name='city')
-    city_in = filters.CharFilter(lookup_expr='in', field_name='city')
+    place_id = filters.CharFilter(lookup_expr='exact', field_name='city_location__place_id')
 
     free = filters.BooleanFilter(lookup_expr='exact', field_name='price')
 
@@ -81,8 +80,7 @@ class EventFilter(filters.FilterSet):
             'tags_in',
             'category',
             'category_in',
-            'city',
-            'city_in',
+            'place_id',
             'free',
             'participants_age',
             'participants_age__gte',
