@@ -1,9 +1,9 @@
-
 from django.contrib.gis.geos import Polygon
 
 from django_filters import rest_framework as filters, Filter
 
 from apps.events.models import Event
+from apps.events.models.city import City
 
 
 class M2MFilter(Filter):
@@ -24,7 +24,6 @@ class M2MFilter(Filter):
 
 
 class EventFilter(filters.FilterSet):
-
     name_contains = filters.CharFilter(lookup_expr='icontains', field_name='name')
     name = filters.CharFilter(lookup_expr='exact', field_name='name')
 

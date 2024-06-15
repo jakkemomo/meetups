@@ -22,8 +22,10 @@ def test_event_get_unauthorised_valid(
         'category': event.category,
         'created_by': event.created_by,
         'location': (event.location.x, event.location.y),
+        'city_location': None,
         'participants_number': event.participants.count(),
-        'average_rating': sum(event.ratings.values_list("value", flat=True))/len(event.ratings.all()) if len(event.ratings.all()) else 0.0,
+        'average_rating': sum(event.ratings.values_list("value", flat=True)) / len(event.ratings.all()) if len(
+            event.ratings.all()) else 0.0,
         'currency': event.currency,
         'schedule': list(event.schedule.all()),
         'is_favorite': False,
@@ -77,8 +79,10 @@ def test_event_get_authorised_valid(
         'category': event.category,
         'created_by': event.created_by,
         'location': (event.location.x, event.location.y),
+        'city_location': None,
         'participants_number': event.participants.count(),
-        'average_rating': sum(event.ratings.values_list("value", flat=True))/len(event.ratings.all()) if len(event.ratings.all()) else 0.0,
+        'average_rating': sum(event.ratings.values_list("value", flat=True)) / len(event.ratings.all()) if len(
+            event.ratings.all()) else 0.0,
         'currency': event.currency,
         'schedule': list(event.schedule.all()),
         'is_favorite': False,
