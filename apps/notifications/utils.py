@@ -4,13 +4,16 @@ from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 
 from apps.core.helpers import send_email
+from apps.notifications.models import Notification
 
 user_model = get_user_model()
 
 
 def send_notification_email(
-        recipient, created_by,
-        notification_type, additional_data
+        created_by: user_model,
+        recipient: user_model,
+        notification_type: Notification.Type,
+        additional_data: dict
 ):
     subject = 'New notification'
     message = render_to_string(

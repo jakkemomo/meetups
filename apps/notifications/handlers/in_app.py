@@ -1,14 +1,15 @@
+from asgiref.sync import async_to_sync
 from django.utils.module_loading import import_string
 
 from apps.notifications.handlers.base import AbstractNotificationsHandler
+from apps.notifications.managers.in_app import InAppNotificationManager
 from apps.notifications.models import Notification
-from apps.notifications.utils import send_notification_email
 from config import settings
 
 user_model = settings.AUTH_USER_MODEL
 
 
-class EmailNotificationsHandler(AbstractNotificationsHandler):
+class InAppNotificationsHandler(AbstractNotificationsHandler):
     def notify(
             self,
             created_by: user_model,
@@ -16,7 +17,7 @@ class EmailNotificationsHandler(AbstractNotificationsHandler):
             notification_type: Notification.Type,
             additional_data: dict
     ):
-        send_notification_email(
+        async_to_sync(InAppNotificationManager.notification)(
             created_by=created_by,
             recipient=recipient,
             notification_type=notification_type,
@@ -24,4 +25,4 @@ class EmailNotificationsHandler(AbstractNotificationsHandler):
         )
 
     def get_preferences_model(self):
-        return import_string(settings.PREFERENCES.get("EMAIL"))
+        return import_string(settings.PREFERENCES.get("IN_APP"))

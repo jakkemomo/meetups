@@ -11,11 +11,13 @@ class AbstractConsumer(AsyncWebsocketConsumer, ABC):
     @abstractmethod
     async def connect(self):
         """
-        This method needs a defined self.group_name in each subclass.
+        This method needs a defined self.group_name with the prefix
+        in each subclass.
 
-        For example, NotificationConsumer works with user's own group – it's id:
+        For example, NotificationConsumer works with user's own group –
+        it's id:
              async def connect(self):
-                self.group_name = str(self.scope.get("user").pk)
+                self.group_name = f"user_{str(user.id)}"
                 await super().connect()
         """
         try:

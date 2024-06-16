@@ -30,7 +30,7 @@ class ChatConsumer(AbstractConsumer):
             )
             await self.close()
 
-        self.group_name = chat_id
+        self.group_name = f"chat_{chat_id}"
         await super().connect()
 
     async def receive(self, text_data):

@@ -9,10 +9,25 @@ user_model = settings.AUTH_USER_MODEL
 
 class Notification(AbstractBaseModel):
     class Type(models.TextChoices):
-        NEW_FOLLOWER = "NEW_FOLLOWER"
-        NEW_FOLLOW_REQUEST = "NEW_FOLLOW_REQUEST"
-        ACCEPTED_FOLLOW_REQUEST = "ACCEPTED_FOLLOW_REQUEST"
-        NEW_MESSAGE = "NEW_MESSAGE"
+        # System
+        SYSTEM = "system"
+        # Chat
+        NEW_MESSAGE = "new_message"
+        # Followers
+        NEW_FOLLOWER = "new_follower"
+        NEW_FOLLOW_REQUEST = "new_follow_request"
+        ACCEPTED_FOLLOW_REQUEST = "accepted_follow_request"
+        # Events
+        EVENT_START = "event_start"
+        NEW_INVITE_TO_EVENT = "new_invite_to_event"
+        NEW_INTERESTING_EVENT_NEAR = "new_interesting_event_near"
+        # Followers events
+        NEW_FOLLOWING_USER_EVENT = "new_following_user_event"
+        FOLLOWING_USER_NEAR_GOING_TO_EVENT = "following_user_near_going_to_event"
+
+    class Method(models.TextChoices):
+        IN_APP = "IN_APP"
+        EMAIL = "EMAIL"
 
     recipient = models.ForeignKey(
         to=user_model,

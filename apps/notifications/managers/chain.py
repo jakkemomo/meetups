@@ -2,6 +2,6 @@ class NotificationsChainManager:
     def __init__(self, handlers):
         self.handlers = handlers
 
-    async def handle(self, **kwargs):
+    def handle(self, **kwargs):
         for handler in self.handlers:
-            await handler.handle(**kwargs)
+            handler.handle(**kwargs)

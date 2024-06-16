@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from django.utils.module_loading import import_string
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -28,6 +29,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.image_url = settings.DEFAULT_USER_AVATAR_URL
         user.save()
+
+        # Notification preferences creating
+        preferences = [import_string(i) for i in settings.PREFERENCES.values()]
+        for preference_model in preferences:
+            preference_model.objects.create(user=user)
 
         try:
             helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
