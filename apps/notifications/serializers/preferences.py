@@ -66,4 +66,3 @@ class InAppNotificationsPreferencesUpdateSerializer(serializers.ModelSerializer)
             "new_following_user_event",
             "following_user_near_going_to_event",
         ]
-
