@@ -308,3 +308,9 @@ WS_ALLOWED_ORIGINS = [
     "*"
 ]
 EVENTS_UPDATE_INTERVAL = 60 * 60  # 1 hour
+
+# Notifications
+PREFERENCES = {
+        "IN_APP": "apps.notifications.models.InAppNotificationsPreferences",
+        "EMAIL": "apps.notifications.models.EmailNotificationsPreferences",
+    }

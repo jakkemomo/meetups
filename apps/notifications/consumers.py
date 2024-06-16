@@ -15,7 +15,7 @@ class NotificationConsumer(AbstractConsumer):
             )
             await self.close()
 
-        self.group_name = str(user.id)
+        self.group_name = f"user_{str(user.id)}"
 
         await super().connect()
 

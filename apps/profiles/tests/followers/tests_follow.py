@@ -13,6 +13,7 @@ def test_follow_valid(
         user,
         user_2,
 ):
+    # TODO: add notification check
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.post(

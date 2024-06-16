@@ -9,8 +9,7 @@ from rest_framework.response import Response
 
 from apps.events.serializers import EmptySerializer
 from apps.events.serializers.events import ParticipantSerializer
-from apps.notifications.handlers.email import EmailNotificationsHandler
-from apps.notifications.handlers.notifications import InAppNotificationsHandler
+from apps.notifications.handlers.in_app import InAppNotificationsHandler
 from apps.notifications.managers.chain import NotificationsChainManager
 from apps.notifications.models import Notification
 from apps.profiles.models import User
@@ -39,7 +38,6 @@ class ChatViewSet(viewsets.ModelViewSet):
     # Notifications
     handlers = (
         InAppNotificationsHandler(),
-        EmailNotificationsHandler(),
     )
     notifications_manager = NotificationsChainManager(handlers)
 
@@ -118,16 +116,16 @@ class ChatViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        # Message creation and sending via ws
         message_object = async_to_sync(ChatManager.chat_message)(
             created_by=request.user,
             chat=chat_object,
             message_text=serializer.validated_data.get("message_text")
         )
-        # TODO: maybe to do this cycle in handler?
-        #  Because we need to send it for all users of the chat
-        #  (who turned notifications on)
+
+        # Notifications sending
         for participant in chat_object.participants.exclude(pk=request.user.id):
-            async_to_sync(self.notifications_manager.handle)(
+            self.notifications_manager.handle(
                 created_by=request.user,
                 recipient=participant,
                 notification_type=Notification.Type.NEW_MESSAGE,
