@@ -1,17 +1,16 @@
 from asgiref.sync import sync_to_async
 
+from django.contrib.auth.models import User
+
 from apps.core.websockets.base import BaseManager
 from apps.notifications.models import Notification
-from config import settings
-
-user_model = settings.AUTH_USER_MODEL
 
 
 class InAppNotificationManager(BaseManager):
     @staticmethod
     async def notification(
-            created_by: user_model,
-            recipient: user_model,
+            created_by: User,
+            recipient: User,
             notification_type: Notification.Type,
             additional_data: dict
     ):

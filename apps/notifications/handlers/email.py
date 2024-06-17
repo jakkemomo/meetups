@@ -1,18 +1,17 @@
 from django.utils.module_loading import import_string
+from django.contrib.auth.models import User
 
 from apps.notifications.handlers.base import AbstractNotificationsHandler
 from apps.notifications.models import Notification
 from apps.notifications.utils import send_notification_email
 from config import settings
 
-user_model = settings.AUTH_USER_MODEL
-
 
 class EmailNotificationsHandler(AbstractNotificationsHandler):
     def notify(
             self,
-            created_by: user_model,
-            recipient: user_model,
+            created_by: User,
+            recipient: User,
             notification_type: Notification.Type,
             additional_data: dict
     ):

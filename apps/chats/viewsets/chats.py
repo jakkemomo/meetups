@@ -1,5 +1,4 @@
 from asgiref.sync import async_to_sync
-from django.contrib.auth import get_user_model
 from django.forms import model_to_dict
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status
@@ -25,8 +24,9 @@ from apps.chats.serializers.messages import (
     MessageCreateSerializer,
 )
 from apps.chats.utils import list_chats_raw
+from config import settings
 
-user_model = get_user_model()
+user_model = settings.AUTH_USER_MODEL
 
 
 class ChatViewSet(viewsets.ModelViewSet):

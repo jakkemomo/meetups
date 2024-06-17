@@ -1,7 +1,6 @@
 import logging
 
 from channels.db import database_sync_to_async
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from channels.middleware import BaseMiddleware
 from channels.auth import AuthMiddlewareStack
@@ -9,7 +8,9 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.state import token_backend
 from rest_framework_simplejwt.tokens import UntypedToken
 
-user_model = get_user_model()
+from config import settings
+
+user_model = settings.AUTH_USER_MODEL
 logger = logging.getLogger("core_app")
 
 
@@ -34,7 +35,7 @@ class JwtAuthMiddleware(BaseMiddleware):
         except Exception as exc:
             logger.exception(exc)
         token_decoded = token_backend.decode(token_key, verify=False)
-        return get_user_model().objects.get(id=token_decoded.get("user_id"))
+        return user_model.objects.get(id=token_decoded.get("user_id"))
 
 
 def JwtAuthMiddlewareStack(inner):

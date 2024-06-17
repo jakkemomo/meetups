@@ -2,18 +2,15 @@ import base64
 import json
 from typing import Any
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 
 from config import settings
 
 
-user_model = get_user_model()
-
-
-def send_email(user: user_model, subject, message):
+def send_email(user: User, subject, message):
     email = EmailMessage(subject, message, to=[user.email])
     email.content_subtype = 'html'
 
