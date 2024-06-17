@@ -24,9 +24,6 @@ from apps.chats.serializers.messages import (
     MessageCreateSerializer,
 )
 from apps.chats.utils import list_chats_raw
-from config import settings
-
-user_model = settings.AUTH_USER_MODEL
 
 
 class ChatViewSet(viewsets.ModelViewSet):
@@ -94,7 +91,7 @@ class ChatViewSet(viewsets.ModelViewSet):
     )
     def participants(self, request, chat_id):
         chat_object: Chat = self.get_object()
-        participants = user_model.objects.filter(
+        participants = User.objects.filter(
             id__in=chat_object.participants.all().values_list("id", flat=True)
         )
         page = self.paginate_queryset(participants)
