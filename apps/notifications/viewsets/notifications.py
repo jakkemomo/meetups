@@ -18,12 +18,12 @@ class NotificationsViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
     def get_queryset(self):
-        self.queryset = (
+        queryset = (
             self.model.objects
             .filter(recipient=self.request.user)
             .order_by("-created_at")
         )
-        return self.queryset.all()
+        return queryset.all()
 
     def get_serializer_class(self):
         match self.action:

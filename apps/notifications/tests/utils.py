@@ -4,7 +4,7 @@ from channels.testing import WebsocketCommunicator
 def get_communicator(app, user) -> WebsocketCommunicator:
     communicator = WebsocketCommunicator(
         app,
-        f"ws/notifications/{user.id}/",
+        "ws/notifications/",
     )
     communicator.scope["user"] = user
     return communicator

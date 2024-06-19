@@ -1,5 +1,8 @@
 import os
 import django
+from django.utils.module_loading import import_string
+
+from config import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
@@ -35,6 +38,12 @@ class SignupTests(CoreTestsBase):
         )
 
         user = User.objects.filter(email=self.DATA.get("email")).first()
+        preferences = [import_string(i) for i in settings.PREFERENCES.values()]
+        for preference_model in preferences:
+            preference_qs = preference_model.objects.filter(user=user)
+            self.assertEqual(preference_qs.count(), 1)
+            preference_object = preference_qs.first()
+            self.assertTrue(preference_object)
 
         # Testing user
         self.assertTrue(user)

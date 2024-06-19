@@ -1,5 +1,4 @@
 from asgiref.sync import async_to_sync
-from django.contrib.auth import get_user_model
 from django.forms import model_to_dict
 from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status
@@ -9,6 +8,9 @@ from rest_framework.response import Response
 
 from apps.events.serializers import EmptySerializer
 from apps.events.serializers.events import ParticipantSerializer
+from apps.notifications.handlers.in_app import InAppNotificationsHandler
+from apps.notifications.managers.chain import NotificationsChainManager
+from apps.notifications.models import Notification
 from apps.profiles.models import User
 from apps.chats.managers import ChatManager
 from apps.chats.models import Chat, Message
@@ -23,14 +25,18 @@ from apps.chats.serializers.messages import (
 )
 from apps.chats.utils import list_chats_raw
 
-user_model = get_user_model()
-
 
 class ChatViewSet(viewsets.ModelViewSet):
     model = Chat
     permission_classes = [IsAuthenticated, ChatPermissions]
     lookup_url_kwarg = "chat_id"
     http_method_names = ["get", "post"]
+
+    # Notifications
+    handlers = (
+        InAppNotificationsHandler(),
+    )
+    notifications_manager = NotificationsChainManager(handlers)
 
     def get_serializer_class(self):
         match self.action:
@@ -85,7 +91,7 @@ class ChatViewSet(viewsets.ModelViewSet):
     )
     def participants(self, request, chat_id):
         chat_object: Chat = self.get_object()
-        participants = user_model.objects.filter(
+        participants = User.objects.filter(
             id__in=chat_object.participants.all().values_list("id", flat=True)
         )
         page = self.paginate_queryset(participants)
@@ -107,11 +113,21 @@ class ChatViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        # Message creation and sending via ws
         message_object = async_to_sync(ChatManager.chat_message)(
             created_by=request.user,
             chat=chat_object,
             message_text=serializer.validated_data.get("message_text")
         )
+
+        # Notifications sending
+        for participant in chat_object.participants.exclude(pk=request.user.id):
+            self.notifications_manager.handle(
+                created_by=request.user,
+                recipient=participant,
+                notification_type=Notification.Type.NEW_MESSAGE,
+                additional_data={"message_text": message_object.message_text}
+            )
 
         return Response(
             status=status.HTTP_201_CREATED,

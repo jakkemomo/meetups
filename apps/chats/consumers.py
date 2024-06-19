@@ -1,13 +1,13 @@
 import json
 import logging
 
-from apps.notifications.base import BaseConsumer
+from apps.core.websockets.base import AbstractConsumer
 from apps.chats.utils import get_chat_async, has_chat_permissions
 
 logger = logging.getLogger("chats_app")
 
 
-class ChatConsumer(BaseConsumer):
+class ChatConsumer(AbstractConsumer):
     async def connect(self):
         user = self.scope.get("user")
         if not user or user.is_anonymous:
@@ -30,7 +30,7 @@ class ChatConsumer(BaseConsumer):
             )
             await self.close()
 
-        self.group_name = chat_id
+        self.group_name = f"chat_{chat_id}"
         await super().connect()
 
     async def receive(self, text_data):

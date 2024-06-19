@@ -7,6 +7,7 @@ app_name = "notifications"
 
 router = routers.SimpleRouter()
 router.register("notifications", NotificationsViewSet, basename="Notifications")
+
 urlpatterns = [
     path("api/v1/", include(router.urls)),
 ]

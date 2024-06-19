@@ -1,10 +1,8 @@
-from django.contrib.auth import get_user_model
 from rest_framework import permissions
 
 from apps.chats.models import Chat
 from apps.profiles.utils import is_follower
 
-user_model = get_user_model()
 
 
 class ChatPermissions(permissions.BasePermission):

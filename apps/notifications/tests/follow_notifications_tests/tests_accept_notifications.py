@@ -48,7 +48,9 @@ async def test_accept_valid(
         'from_user_id': async_user_2_private.id,
         'from_username': async_user_2_private.username,
         'from_user_image_url': async_user_2_private.image_url,
-        'follower_status': Follower.Status.ACCEPTED,
+        'additional_data': {
+            "follower_status": Follower.Status.ACCEPTED,
+        }
     }
 
     notification_object = await database_sync_to_async(Notification.objects.filter)(
