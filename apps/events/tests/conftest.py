@@ -185,25 +185,6 @@ def city_location_minsk_yandex_data() -> dict:
     }
 
 
-@pytest.fixture
-def city_location_default_data() -> dict:
-    return {
-        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
 @pytest.fixture()
 def authenticated_user(api_client, user) -> APIClient:
     token = get_tokens(user)
