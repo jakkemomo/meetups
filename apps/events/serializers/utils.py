@@ -79,5 +79,5 @@ def update_city_if_exist(instance, validated_data):
     if city.place_id != city_location["place_id"] and city_location["place_id"] != "":
         city.place_id = city_location["place_id"]
         city.save()
-        instance.city_location = city
+    instance.city_location = city
     return instance
