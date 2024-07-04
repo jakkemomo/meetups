@@ -67,19 +67,19 @@ def city_location_yandex(city_location_minsk_yandex_data):
 
 
 @pytest.fixture
-def city_location_default(city_location_default_data):
+def city_location_default(city_location_data):
     city = City.objects.create(
-        location=Point(city_location_default_data["location"]["longitude"],
-                       city_location_default_data["location"]["latitude"]),
-        place_id=city_location_default_data["place_id"],
-        south_west_point=city_location_default_data['south_west_point'],
-        north_east_point=city_location_default_data['north_east_point']
+        location=Point(city_location_data["location"]["longitude"],
+                       city_location_data["location"]["latitude"]),
+        place_id=city_location_data["place_id"],
+        south_west_point=city_location_data['south_west_point'],
+        north_east_point=city_location_data['north_east_point']
     )
     return city
 
 
 @pytest.fixture
-def event_data(currency, tag, category, city_location_default_data) -> dict:
+def event_data(currency, tag, category, city_location_data) -> dict:
     return {
         "name": "Test Event",
         "address": "123 Test St",
@@ -91,7 +91,7 @@ def event_data(currency, tag, category, city_location_default_data) -> dict:
             "latitude": 53.902284,
             "longitude": 27.561831
         },
-        "city_location": city_location_default_data,
+        "city_location": city_location_data,
         "cost": 10.99,
         "repeatable": False,
         "participants_age": 25,
