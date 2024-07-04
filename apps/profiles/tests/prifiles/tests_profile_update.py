@@ -24,7 +24,7 @@ def test_profile_location_update(api_client, user, user_location_data):
 
 
 @pytest.mark.django_db
-def test_profile_update_by_existing_location_data(api_client, user, user_location_data, user_location_data_2):
+def test_profile_update_by_existing_location_data_change_place_id(api_client, user, user_location_data, user_location_data_2):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     api_client.patch(
