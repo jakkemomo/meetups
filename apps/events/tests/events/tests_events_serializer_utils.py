@@ -8,8 +8,8 @@ from rest_framework.reverse import reverse
 from apps.profiles.tests.utils import get_tokens
 
 
-def test_area_bbox(city_location_default_data):
-    location = city_location_default_data["location"]
+def test_area_bbox(city_location_data):
+    location = city_location_data["location"]
     bbox = utils.area_bbox(location)
     bbox_str = 'POLYGON ((27.551831 53.892284000000004, 27.551831 53.912284, 27.571831000000003 53.912284, 27.571831000000003 53.892284000000004, 27.551831 53.892284000000004))'
 
@@ -18,7 +18,7 @@ def test_area_bbox(city_location_default_data):
 
 @pytest.mark.django_db
 def test_data_update_city_not_exist(event_created_by_user_2, event_data,
-                                    city_location_default_data,
+                                    city_location_data,
                                     api_client,
                                     user_2):
     token = get_tokens(user_2)
@@ -31,8 +31,8 @@ def test_data_update_city_not_exist(event_created_by_user_2, event_data,
     )
 
     assert response.data['city_location'] is not None
-    assert response.data['city_location']['place_id'] == city_location_default_data['place_id']
-    assert response.data['city_location']['location'] == city_location_default_data['location']
+    assert response.data['city_location']['place_id'] == city_location_data['place_id']
+    assert response.data['city_location']['location'] == city_location_data['location']
 
 
 @pytest.mark.django_db
