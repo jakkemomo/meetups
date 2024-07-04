@@ -43,3 +43,9 @@ def test_profile_update_by_existing_location_data_change_place_id(api_client, us
     city_location_id = User.objects.filter(id=user.id).values("city_location").first()
     city_location = City.objects.filter(id=city_location_id["city_location"]).first()
     assert city_location.place_id == user_location_data_2["city_location"]["place_id"]
+    assert city_location.location.x == user_location_data_2["city_location"]["location"]["longitude"]
+    assert city_location.location.y == user_location_data_2["city_location"]["location"]["latitude"]
+    assert city_location.north_east_point.x == user_location_data_2["city_location"]["north_east_point"]["longitude"]
+    assert city_location.north_east_point.y == user_location_data_2["city_location"]["north_east_point"]["latitude"]
+    assert city_location.south_west_point.x == user_location_data_2["city_location"]["south_west_point"]["longitude"]
+    assert city_location.south_west_point.y == user_location_data_2["city_location"]["south_west_point"]["latitude"]
