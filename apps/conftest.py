@@ -71,16 +71,16 @@ def city_location_data_2() -> dict:
     return {
         "place_id": "ChIJybDUc_xKtUYRTM9XV8zWRD0",
         "location": {
-            "latitude": 55.755826,
-            "longitude": 37.6173
+            "latitude": 53.902284,
+            "longitude": 27.561831
         },
         "south_west_point": {
-            "latitude": 56.02146092898715,
-            "longitude": 37.96782207220939
+            "latitude": 53.82427,
+            "longitude": 27.38909
         },
         "north_east_point": {
-            "latitude": 55.14259103141742,
-            "longitude": 36.80322492234751
+            "latitude": 53.97800,
+            "longitude": 27.76125
         },
     }
 
