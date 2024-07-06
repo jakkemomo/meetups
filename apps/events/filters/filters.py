@@ -51,7 +51,7 @@ class EventFilter(filters.FilterSet):
 
     place_id = filters.CharFilter(lookup_expr='exact', field_name='city_location__place_id')
 
-    free = filters.BooleanFilter(lookup_expr='exact', field_name='price')
+    free = filters.BooleanFilter(lookup_expr='exact', field_name='free')
 
     participants_age = filters.NumberFilter(lookup_expr='exact', field_name='participants_age')
     participants_age__gte = filters.NumberFilter(lookup_expr='gte', field_name='participants_age')
