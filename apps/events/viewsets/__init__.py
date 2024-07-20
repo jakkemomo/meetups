@@ -1,5 +1,5 @@
 from .events import EventViewSet
-from ...profiles.viewsets.profiles import ProfileEventViewSet
+from .city import CityViewSet
 from .ratings import RatingViewSet
 from .categories import CategoryViewSet
 from .tags import TagViewSet

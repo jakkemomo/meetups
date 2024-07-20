@@ -32,3 +32,4 @@ from .review import (
 )
 from .map import GeoJsonSerializer
 from .currency import CurrencySerializer
+from .city import CityListSerializer
