@@ -193,3 +193,30 @@ class FollowerViewSet(viewsets.ModelViewSet):
         filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset).qs
         serializer = self.get_serializer(filter_follows, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="follow/(?P<followed_user_id>[^/.]+)/status/",
+        url_name="user_follow_status",
+    )
+    def follow_status(self, request, user_id, followed_user_id):
+        user = get_user_object(user_id=user_id)
+        followed_user = get_user_object(user_id=followed_user_id)
+        follower_object = Follower.objects.filter(
+            user=user,
+            follower=followed_user
+        ).first()
+
+        if not follower_object:
+            follow_status: str = 'NOT_FOLLOWED'
+        else:
+            follow_status: str = follower_object.status
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data={"status": follow_status},
+        )
