@@ -200,7 +200,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
     @action(
         methods=["get"],
         detail=True,
-        url_path="follow/(?P<followed_user_id>[^/.]+)/status/",
+        url_path="follow/(?P<followed_user_id>[^/.]+)/status",
         url_name="user_follow_status",
     )
     def follow_status(self, request, user_id, followed_user_id):
