@@ -62,3 +62,9 @@ class CitySerializer(serializers.ModelSerializer):
         city_location = City(**validated_data)
         city_location.save()
         return city_location
+
+
+class CityListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ["place_id"]

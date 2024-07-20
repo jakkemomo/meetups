@@ -9,7 +9,7 @@ from .viewsets import (
     MarkerViewSet,
     CurrencyViewSet,
     ReviewViewSet,
-    ParticipantViewSet,
+    ParticipantViewSet, CityViewSet,
 )
 
 app_name = "events"
@@ -23,6 +23,7 @@ router.register("markers", MarkerViewSet, basename="Markers")
 router.register("currencies", CurrencyViewSet, basename="Currencies")
 router.register("events/(?P<event_id>[^/.]+)/review", ReviewViewSet, basename="Review")
 router.register("events", ParticipantViewSet, basename="Events participants")
+router.register("city", CityViewSet, basename="city")
 
 urlpatterns = [
     path("api/v1/", include(router.urls)),
