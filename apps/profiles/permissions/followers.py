@@ -10,6 +10,7 @@ class FollowerPermissions(permissions.BasePermission):
             "list_followers",
             "list_following",
             "list_user_is_participant",
+            "follow_status"
         ]:
             user = get_user_object(user_id=view.kwargs.get("user_id"))
             # TODO resolve user getting here and in endpoints
