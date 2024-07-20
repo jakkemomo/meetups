@@ -1,7 +1,5 @@
-from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
-from apps.events.models.city import City
 from apps.events.serializers import CategoryListSerializer, city as city_serializers, utils
 from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists

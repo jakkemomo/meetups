@@ -1,4 +1,3 @@
-from typing import Any
 
 from django.db.models import Q, Count, Avg, Exists, OuterRef, Subquery
 from django.db.models.functions import Coalesce

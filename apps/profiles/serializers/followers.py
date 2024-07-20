@@ -4,8 +4,11 @@ from apps.profiles.models.followers import Follower
 
 
 class FollowerSerializer(serializers.ModelSerializer):
+    queryset = Follower.objects.prefetch_related("followers", "users")
+
     class Meta:
         model = Follower
+        depth = 1
         fields = (
             "user",
             "follower",
