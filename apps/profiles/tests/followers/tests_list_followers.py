@@ -37,8 +37,8 @@ def test_list_followers_accepted(
         reverse(LIST_FOLLOWERS_URL, args=[user_2.id])
     )
     assert response.status_code == 200
-    assert response.data[0].get("user") == user_2.id
-    assert response.data[0].get("follower") == user.id
+    assert response.data[0].get("user")['id'] == user_2.id
+    assert response.data[0].get("follower")['id'] == user.id
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
 
@@ -57,8 +57,8 @@ def test_list_followers_accepted_private(
         reverse(LIST_FOLLOWERS_URL, args=[user_2_private.id])
     )
     assert response.status_code == 200
-    assert response.data[0].get("user") == user_2_private.id
-    assert response.data[0].get("follower") == user_private.id
+    assert response.data[0].get("user")['id'] == user_2_private.id
+    assert response.data[0].get("follower")['id'] == user_private.id
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
 
@@ -143,8 +143,8 @@ def test_list_followers_current_user_accepted(
         reverse(LIST_FOLLOWERS_URL, args=[user_2.id])
     )
     assert response.status_code == 200
-    assert response.data[0].get("user") == user_2.id
-    assert response.data[0].get("follower") == user.id
+    assert response.data[0].get("user")['id'] == user_2.id
+    assert response.data[0].get("follower")['id'] == user.id
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
 

@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
 from apps.profiles.models.followers import Follower
+from .profiles import ProfileListSerializer
 
 
 class FollowerSerializer(serializers.ModelSerializer):
+    user = ProfileListSerializer()
+
     class Meta:
         model = Follower
         fields = (
