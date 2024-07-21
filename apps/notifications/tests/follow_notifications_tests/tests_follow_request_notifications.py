@@ -36,7 +36,9 @@ async def test_follow_request_valid(
     assert response.data == {
         'user': async_user_2_private.id,
         'follower': async_user.id,
-        'status': Follower.Status.PENDING
+        'status': Follower.Status.PENDING,
+        'username': async_user.username,
+        'image_url': async_user.image_url,
     }
 
     # notification check
