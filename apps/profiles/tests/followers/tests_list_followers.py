@@ -148,7 +148,6 @@ def test_list_followers_current_user_accepted(
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
 
-
 @pytest.mark.usefixtures(
     "follower_user_pending_private",
 )
