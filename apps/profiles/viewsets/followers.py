@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from apps.events.filters import TrigramSimilaritySearchFilter
@@ -13,14 +13,13 @@ from apps.notifications.models import Notification
 from apps.profiles.filters import filters_followers
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions.followers import FollowerPermissions
-from apps.profiles.serializers import FollowerSerializer
+from apps.profiles.serializers import FollowerSerializer, FollowingSerializer
 from apps.profiles.utils import get_user_object, is_current_user
 
 
 class FollowerViewSet(viewsets.ModelViewSet):
     model = Follower
     queryset = Follower.objects.all()
-    serializer_class = FollowerSerializer
     permission_classes = (IsAuthenticated, FollowerPermissions)
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
@@ -28,6 +27,12 @@ class FollowerViewSet(viewsets.ModelViewSet):
     filterset_class = filters_followers.UserFollowersFilter
     search_fields = ['user__username', 'user__age', 'user__city', ]
     ordering_fields = ['user__username', 'user__age', ]
+
+    def get_serializer_class(self):
+        if self.action == "list_following":
+            return FollowingSerializer
+        else:
+            return FollowerSerializer
 
     @swagger_auto_schema(
         request_body=no_body,
