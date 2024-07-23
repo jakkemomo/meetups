@@ -30,6 +30,7 @@ def user() -> User:
         email="user@example.com",
         password="test",
         is_email_verified=True,
+        username = "user"
     )
 
 
@@ -91,6 +92,7 @@ def user_2() -> User:
         email="user2@example.com",
         password="test2",
         is_email_verified=True,
+        username="user_2",
     )
 
 
