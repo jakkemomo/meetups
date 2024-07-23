@@ -39,6 +39,7 @@ def test_list_followers_accepted(
     assert response.status_code == 200
     assert response.data[0].get("user") == user_2.id
     assert response.data[0].get("follower") == user.id
+    assert response.data[0].get("username") == user.username
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
 
@@ -145,6 +146,7 @@ def test_list_followers_current_user_accepted(
     assert response.status_code == 200
     assert response.data[0].get("user") == user_2.id
     assert response.data[0].get("follower") == user.id
+    assert response.data[0].get("username") == user.username
     assert response.data[0].get("status") == Follower.Status.ACCEPTED
 
 

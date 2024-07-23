@@ -12,3 +12,6 @@ from .user_ratings import (
 from .followers import (
     FollowerSerializer,
 )
+from .following import (
+    FollowingSerializer
+)
