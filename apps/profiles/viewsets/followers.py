@@ -13,14 +13,13 @@ from apps.notifications.models import Notification
 from apps.profiles.filters import filters_followers
 from apps.profiles.models.followers import Follower
 from apps.profiles.permissions.followers import FollowerPermissions
-from apps.profiles.serializers import FollowerSerializer
+from apps.profiles.serializers import FollowerSerializer, FollowingSerializer
 from apps.profiles.utils import get_user_object, is_current_user
 
 
 class FollowerViewSet(viewsets.ModelViewSet):
     model = Follower
     queryset = Follower.objects.all()
-    serializer_class = FollowerSerializer
     permission_classes = (IsAuthenticated, FollowerPermissions)
     http_method_names = ["get", "post", "delete"]
     lookup_url_kwarg = "user_id"
@@ -34,6 +33,12 @@ class FollowerViewSet(viewsets.ModelViewSet):
         InAppNotificationsHandler(),
     )
     notifications_manager = NotificationsChainManager(handlers)
+    
+    def get_serializer_class(self):
+        if self.action == "list_following":
+            return FollowingSerializer
+        else:
+            return FollowerSerializer
 
     @swagger_auto_schema(
         request_body=no_body,
@@ -199,3 +204,30 @@ class FollowerViewSet(viewsets.ModelViewSet):
         filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset).qs
         serializer = self.get_serializer(filter_follows, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    @swagger_auto_schema(
+        request_body=no_body,
+    )
+    @action(
+        methods=["get"],
+        detail=True,
+        url_path="follow/(?P<followed_user_id>[^/.]+)/status",
+        url_name="user_follow_status",
+    )
+    def follow_status(self, request, user_id, followed_user_id):
+        user = get_user_object(user_id=user_id)
+        followed_user = get_user_object(user_id=followed_user_id)
+        follower_object = Follower.objects.filter(
+            user=user,
+            follower=followed_user
+        ).first()
+
+        if not follower_object:
+            follow_status: str = 'NOT_FOLLOWED'
+        else:
+            follow_status: str = follower_object.status
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data={"status": follow_status},
+        )
