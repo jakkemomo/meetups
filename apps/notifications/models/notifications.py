@@ -8,6 +8,10 @@ user_model = settings.AUTH_USER_MODEL
 
 
 class Notification(AbstractBaseModel):
+    class Status(models.TextChoices):
+        NEW = "NEW"
+        READ = "READ"
+
     class Type(models.TextChoices):
         # System
         SYSTEM = "system"
@@ -40,6 +44,12 @@ class Notification(AbstractBaseModel):
         choices=Type.choices,
         verbose_name=_("Type"),
     )
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default="NEW",
+        verbose_name=_("Status"),
+    )
     text = models.TextField(
         verbose_name=_("Text"),
         default="New notification"
@@ -52,7 +62,7 @@ class Notification(AbstractBaseModel):
         help_text="Unique data for certain type of notification",
     )
 
-    class Meta():
+    class Meta:
         ordering = ["created_at"]
         verbose_name = "Notification"
         verbose_name_plural = "Notifications"
