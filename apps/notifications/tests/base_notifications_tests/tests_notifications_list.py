@@ -30,9 +30,12 @@ async def test_notifications_list_valid(
     assert not response.data.get("previous")
     results = response.data.get("results")[0]
     assert results.get("id") == async_user_notification.id
-    assert results.get("created_by") == async_user_notification.created_by
+    assert results.get("created_by") == async_user_notification.created_by.id
+    assert results.get("created_by_username") == async_user_notification.created_by.username
     assert results.get("recipient") == async_user.id
+    assert results.get("recipient_username") == async_user.username
     assert results.get("type") == async_user_notification.type
+    assert results.get("text") == async_user_notification.text
 
 
 @pytest.mark.django_db(transaction=True)
