@@ -33,7 +33,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         InAppNotificationsHandler(),
     )
     notifications_manager = NotificationsChainManager(handlers)
-    
+
     def get_serializer_class(self):
         if self.action == "list_following":
             return FollowingSerializer

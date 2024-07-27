@@ -40,6 +40,10 @@ class Notification(AbstractBaseModel):
         choices=Type.choices,
         verbose_name=_("Type"),
     )
+    text = models.TextField(
+        verbose_name=_("Text"),
+        default="New notification"
+    )
     additional_data = models.JSONField(
         null=True,
         blank=True,

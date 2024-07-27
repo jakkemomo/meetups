@@ -25,9 +25,12 @@ async def test_notifications_get_valid(
     # Assertions
     assert response.status_code == 200
     assert response.data.get("id") == async_user_notification.id
-    assert response.data.get("created_by") == async_user_notification.created_by
+    assert response.data.get("created_by") == async_user_notification.created_by.id
+    assert response.data.get("created_by_username") == async_user_notification.created_by.username
     assert response.data.get("recipient") == async_user.id
+    assert response.data.get("recipient_username") == async_user.username
     assert response.data.get("type") == async_user_notification.type
+    assert response.data.get("text") == async_user_notification.text
 
 
 @pytest.mark.django_db(transaction=True)
