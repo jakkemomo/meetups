@@ -1,7 +1,7 @@
 from asgiref.sync import sync_to_async
 
 from apps.chats.models import Message
-from apps.notifications.base import BaseManager
+from apps.core.websockets.base import BaseManager
 
 
 class ChatManager(BaseManager):
@@ -20,7 +20,7 @@ class ChatManager(BaseManager):
         }
         await ChatManager.send_data(
             type="chat_message",
-            recipient=message_object.chat.id,
+            recipient=f"chat_{message_object.chat.id}",
             data=data,
             created_at=message_object.created_at
         )

@@ -9,7 +9,7 @@ from django.core.asgi import get_asgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-from apps.core.middlewares import JwtAuthMiddlewareStack
+from apps.core.websockets.middlewares import JwtAuthMiddlewareStack
 from config.settings import WS_ALLOWED_ORIGINS
 from config.urls import websocket_urlpatterns
 

@@ -51,7 +51,9 @@ async def test_follow_request_valid(
         'from_user_id': async_user.id,
         'from_user_image_url': async_user.image_url,
         'from_username': async_user.username,
-        'follower_status': Follower.Status.PENDING,
+        'additional_data': {
+            "follower_status": Follower.Status.PENDING,
+        }
     }
 
     notification_object = await database_sync_to_async(

@@ -5,8 +5,9 @@ from apps.notifications.models import Notification
 
 
 @pytest.fixture
-async def async_user_notification(async_user) -> Notification:
+async def async_user_notification(async_user, async_user_2) -> Notification:
     data = {
+        "created_by": async_user_2,
         "recipient": async_user,
         "type": Notification.Type.NEW_FOLLOWER
     }

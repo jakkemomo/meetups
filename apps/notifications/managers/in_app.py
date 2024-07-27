@@ -1,12 +1,19 @@
 from asgiref.sync import sync_to_async
 
-from apps.notifications.base import BaseManager
+from django.contrib.auth.models import User
+
+from apps.core.websockets.base import BaseManager
 from apps.notifications.models import Notification
 
 
-class NotificationManager(BaseManager):
+class InAppNotificationManager(BaseManager):
     @staticmethod
-    async def notification(created_by, recipient, notification_type, additional_data):
+    async def notification(
+            created_by: User,
+            recipient: User,
+            notification_type: Notification.Type,
+            additional_data: dict
+    ):
         notification_object = await sync_to_async(Notification.objects.create)(
             created_by=created_by,
             recipient=recipient,
@@ -23,12 +30,12 @@ class NotificationManager(BaseManager):
             "from_user_id": created_by.id,
             "from_username": created_by.username,
             "from_user_image_url": created_by.image_url,
-            "follower_status": notification_object.additional_data.get("follower_status"),
+            "additional_data": additional_data,
         }
 
-        await NotificationManager.send_data(
+        await InAppNotificationManager.send_data(
             type="notification",
-            recipient=recipient.id,
+            recipient=f"user_{recipient.id}",
             data=data,
             created_at=created_at,
         )

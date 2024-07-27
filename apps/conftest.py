@@ -11,12 +11,17 @@ from rest_framework.test import APIClient
 from django.test import AsyncClient
 from channels.routing import URLRouter
 from channels.db import database_sync_to_async
+from django.db import models
+from django.utils.module_loading import import_string
 
 from apps.profiles.models import User
 from apps.profiles.models.followers import Follower
 from apps.events.models import Event
 from apps.chats.models import Chat
 from config.urls import websocket_urlpatterns
+from config import settings
+
+PREFERENCES = [import_string(i) for i in settings.PREFERENCES.values()]
 
 
 @pytest.fixture
@@ -26,12 +31,17 @@ def api_client() -> APIClient:
 
 @pytest.fixture
 def user() -> User:
-    return User.objects.create(
+    user_object = User.objects.create(
         email="user@example.com",
         password="test",
         is_email_verified=True,
         username = "user"
     )
+    for preference_model in PREFERENCES:
+            preference_model.objects.create(
+                user=user_object,
+            )
+    return user_object
 
 
 @pytest.fixture()
@@ -324,6 +334,28 @@ async def async_client() -> AsyncClient:
     return AsyncClient()
 
 
+async def create_user(data):
+    user_object = await database_sync_to_async(User.objects.create)(**data)
+    for preference_model in PREFERENCES:
+        await database_sync_to_async(preference_model.objects.create)(
+            user=user_object,
+        )
+    return user_object
+
+
+@pytest.fixture
+async def async_user_2_false_all_preferences(async_user_2):
+    for preferences_model in PREFERENCES:
+        preferences_object = await database_sync_to_async(preferences_model.objects.filter)(
+            user=async_user_2,
+        )
+        preferences_object = await database_sync_to_async(preferences_object.first)()
+        for field in preferences_model._meta.fields:
+            if isinstance(field, models.BooleanField) and field.name != 'user':
+                setattr(preferences_object, field.name, False)
+        await database_sync_to_async(preferences_object.save)()
+
+
 @pytest.fixture
 async def async_user() -> User:
     data = {
@@ -332,7 +364,7 @@ async def async_user() -> User:
         "password": "test",
         "image_url": "test_image_url",
     }
-    return await database_sync_to_async(User.objects.create)(**data)
+    return await create_user(data)
 
 
 @pytest.fixture
@@ -343,7 +375,7 @@ async def async_user_2() -> User:
         "password": "test",
         "image_url": "test_image_url_2",
     }
-    return await database_sync_to_async(User.objects.create)(**data)
+    return await create_user(data)
 
 
 @pytest.fixture
