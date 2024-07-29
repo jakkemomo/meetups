@@ -1,3 +1,5 @@
+from typing import Union
+
 from asgiref.sync import async_to_sync
 from django.forms import model_to_dict
 from drf_yasg.utils import swagger_auto_schema, no_body
@@ -24,6 +26,7 @@ from apps.chats.serializers.messages import (
     MessageCreateSerializer,
 )
 from apps.chats.utils import list_chats_raw
+from apps.profiles.utils import get_user_object
 
 
 class ChatViewSet(viewsets.ModelViewSet):
@@ -164,12 +167,12 @@ class DirectChatViewSet(viewsets.ModelViewSet):
                 data="You can't chat with yourself"
             )
 
-
         try:
-            chat_object: Chat = Chat.objects.filter(
-                participants__in=[user, request.user],
-                type=Chat.Type.DIRECT,
-            ).first()
+            chat_object: Union[Chat, None] = (
+                Chat.objects
+                .filter(participants=user, type=Chat.Type.DIRECT)
+                .filter(participants=request.user).first()
+            )
         except Chat.DoesNotExist:
             chat_object = None
 
