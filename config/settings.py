@@ -305,7 +305,8 @@ CHANNEL_LAYERS = {
 }
 
 WS_ALLOWED_ORIGINS = [
-    "*"
+    "http://localhost:3000",
+    FRONTEND_URL,
 ]
 EVENTS_UPDATE_INTERVAL = 60 * 60  # 1 hour
 
