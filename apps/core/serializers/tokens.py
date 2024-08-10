@@ -45,7 +45,10 @@ class TokenPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         attrs[self.username_field] = attrs[self.username_field].lower()
-        return super().validate(attrs)
+        data = super().validate(attrs)
+        if not self.user.is_email_verified:
+            raise serializers.ValidationError("Email is not verified")
+        return data
 
     @classmethod
     def get_token(cls, user):

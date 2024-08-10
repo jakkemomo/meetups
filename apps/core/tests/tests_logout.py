@@ -2,6 +2,8 @@ import os
 
 import django
 
+from apps.profiles.models import User
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
@@ -14,8 +16,12 @@ from apps.core.tests.models import CoreTestsBase
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class LogoutTests(CoreTestsBase):
     def setUp(self):
-        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
-        response = self.client.post(self.LOGIN_PATH, self.DATA)
+        self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
+        user_record = User.objects.filter(email=self.CLIENT_DATA.get("email")).first()
+        user_record.is_email_verified = True
+        user_record.save()
+
+        response = self.client.post(self.LOGIN_PATH, self.CLIENT_DATA)
         self.refresh_token = response.data.get("refresh")
         self.access_token = response.data.get("access")
 
@@ -35,8 +41,13 @@ class LogoutTests(CoreTestsBase):
 
 class LogoutTestsUserLoggedOut(CoreTestsBase):
     def setUp(self):
-        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
-        response = self.client.post(self.LOGIN_PATH, self.DATA)
+        self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
+        user_record = User.objects.filter(email=self.CLIENT_DATA.get("email")).first()
+        user_record.is_email_verified = True
+        user_record.save()
+
+        response = self.client.post(self.LOGIN_PATH, self.CLIENT_DATA)
+
         self.refresh_token = response.data.get("refresh")
         self.access_token = response.data.get("access")
         self.client.post(self.LOGOUT_PATH, {"refresh": self.refresh_token})

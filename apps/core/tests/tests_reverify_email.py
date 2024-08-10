@@ -16,11 +16,11 @@ from apps.core.tests.models import CoreTestsBase
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class ReverifyEmailTests(CoreTestsBase):
     def setUp(self):
-        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
+        self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
 
     def test_valid(self):
         response = self.client.post(
-            path=self.REVERIFY_EMAIL_PATH, data={"email": self.DATA.get("email")}
+            path=self.REVERIFY_EMAIL_PATH, data={"email": self.CLIENT_DATA.get("email")}
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -42,7 +42,7 @@ class ReverifyEmailTests(CoreTestsBase):
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class ReverifyEmailTestsAlreadyVerified(CoreTestsBase):
     def setUp(self):
-        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
+        self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
         email_data = mail.outbox[0]
         soup = BeautifulSoup(email_data.body, "html.parser")
         email_verification_link = soup.find_all("a")[1].attrs.get("href")
@@ -51,7 +51,7 @@ class ReverifyEmailTestsAlreadyVerified(CoreTestsBase):
 
     def test_email_verified(self):
         response = self.client.post(
-            path=self.REVERIFY_EMAIL_PATH, data={"email": self.DATA.get("email")}
+            path=self.REVERIFY_EMAIL_PATH, data={"email": self.CLIENT_DATA.get("email")}
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -15,11 +15,14 @@ from apps.profiles.models.users import User
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class LoginTests(CoreTestsBase):
     def setUp(self):
-        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
+        self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
 
     def test_valid(self):
         data = {"email": "user@example.com", "password": "test"}
-        self.assertTrue(User.objects.filter(email=data.get("email")).first())
+        user_record = User.objects.filter(email=data.get("email")).first()
+        self.assertIsNotNone(user_record)
+        user_record.is_email_verified = True
+        user_record.save()
 
         response = self.client.post(self.LOGIN_PATH, data, format="json")
 
@@ -30,7 +33,6 @@ class LoginTests(CoreTestsBase):
     def test_email_not_provided(self):
         data = {"username": "test", "password": "test"}
         response = self.client.post(self.LOGIN_PATH, data, format="json")
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {"email": ["This field is required."]})
 
@@ -55,7 +57,8 @@ class LoginTests(CoreTestsBase):
     # password field
     def test_password_not_provided(self):
         data = {"email": "user@example.com"}
-        self.assertTrue(User.objects.filter(email=data.get("email")).first())
+        user_record = User.objects.filter(email=data.get("email")).first()
+        self.assertTrue(user_record)
 
         response = self.client.post(self.LOGIN_PATH, data, format="json")
 
@@ -64,8 +67,8 @@ class LoginTests(CoreTestsBase):
 
     def test_password_blank(self):
         data = {"email": "user@example.com", "password": ""}
-        self.assertTrue(User.objects.filter(email=data.get("email")).first())
-
+        user_record = User.objects.filter(email=data.get("email")).first()
+        self.assertTrue(user_record)
         response = self.client.post(self.LOGIN_PATH, data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -73,7 +76,8 @@ class LoginTests(CoreTestsBase):
 
     def test_password_invalid(self):
         data = {"email": "user@example.com", "password": "invalid"}
-        self.assertTrue(User.objects.filter(email=data.get("email")).first())
+        user_record = User.objects.filter(email=data.get("email")).first()
+        user_record.is_email_verified = True
 
         response = self.client.post(self.LOGIN_PATH, data, format="json")
 

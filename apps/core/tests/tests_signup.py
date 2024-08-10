@@ -20,15 +20,16 @@ class SignupTests(CoreTestsBase):
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_valid(self):
-        response = self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
+        response = self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
 
         # Testing response
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
-            response.data, {"username": self.DATA.get("username"), "email": self.DATA.get("email")}
+            response.data,
+            {"username": self.CLIENT_DATA.get("username"), "email": self.CLIENT_DATA.get("email")},
         )
 
-        user = User.objects.filter(email=self.DATA.get("email")).first()
+        user = User.objects.filter(email=self.CLIENT_DATA.get("email")).first()
         preferences = [import_string(i) for i in settings.NOTIFICATION_PREFERENCES.values()]
         for preference_model in preferences:
             preference_qs = preference_model.objects.filter(user=user)
@@ -142,12 +143,12 @@ class SignupTests(CoreTestsBase):
 
 class SignupTestsUserExists(CoreTestsBase):
     def setUp(self):
-        self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
+        self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
 
     # email field
     def test_email_exists(self):
-        response = self.client.post(path=self.SIGNUP_PATH, data=self.DATA, format="json")
+        response = self.client.post(path=self.SIGNUP_PATH, data=self.CLIENT_DATA, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {"email": ["This field must be unique."]})
-        self.assertTrue(User.objects.filter(email=self.DATA.get("email")).first())
+        self.assertTrue(User.objects.filter(email=self.CLIENT_DATA.get("email")).first())
