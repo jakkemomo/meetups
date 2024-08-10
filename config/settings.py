@@ -327,5 +327,5 @@ LANGUAGES = (
     ('ru', gettext('Russian')),
     ('en', gettext('English')),
 )
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'en-us')
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
