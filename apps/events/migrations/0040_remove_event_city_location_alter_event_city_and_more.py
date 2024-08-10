@@ -8,11 +8,32 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('profiles', '0025_remove_user_city_location_user_city'),
-        ('cities_light', '0012_city_display_name_en_city_display_name_ru_and_more'),
+        ('cities_light', '0011_alter_city_country_alter_city_region_and_more'),
         ('events', '0039_remove_event_city_north_east_point_and_more'),
     ]
-
     operations = [
+        # from cities_light
+        migrations.AddField(
+            model_name='city',
+            name='display_name_en',
+            field=models.CharField(max_length=200, null=True),
+        ),
+        migrations.AddField(
+            model_name='city',
+            name='display_name_ru',
+            field=models.CharField(max_length=200, null=True),
+        ),
+        migrations.AddField(
+            model_name='city',
+            name='name_en',
+            field=models.CharField(db_index=True, max_length=200, null=True),
+        ),
+        migrations.AddField(
+            model_name='city',
+            name='name_ru',
+            field=models.CharField(db_index=True, max_length=200, null=True),
+        ),
+        # from events
         migrations.RemoveField(
             model_name='event',
             name='city_location',
