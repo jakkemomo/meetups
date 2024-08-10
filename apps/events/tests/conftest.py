@@ -123,8 +123,6 @@ def city_minsk(region_minsk, country_minsk):
             "subregion_id": None,
             "display_name_ru": "Минск, Минская область, Беларусь",
             "display_name_en": "Minsk, Minsk City, Belarus",
-            "name_ru": "Минск",
-            "name_en": "Minsk"
         }
     )
     return city
