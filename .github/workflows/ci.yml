@@ -44,7 +44,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends binutils libproj-dev gdal-bin
       - name: Run database
         run: |
-          docker-compose -f deployments/docker-compose-db.yml up -d
+          docker compose -f deployments/docker-compose-db.yml up -d
           for i in {1..10}; do
             if pg_isready -h "${{ secrets.DB_HOST }}" -p "${{ secrets.DB_PORT }}"; then
               echo "Database is ready to accept connections."
