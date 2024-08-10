@@ -230,12 +230,13 @@ def follower_user_2_declined_private(user_private, user_2_private) -> Follower:
 
 
 @pytest.fixture
-def event() -> Event:
+def event(city_minsk) -> Event:
     chat = Chat.objects.create(type=Chat.Type.EVENT)
     return Event.objects.create(
         name="test_event",
         chat=chat,
         image_url="test_image_url",
+        city_id=city_minsk.id
     )
 
 

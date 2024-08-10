@@ -56,7 +56,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 self.queryset = self.model.objects.filter(
                     Q(is_visible=True) & Q(is_finished=False) & Q(type="open")
                 )
-        queryset = self.queryset.prefetch_related('category', 'tags').annotate(
+        queryset = self.queryset.prefetch_related('category', 'tags', 'city').annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
             is_favorite=Exists(

@@ -29,4 +29,4 @@ class LocationSerializer(serializers.ModelSerializer):
 class CitySerializer(ModelSerializer):
     class Meta:
         model = City
-        fields = ["id", "name", "display_name", ]
+        fields = ["id", "name", "display_name", "country_id", "latitude", "longitude", "timezone"]

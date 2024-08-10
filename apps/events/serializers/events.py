@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from cities_light.contrib.restframework3 import City, Country
+from cities_light.contrib.restframework3 import City
 from django.contrib.gis.geos import Point
 from django.db import transaction
 from rest_framework import serializers
@@ -9,7 +9,7 @@ from apps.events.models import Event, Tag, Category, Schedule, Currency
 from apps.profiles.models import User
 from apps.chats.models import Chat
 from . import currency, utils
-from .city import LocationSerializer
+from .city import LocationSerializer, CitySerializer
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -287,7 +287,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
-    # city_location = city_serializers.CitySerializer()
+    city = CitySerializer(many=False)
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()
     currency = currency.CurrencySerializer(many=False)

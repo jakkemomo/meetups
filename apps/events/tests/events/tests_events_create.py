@@ -24,6 +24,10 @@ def test_event_create_valid(
 
     assert response.status_code == 201
     assert Event.objects.filter(name=event_data.get("name")).first()
+    body = response.json()
+    body.pop('created_at')
+    body.pop('updated_at')
+    assert body == {'id': 1, 'desired_participants_number': 0, 'location': {'latitude': 53.902284, 'longitude': 27.561831}, 'city': 2495, 'cost': '10.99', 'repeatable': False, 'participants_age': 25, 'currency': 1, 'free': False, 'gallery': ['image1.jpg', 'image2.jpg'], 'schedule': [], 'tags': [1], 'category': 1, 'is_finished': False, 'is_visible': True, 'any_participant_number': True, 'start_date': '2024-05-15', 'end_date': '2024-05-20', 'start_time': '08:00:00', 'end_time': '18:00:00', 'name': 'Test Event', 'address': '123 Test St', 'image_url': None, 'type': 'open', 'description': 'This is an example event.', 'private_token': None, 'favorites': []}
 
 
 @pytest.mark.django_db
