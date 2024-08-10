@@ -97,8 +97,15 @@ def test_event_get_authorised_valid(
         'updated_at': event.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%f') + 'Z',
         'name': event.name,
         'address': event.address,
-        'city': event.city,
-        # 'country': event.country,
+        'city': {
+            'id': event.city.id,
+            'name': event.city.name,
+            'display_name': event.city.display_name,
+            'country_id': event.city.country_id,
+            'latitude': str(event.city.latitude) if event.city.latitude else event.city.latitude,
+            'longitude': str(event.city.longitude) if event.city.longitude else event.city.longitude,
+            'timezone': event.city.timezone
+        },        # 'country': event.country,
         'image_url': event.image_url,
         'type': event.type,
         'description': event.description,
