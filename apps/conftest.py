@@ -20,6 +20,7 @@ from apps.events.models import Event
 from apps.chats.models import Chat
 from config.urls import websocket_urlpatterns
 from config import settings
+from cities_light.contrib.restframework3 import City, Region, Country
 
 PREFERENCES = [import_string(i) for i in settings.PREFERENCES.values()]
 
@@ -43,6 +44,69 @@ def user() -> User:
             )
     return user_object
 
+
+@pytest.fixture
+def country_minsk():
+    country = Country.objects.create(
+        **
+  {
+    "id": 36,
+    "name_ascii": "Belarus",
+    "slug": "belarus",
+    "geoname_id": 630336,
+    "alternate_names": "Belarus’;Republic of Belarus;Respublika Belarus’;Respublika Byelarus’;Беларусь;Белоруссия;Республика Беларусь;Рэспубліка Беларусь",
+    "name": "Belarus",
+    "code2": "BY",
+    "code3": "BLR",
+    "continent": "EU",
+    "tld": "by",
+    "phone": "375"
+  })
+
+    return country
+
+@pytest.fixture
+def region_minsk(country_minsk):
+    region = Region.objects.create(
+        **  {
+    "id": 457,
+    "name_ascii": "Minsk City",
+    "slug": "minsk-city",
+    "geoname_id": 625143,
+    "alternate_names": "Горад Мінск",
+    "name": "Minsk City",
+    "display_name": "Minsk City, Belarus",
+    "geoname_code": "04",
+    "country_id": 36
+  }
+    )
+    return region
+
+@pytest.fixture
+def city_minsk(region_minsk, country_minsk):
+    city = City.objects.create(
+        **{
+            "id": 2495,
+            "name_ascii": "Minsk",
+            "slug": "minsk",
+            "geoname_id": 625144,
+            "alternate_names": "Минск;Мінск",
+            "name": "Minsk",
+            "display_name": "Minsk, Minsk City, Belarus",
+            "search_names": "minskbelarus minskbelorussiia minskgoradminskbelarus minskgoradminskbelorussiia minskgoradminskrepublicofbelarus minskgoradminskrespublikabelarus minskgoradminskrespublikabyelarus minskminskcitybelarus minskminskcitybelorussiia minskminskcityrepublicofbelarus minskminskcityrespublikabelarus minskminskcityrespublikabyelarus minskrepublicofbelarus minskrespublikabelarus minskrespublikabyelarus",
+            "latitude": 53.90000,
+            "longitude": 27.56667,
+            "region_id": 457,
+            "country_id": 36,
+            "population": 1742124,
+            "feature_code": "PPLC",
+            "timezone": "Europe/Minsk",
+            "subregion_id": None,
+            "display_name_ru": "Минск, Минская область, Беларусь",
+            "display_name_en": "Minsk, Minsk City, Belarus",
+        }
+    )
+    return city
 
 # @pytest.fixture()
 # def user_location_data(city_location_data) -> dict:
