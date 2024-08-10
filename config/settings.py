@@ -191,6 +191,8 @@ CONFIRM_PASSWORD_RESET_URL = os.getenv(  #  забыл пароль ( не ав�
 CHANGE_EMAIL_URL = os.getenv(  # забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
     "CHANGE_EMAIL_URL", f"{FRONTEND_URL}/security/email/confirm"
 )
+# todo: make new backend url for chaning email and keep separate from VERIFY_EMAIL_URL
+# todo: store new email in the hash field that is sent to email
 
 DEFAULT_USER_AVATAR_URL = os.getenv(
     "DEFAULT_USER_AVATAR_URL", "images/f4fcce125def40e7a232bb31109de9ac.webp"
