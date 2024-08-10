@@ -28,7 +28,7 @@ class Event(AbstractBaseModel):
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
     city = models.ForeignKey("cities_light.City", on_delete=models.PROTECT, null=True, blank=True)
-    country = models.ForeignKey("cities_light.Country", on_delete=models.PROTECT, null=True, blank=True)
+    # country = models.ForeignKey("cities_light.Country", on_delete=models.PROTECT, null=True, blank=True)
     location = PointField(default=Point(27.561831, 53.902284))
 
     participants_age = fields.PositiveSmallIntegerField(default=18, null=False, blank=False)

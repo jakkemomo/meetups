@@ -134,7 +134,7 @@ def event_data(currency, tag, category, city_minsk) -> dict:
         "name": "Test Event",
         "address": "123 Test St",
         "city_id": 2495,
-        "country_id": 36,
+        # "country_id": 36,
         "type": "open",
         "description": "This is an example event.",
         "location": {
@@ -165,7 +165,7 @@ def event_yandex_city_location_data(currency, tag, category) -> dict:
         "name": "Test Event",
         "address": "123 Test St",
         "city_id": 2495,
-        "country_id": 36,
+        # "country_id": 36,
         "type": "open",
         "description": "This is an example event.",
         "location": {

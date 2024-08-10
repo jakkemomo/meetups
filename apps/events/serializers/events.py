@@ -25,7 +25,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
                                                            required=False)
     location = LocationSerializer(required=True, many=False)
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False, allow_null=True)
-    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=False, allow_null=True)
+    # country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=False, allow_null=True)
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
     repeatable = serializers.BooleanField(default=False)
     participants_age = serializers.IntegerField(min_value=0, max_value=100, default=18)
