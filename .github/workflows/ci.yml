@@ -66,7 +66,7 @@ jobs:
           WS_DB: ${{ secrets.WS_DB }}
       - name: Test with pytest
         run: |
-          python manage.py migrate --noinput --database=channels_postgres && python manage.py migrate --noinput && python manage.py sync_translation_fields --noinput
+          python manage.py migrate --noinput --database=channels_postgres && python manage.py migrate --noinput && python manage.py sync_translation_fields && python manage.py makemigrations --noinput && python manage.py migrate cities_light --fake
           pytest -m "not asyncio"
           pytest -m asyncio
         env:
