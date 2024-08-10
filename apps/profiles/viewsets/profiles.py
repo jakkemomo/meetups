@@ -132,7 +132,10 @@ class ProfileEventViewSet(viewsets.ModelViewSet):
             )
 
         self.queryset = self.queryset.prefetch_related('category',
-                                                       'tags', 'city_location').annotate(
+                                                       'tags',
+                                                       'city',
+                                                       'country',
+                                                       ).annotate(
             participants_number=Count("participants"),
             average_rating=Coalesce(Avg("ratings__value"), 0.0),
             is_favorite=Exists(

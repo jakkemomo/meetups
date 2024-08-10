@@ -23,6 +23,7 @@ def test_event_update_valid(
     )
 
     # assertions
+
     assert response.status_code == 200
     changed_event = Event.objects.filter(created_by=user_2).first()
     assert changed_event

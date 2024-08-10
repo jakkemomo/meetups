@@ -32,6 +32,11 @@ class Migration(migrations.Migration):
             name='city',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='cities_light.city'),
         ),
+        migrations.AddField(
+            model_name='event',
+            name='country',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='cities_light.country'),
+        ),
         migrations.DeleteModel(
             name='City',
         ),

@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from cities_light.contrib.restframework3 import City
+from cities_light.contrib.restframework3 import City, Country
 from django.contrib.gis.geos import Point
 from django.db import transaction
 from rest_framework import serializers
@@ -25,8 +25,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
                                                            required=False)
     location = LocationSerializer(required=True, many=False)
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False, allow_null=True)
-    # city_location = city_serializers.CitySerializer()
-    country = serializers.CharField(max_length=50)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=False, allow_null=True)
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
     repeatable = serializers.BooleanField(default=False)
     participants_age = serializers.IntegerField(min_value=0, max_value=100, default=18)
@@ -189,7 +188,6 @@ class EventUpdateSerializer(EventCreateSerializer):
             )
         # if validated_data.get("city_location"):
         #     utils.update_city_if_exist(instance=instance, validated_data=validated_data)
-
         schedule_data = validated_data.pop("schedule", None)
         tags = validated_data.pop("tags", None)
 
@@ -203,7 +201,6 @@ class EventUpdateSerializer(EventCreateSerializer):
             schedule_start = utils.get_schedule_start(schedule_data)
             instance.start_date = schedule_start.date()
             instance.start_time = schedule_start.time()
-
         instance.save()
 
         if schedule_data:

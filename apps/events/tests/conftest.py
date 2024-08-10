@@ -5,21 +5,21 @@ from random import choices
 from typing import List
 
 import pytest
+from cities_light.contrib.restframework3 import City, Region, Country
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 
 from apps.events.models import Event, Category, Tag, Currency
-from apps.events.models.city import City
+# from apps.events.models.city import City
 from apps.profiles.tests.utils import get_tokens
 from rest_framework.test import APIClient
 
 
 @pytest.fixture
-def hundred_events(city_location_yandex) -> List:
+def hundred_events(city_minsk) -> List:
     events = []
     for i in range(100):
         name = ''.join(choices(string.ascii_uppercase + string.digits, k=20))
-        city_location = city_location_yandex
         start_date = timezone.now() + datetime.timedelta(days=i)
         end_date = start_date + datetime.timedelta(hours=random.randint(1, 5))
         # todo: change time handling to freezegun or mock
@@ -34,7 +34,7 @@ def hundred_events(city_location_yandex) -> List:
             end_date=end_date,
             start_time=start_time,
             end_time=end_time,
-            city_location=city_location
+            city=city_minsk
         )
         events.append(event)
 
@@ -56,42 +56,93 @@ def currency() -> Currency:
     return Currency.objects.create(name="USD")
 
 
+# @pytest.fixture
+# def city_location_yandex(city_location_minsk_yandex_data):
+#     city = City.objects.create(
+#         location=Point(city_location_minsk_yandex_data["location"]["longitude"],
+#                        city_location_minsk_yandex_data["location"]["latitude"]),
+#         place_id=city_location_minsk_yandex_data["place_id"],
+#     )
+#     return city
 @pytest.fixture
-def city_location_yandex(city_location_minsk_yandex_data):
+def country_minsk():
+    country = Country.objects.create(
+        **
+  {
+    "id": 36,
+    "name_ascii": "Belarus",
+    "slug": "belarus",
+    "geoname_id": 630336,
+    "alternate_names": "Belarus’;Republic of Belarus;Respublika Belarus’;Respublika Byelarus’;Беларусь;Белоруссия;Республика Беларусь;Рэспубліка Беларусь",
+    "name": "Belarus",
+    "code2": "BY",
+    "code3": "BLR",
+    "continent": "EU",
+    "tld": "by",
+    "phone": "375"
+  })
+
+    return country
+
+@pytest.fixture
+def region_minsk(country_minsk):
+    region = Region.objects.create(
+        **  {
+    "id": 457,
+    "name_ascii": "Minsk City",
+    "slug": "minsk-city",
+    "geoname_id": 625143,
+    "alternate_names": "Горад Мінск",
+    "name": "Minsk City",
+    "display_name": "Minsk City, Belarus",
+    "geoname_code": "04",
+    "country_id": 36
+  }
+    )
+    return region
+
+@pytest.fixture
+def city_minsk(region_minsk, country_minsk):
     city = City.objects.create(
-        location=Point(city_location_minsk_yandex_data["location"]["longitude"],
-                       city_location_minsk_yandex_data["location"]["latitude"]),
-        place_id=city_location_minsk_yandex_data["place_id"],
+        **{
+            "id": 2495,
+            "name_ascii": "Minsk",
+            "slug": "minsk",
+            "geoname_id": 625144,
+            "alternate_names": "Минск;Мінск",
+            "name": "Minsk",
+            "display_name": "Minsk, Minsk City, Belarus",
+            "search_names": "minskbelarus minskbelorussiia minskgoradminskbelarus minskgoradminskbelorussiia minskgoradminskrepublicofbelarus minskgoradminskrespublikabelarus minskgoradminskrespublikabyelarus minskminskcitybelarus minskminskcitybelorussiia minskminskcityrepublicofbelarus minskminskcityrespublikabelarus minskminskcityrespublikabyelarus minskrepublicofbelarus minskrespublikabelarus minskrespublikabyelarus",
+            "latitude": 53.90000,
+            "longitude": 27.56667,
+            "region_id": 457,
+            "country_id": 36,
+            "population": 1742124,
+            "feature_code": "PPLC",
+            "timezone": "Europe/Minsk",
+            "subregion_id": None,
+            "display_name_ru": "Минск, Минская область, Беларусь",
+            "display_name_en": "Minsk, Minsk City, Belarus",
+            "name_ru": "Минск",
+            "name_en": "Minsk"
+        }
     )
     return city
 
 
 @pytest.fixture
-def city_location_default(city_location_data):
-    city = City.objects.create(
-        location=Point(city_location_data["location"]["longitude"],
-                       city_location_data["location"]["latitude"]),
-        place_id=city_location_data["place_id"],
-        south_west_point=city_location_data['south_west_point'],
-        north_east_point=city_location_data['north_east_point']
-    )
-    return city
-
-
-@pytest.fixture
-def event_data(currency, tag, category, city_location_data) -> dict:
+def event_data(currency, tag, category, city_minsk) -> dict:
     return {
         "name": "Test Event",
         "address": "123 Test St",
-        "city": "Test City",
-        "country": "Test Country",
+        "city_id": 2495,
+        "country_id": 36,
         "type": "open",
         "description": "This is an example event.",
         "location": {
             "latitude": 53.902284,
             "longitude": 27.561831
         },
-        "city_location": city_location_data,
         "cost": 10.99,
         "repeatable": False,
         "participants_age": 25,
@@ -111,19 +162,19 @@ def event_data(currency, tag, category, city_location_data) -> dict:
 
 
 @pytest.fixture
-def event_yandex_city_location_data(currency, tag, category, city_location_minsk_yandex_data) -> dict:
+def event_yandex_city_location_data(currency, tag, category) -> dict:
     return {
         "name": "Test Event",
         "address": "123 Test St",
-        "city": "Test City",
-        "country": "Test Country",
+        "city_id": 2495,
+        "country_id": 36,
         "type": "open",
         "description": "This is an example event.",
         "location": {
             "latitude": 53.902284,
             "longitude": 27.561831
         },
-        "city_location": city_location_minsk_yandex_data,
+        # "city_location": city_location_minsk_yandex_data,
         "cost": 10.99,
         "repeatable": False,
         "participants_age": 25,
@@ -145,44 +196,6 @@ def event_yandex_city_location_data(currency, tag, category, city_location_minsk
 @pytest.fixture
 def event_from_data_created_by_user_2(event_data, user_2):
     return Event.objects.create(**event_data, created_by=user_2)
-
-
-@pytest.fixture
-def city_location_minsk_google_data() -> dict:
-    return {
-        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture
-def city_location_minsk_yandex_data() -> dict:
-    return {
-        "place_id": "",
-        "location": {
-            "latitude": 53.906284,
-            "longitude": 27.556831
-        },
-        "south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
 
 
 @pytest.fixture()

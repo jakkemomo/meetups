@@ -44,56 +44,56 @@ def user() -> User:
     return user_object
 
 
-@pytest.fixture()
-def user_location_data(city_location_data) -> dict:
-    return {
-        "city_location": city_location_data,
-    }
+# @pytest.fixture()
+# def user_location_data(city_location_data) -> dict:
+#     return {
+#         "city_location": city_location_data,
+#     }
+#
+#
+# @pytest.fixture()
+# def user_location_data_2(city_location_data_2) -> dict:
+#     return {
+#         "city_location": city_location_data_2,
+#     }
 
 
-@pytest.fixture()
-def user_location_data_2(city_location_data_2) -> dict:
-    return {
-        "city_location": city_location_data_2,
-    }
+# @pytest.fixture
+# def city_location_data() -> dict:
+#     return {
+#         "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
+#         "location": {
+#             "latitude": 53.902284,
+#             "longitude": 27.561831
+#         },
+#         "south_west_point": {
+#             "latitude": 53.82427,
+#             "longitude": 27.38909
+#         },
+#         "north_east_point": {
+#             "latitude": 53.97800,
+#             "longitude": 27.76125
+#         },
+#     }
 
 
-@pytest.fixture
-def city_location_data() -> dict:
-    return {
-        "place_id": "ChIJ02oeW9PP20YR2XC13VO4YQs",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
-
-
-@pytest.fixture
-def city_location_data_2() -> dict:
-    return {
-        "place_id": "ChIJybDUc_xKtUYRTM9XV8zWRD0",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
-        "south_west_point": {
-            "latitude": 53.82427,
-            "longitude": 27.38909
-        },
-        "north_east_point": {
-            "latitude": 53.97800,
-            "longitude": 27.76125
-        },
-    }
+# @pytest.fixture
+# def city_location_data_2() -> dict:
+#     return {
+#         "place_id": "ChIJybDUc_xKtUYRTM9XV8zWRD0",
+#         "location": {
+#             "latitude": 53.902284,
+#             "longitude": 27.561831
+#         },
+#         "south_west_point": {
+#             "latitude": 53.82427,
+#             "longitude": 27.38909
+#         },
+#         "north_east_point": {
+#             "latitude": 53.97800,
+#             "longitude": 27.76125
+#         },
+#     }
 
 
 @pytest.fixture
