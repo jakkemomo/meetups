@@ -329,3 +329,5 @@ LANGUAGES = (
 )
 LANGUAGE_CODE = 'ru-ru'
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+
+MIGRATION_MODULES = {'cities_light': 'apps.core.migrations'}
