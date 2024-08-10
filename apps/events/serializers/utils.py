@@ -3,7 +3,7 @@ from typing import Any
 
 from django.contrib.gis.geos import Polygon, Point
 
-from apps.events.models.city import City
+# from apps.events.models.city import City
 
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
@@ -53,31 +53,31 @@ def area_bbox(location: dict):
     return Polygon.from_bbox(bbox)
 
 
-def update_city_if_exist(instance, validated_data):
-    city_location = validated_data.pop("city_location")
-    city = City.objects.filter(
-        location__within=area_bbox(city_location["location"])
-    ).first()
-    if not city:
-        city = City.objects.create(
-            place_id=city_location["place_id"],
-            north_east_point=Point((
-                city_location["north_east_point"]["longitude"],
-                city_location["north_east_point"]["latitude"]
-            )),
-            south_west_point=Point((
-                city_location["south_west_point"]["longitude"],
-                city_location["south_west_point"]["latitude"],
-            )),
-            location=Point((
-                city_location["location"]["longitude"],
-                city_location["location"]["latitude"],
-            )),
-        )
-        instance.city_location = city
-        return instance
-    if city.place_id != city_location["place_id"] and city_location["place_id"] != "":
-        city.place_id = city_location["place_id"]
-        city.save()
-    instance.city_location = city
-    return instance
+# def update_city_if_exist(instance, validated_data):
+#     city_location = validated_data.pop("city_location")
+#     city = City.objects.filter(
+#         location__within=area_bbox(city_location["location"])
+#     ).first()
+#     if not city:
+#         city = City.objects.create(
+#             place_id=city_location["place_id"],
+#             north_east_point=Point((
+#                 city_location["north_east_point"]["longitude"],
+#                 city_location["north_east_point"]["latitude"]
+#             )),
+#             south_west_point=Point((
+#                 city_location["south_west_point"]["longitude"],
+#                 city_location["south_west_point"]["latitude"],
+#             )),
+#             location=Point((
+#                 city_location["location"]["longitude"],
+#                 city_location["location"]["latitude"],
+#             )),
+#         )
+#         instance.city_location = city
+#         return instance
+#     if city.place_id != city_location["place_id"] and city_location["place_id"] != "":
+#         city.place_id = city_location["place_id"]
+#         city.save()
+#     instance.city_location = city
+#     return instance

@@ -1,16 +1,15 @@
 from uuid import uuid4
 
+from cities_light.contrib.restframework3 import City
 from django.contrib.gis.geos import Point
 from django.db import transaction
 from rest_framework import serializers
 
 from apps.events.models import Event, Tag, Category, Schedule, Currency
-from apps.events.serializers import city as city_serializers
 from apps.profiles.models import User
 from apps.chats.models import Chat
 from . import currency, utils
 from .city import LocationSerializer
-from ..models.city import City
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -21,13 +20,12 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Schedule
         fields = ["id", "day_of_week", "time"]
 
-
 class EventCreateSerializer(serializers.ModelSerializer):
     desired_participants_number = serializers.IntegerField(min_value=0, max_value=10000000, default=0, allow_null=True,
                                                            required=False)
     location = LocationSerializer(required=True, many=False)
-    city = serializers.CharField(max_length=50)
-    city_location = city_serializers.CitySerializer()
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False, allow_null=True)
+    # city_location = city_serializers.CitySerializer()
     country = serializers.CharField(max_length=50)
     cost = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True, required=False)
     repeatable = serializers.BooleanField(default=False)
@@ -102,13 +100,13 @@ class EventCreateSerializer(serializers.ModelSerializer):
                 validated_data["location"]["latitude"]
             )
         )
-        city_location = validated_data['city_location']["location"]
-        city = City.objects.filter(
-            location__within=utils.area_bbox(city_location)
-        ).first()
-        if not city:
-            city = city_serializers.CitySerializer().create(validated_data['city_location'])
-        validated_data['city_location'] = city
+        # city_location = validated_data['city_location']["location"]
+        # city = City.objects.filter(
+        #     location__within=utils.area_bbox(city_location)
+        # ).first()
+        # if not city:
+        #     city = city_serializers.CitySerializer().create(validated_data['city_location'])
+        # validated_data['city_location'] = city
         request = self.context["request"]
         user_id = request.user.id
         validated_data["created_by_id"] = user_id
@@ -189,8 +187,8 @@ class EventUpdateSerializer(EventCreateSerializer):
                     location.get("latitude")
                 )
             )
-        if validated_data.get("city_location"):
-            utils.update_city_if_exist(instance=instance, validated_data=validated_data)
+        # if validated_data.get("city_location"):
+        #     utils.update_city_if_exist(instance=instance, validated_data=validated_data)
 
         schedule_data = validated_data.pop("schedule", None)
         tags = validated_data.pop("tags", None)
@@ -292,7 +290,7 @@ class EventRetrieveSerializer(serializers.ModelSerializer):
     category = EventCategorySerializer(many=False)
     created_by = ParticipantSerializer(many=False)
     location = serializers.SerializerMethodField("get_location")
-    city_location = city_serializers.CitySerializer()
+    # city_location = city_serializers.CitySerializer()
     participants_number = serializers.IntegerField()
     average_rating = serializers.FloatField()
     currency = currency.CurrencySerializer(many=False)

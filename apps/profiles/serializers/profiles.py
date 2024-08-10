@@ -1,16 +1,15 @@
-from django.contrib.gis.geos import Point
+from cities_light.contrib.restframework3 import City
 from rest_framework import serializers
 
-from apps.events.models.city import City
-from apps.events.serializers import CategoryListSerializer, city as city_serializers, utils
-from apps.profiles.models import User
 from apps.core.utils import delete_image_if_exists
+from apps.events.serializers import CategoryListSerializer
+from apps.profiles.models import User
 from apps.profiles.utils import change_followers_if_exists
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
     category_favorite = CategoryListSerializer(many=True)
-    city_location = city_serializers.CitySerializer()
+    # city_location = city_serializers.CitySerializer()
 
     class Meta:
         model = User
@@ -20,7 +19,8 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "city_location",
+            "city",
+            "city",
             "image_url",
             "is_email_verified",
             "is_private",
@@ -50,7 +50,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=False, max_length=30)
     email = serializers.EmailField(required=False, max_length=40)
     image_url = serializers.CharField(required=False, max_length=100)
-    city_location = city_serializers.CitySerializer()
+    # city_location = city_serializers.CitySerializer()
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False, allow_null=True)
     date_of_birth = serializers.DateField(required=False)
     category_favorite = CategoryListSerializer(many=True)
     gender = serializers.ChoiceField(choices=User.Gender.choices, required=False)
@@ -66,7 +67,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "email",
             "image_url",
             "is_email_verified",
-            "city_location",
+            "city",
             "is_private",
             "bio",
             "category_favorite",
@@ -84,8 +85,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             change_followers_if_exists(instance)
 
         categories = validated_data.pop("category_favorite", [])
-        if validated_data.get("city_location"):
-            utils.update_city_if_exist(instance=instance, validated_data=validated_data)
+        # if validated_data.get("city_location"):
+        #     utils.update_city_if_exist(instance=instance, validated_data=validated_data)
         profile: User = super().update(instance, validated_data)
 
         if categories:

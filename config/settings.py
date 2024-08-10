@@ -87,6 +87,8 @@ INSTALLED_APPS = [
     "daphne",
     "channels",
     "channels_postgres",
+    'modeltranslation',
+    'cities_light',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -174,7 +176,7 @@ AUTH_PASSWORD_VALIDATORS: list[dict] = []
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-LANGUAGE_CODE = "en-us"
+# LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
@@ -316,3 +318,14 @@ PREFERENCES = {
         "IN_APP": "apps.notifications.models.InAppNotificationsPreferences",
         "EMAIL": "apps.notifications.models.EmailNotificationsPreferences",
     }
+
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['ru', 'en', 'be', 'abbr']
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'STLMT',]
+
+gettext = lambda s: s
+LANGUAGES = (
+    ('ru', gettext('Russian')),
+    ('en', gettext('English')),
+)
+LANGUAGE_CODE = 'ru-ru'
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'

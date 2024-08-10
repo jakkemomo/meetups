@@ -1,23 +1,19 @@
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import AllowAny
+from cities_light.contrib.restframework3 import CitiesLightListModelViewSet, City
+from django_filters.rest_framework import DjangoFilterBackend
 
-from apps.events.models.city import City
-from apps.events.serializers.city import CityListSerializer
+from apps.events.filters import TrigramSimilaritySearchFilter
+from apps.events.serializers.city import CitySerializer
 
 
-class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class CityViewSet(CitiesLightListModelViewSet):
     """
-    A simple ViewSet for viewing City data.
+    ListRetrieveView for City.
     """
-
-    permission_classes = [AllowAny]
+    serializer_class = CitySerializer
     queryset = City.objects.all()
-    serializer_class = CityListSerializer
+    filter_backends = [TrigramSimilaritySearchFilter, DjangoFilterBackend]
+    search_fields = ["name", "display_name", "alternate_names",]
 
-    @swagger_auto_schema(
-        tags=['city'],
-        operation_description="Get all city place_id",
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        queryset = self.queryset
+        return queryset

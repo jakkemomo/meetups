@@ -3,7 +3,6 @@ from django.contrib.gis.geos import Polygon
 from django_filters import rest_framework as filters, Filter
 
 from apps.events.models import Event
-from apps.events.models.city import City
 
 
 class M2MFilter(Filter):
@@ -49,7 +48,7 @@ class EventFilter(filters.FilterSet):
     # category_in = filters.ModelMultipleChoiceFilter(field_name='category', queryset=Category.objects.all(),
     #                                                 conjoined=False)
 
-    place_id = filters.CharFilter(lookup_expr='exact', field_name='city_location__place_id')
+    city = filters.CharFilter(lookup_expr='exact', field_name='city')
 
     free = filters.BooleanFilter(lookup_expr='exact', field_name='free')
 
@@ -80,7 +79,7 @@ class EventFilter(filters.FilterSet):
             'tags_in',
             'category',
             'category_in',
-            'place_id',
+            'city',
             'free',
             'participants_age',
             'participants_age__gte',
