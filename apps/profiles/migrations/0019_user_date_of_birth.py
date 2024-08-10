@@ -5,14 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0018_alter_user_city_delete_city'),
-    ]
+    dependencies = [("profiles", "0018_alter_user_city_delete_city")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='date_of_birth',
-            field=models.DateField(blank=True, null=True),
-        ),
+            model_name="user", name="date_of_birth", field=models.DateField(blank=True, null=True)
+        )
     ]

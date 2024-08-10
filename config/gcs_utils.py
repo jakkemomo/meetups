@@ -16,5 +16,5 @@ class ExtendedGoogleCloudStorage(GoogleCloudStorage):
         return self._client
 
 
-static = lambda: ExtendedGoogleCloudStorage(location='static')
-media = lambda: ExtendedGoogleCloudStorage(location='media')
+static = lambda: ExtendedGoogleCloudStorage(location="static")
+media = lambda: ExtendedGoogleCloudStorage(location="media")

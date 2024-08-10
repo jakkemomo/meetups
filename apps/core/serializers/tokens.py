@@ -51,7 +51,7 @@ class TokenPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        token['aud'] = 'WEB'
-        token['iss'] = settings.SERVICE_URL
+        token["aud"] = "WEB"
+        token["iss"] = settings.SERVICE_URL
 
         return token

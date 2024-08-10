@@ -1,17 +1,9 @@
-from .profiles import (
-    ProfileRetrieveSerializer,
-    ProfileUpdateSerializer,
-    ProfileListSerializer,
-)
+from .followers import FollowerSerializer
+from .following import FollowingSerializer
+from .profiles import ProfileListSerializer, ProfileRetrieveSerializer, ProfileUpdateSerializer
 from .user_ratings import (
-    UserRatingListSerializer,
-    UserRatingUpdateSerializer,
     UserRatingCreateSerializer,
+    UserRatingListSerializer,
     UserRatingRetrieveSerializer,
-)
-from .followers import (
-    FollowerSerializer,
-)
-from .following import (
-    FollowingSerializer
+    UserRatingUpdateSerializer,
 )

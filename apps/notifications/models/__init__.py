@@ -1,5 +1,2 @@
 from .notifications import Notification
-from .preferences import (
-    InAppNotificationsPreferences,
-    EmailNotificationsPreferences,
-)
+from .preferences import EmailNotificationsPreferences, InAppNotificationsPreferences

@@ -2,14 +2,14 @@ from cities_light.contrib.restframework3 import City
 from rest_framework import serializers
 
 from apps.core.utils import delete_image_if_exists
-from apps.events.serializers import CategoryListSerializer
+from apps.events.serializers import CategoryListSerializer, CitySerializer
 from apps.profiles.models import User
 from apps.profiles.utils import change_followers_if_exists
 
 
 class ProfileRetrieveSerializer(serializers.ModelSerializer):
     category_favorite = CategoryListSerializer(many=True)
-    # city_location = city_serializers.CitySerializer()
+    city = CitySerializer(many=False)
 
     class Meta:
         model = User
@@ -19,7 +19,6 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "city",
             "city",
             "image_url",
             "is_email_verified",
@@ -35,12 +34,7 @@ class ProfileRetrieveSerializer(serializers.ModelSerializer):
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-        )
+        fields = ("id", "username", "first_name", "last_name")
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -50,8 +44,9 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=False, max_length=30)
     email = serializers.EmailField(required=False, max_length=40)
     image_url = serializers.CharField(required=False, max_length=100)
-    # city_location = city_serializers.CitySerializer()
-    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False, allow_null=True)
+    city = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(), required=False, allow_null=True
+    )
     date_of_birth = serializers.DateField(required=False)
     category_favorite = CategoryListSerializer(many=True)
     gender = serializers.ChoiceField(choices=User.Gender.choices, required=False)
@@ -77,7 +72,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        if 'image_url' in validated_data and not validated_data['image_url']:
+        if "image_url" in validated_data and not validated_data["image_url"]:
             delete_image_if_exists(instance)
 
         is_private = validated_data.get("is_private")
@@ -90,7 +85,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         profile: User = super().update(instance, validated_data)
 
         if categories:
-            profile.category_favorite.set([category.get('id') for category in categories])
+            profile.category_favorite.set([category.get("id") for category in categories])
         else:
             profile.category_favorite.clear()
 

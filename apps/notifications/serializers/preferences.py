@@ -1,9 +1,6 @@
 from rest_framework import serializers
 
-from apps.notifications.models import (
-    InAppNotificationsPreferences,
-    EmailNotificationsPreferences,
-)
+from apps.notifications.models import EmailNotificationsPreferences, InAppNotificationsPreferences
 
 
 class EmailNotificationsPreferencesRetrieveSerializer(serializers.ModelSerializer):

@@ -1,5 +1,6 @@
 from rest_framework import permissions
-from apps.core.permissions.common import is_verified, is_owner
+
+from apps.core.permissions.common import is_owner, is_verified
 
 
 class UserRatingPermissions(permissions.BasePermission):
@@ -10,7 +11,7 @@ class UserRatingPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        elif view.action in ['create', 'update', 'partial_update', 'destroy']:
+        elif view.action in ["create", "update", "partial_update", "destroy"]:
             return is_verified(request) and is_self_rated(request, obj) and is_owner(request, obj)
         else:
             return False

@@ -5,14 +5,10 @@ from rest_framework.serializers import ModelSerializer
 
 class LocationSerializer(serializers.ModelSerializer):
     latitude = serializers.DecimalField(
-        max_value=180, min_value=-180,
-        write_only=True, max_digits=18,
-        decimal_places=15,
+        max_value=180, min_value=-180, write_only=True, max_digits=18, decimal_places=15
     )
     longitude = serializers.DecimalField(
-        max_value=180, min_value=-180,
-        write_only=True, max_digits=18,
-        decimal_places=15,
+        max_value=180, min_value=-180, write_only=True, max_digits=18, decimal_places=15
     )
 
     class Meta:
@@ -20,10 +16,7 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ["latitude", "longitude"]
 
     def to_representation(self, value):
-        return {
-            "latitude": value.y,
-            "longitude": value.x
-        }
+        return {"latitude": value.y, "longitude": value.x}
 
 
 class CitySerializer(ModelSerializer):

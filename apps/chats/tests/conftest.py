@@ -22,9 +22,7 @@ async def chat_event_add_user_2(event, async_user_2) -> Chat:
 @pytest.fixture
 async def chat_event_add_message(event, async_user) -> Message:
     message = await database_sync_to_async(Message.objects.create)(
-        created_by=async_user,
-        chat=event.chat,
-        message_text="Hello, World!"
+        created_by=async_user, chat=event.chat, message_text="Hello, World!"
     )
     return message
 
@@ -34,13 +32,10 @@ async def chat_event_add_hundred_messages(event, async_user) -> list:
     messages = []
     for _ in range(100):
         # Generate a random message
-        message_text = ''.join(
-            choices(string.ascii_uppercase + string.digits, k=20))
+        message_text = "".join(choices(string.ascii_uppercase + string.digits, k=20))
 
         message = await database_sync_to_async(Message.objects.create)(
-            created_by=async_user,
-            chat=event.chat,
-            message_text=message_text
+            created_by=async_user, chat=event.chat, message_text=message_text
         )
         messages.append(message)
     return messages

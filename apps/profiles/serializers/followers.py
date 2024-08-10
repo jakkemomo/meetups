@@ -9,13 +9,7 @@ class FollowerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follower
-        fields = (
-            "user",
-            "follower",
-            "status",
-            "username",
-            "image_url",
-        )
+        fields = ("user", "follower", "status", "username", "image_url")
 
     def create(self, validated_data):
         user = validated_data.get("user")

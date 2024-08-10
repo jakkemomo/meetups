@@ -8,9 +8,7 @@ class ChatManager(BaseManager):
     @staticmethod
     async def chat_message(created_by, chat, message_text):
         message_object = await sync_to_async(Message.objects.create)(
-            created_by=created_by,
-            chat=chat,
-            message_text=message_text
+            created_by=created_by, chat=chat, message_text=message_text
         )
 
         data = {
@@ -22,7 +20,7 @@ class ChatManager(BaseManager):
             type="chat_message",
             recipient=f"chat_{message_object.chat.id}",
             data=data,
-            created_at=message_object.created_at
+            created_at=message_object.created_at,
         )
 
         return message_object

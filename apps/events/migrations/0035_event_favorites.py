@@ -8,13 +8,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('events', '0034_rename_private_url_event_private_token'),
+        ("events", "0034_rename_private_url_event_private_token"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='favorites',
-            field=models.ManyToManyField(blank=True, related_name='favorite_events', through='events.FavoriteEvent', to=settings.AUTH_USER_MODEL),
-        ),
+            model_name="event",
+            name="favorites",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="favorite_events",
+                through="events.FavoriteEvent",
+                to=settings.AUTH_USER_MODEL,
+            ),
+        )
     ]

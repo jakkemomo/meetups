@@ -6,11 +6,11 @@ from django.db import models
 from django.db.models import fields
 from django.utils.translation import gettext_lazy as _
 
+from apps.chats.models import Chat
 from apps.core.models import AbstractBaseModel
 from apps.events.models.rating import Rating
 from apps.events.models.schedule import Schedule
 from apps.events.models.tags import Tag
-from apps.chats.models import Chat
 
 user_model = settings.AUTH_USER_MODEL
 
@@ -46,26 +46,21 @@ class Event(AbstractBaseModel):
     repeatable = fields.BooleanField(default=False)
     free = fields.BooleanField(default=True)
 
-    gallery = ArrayField(models.CharField(max_length=250, null=True, blank=True, default=""), default=list)
+    gallery = ArrayField(
+        models.CharField(max_length=250, null=True, blank=True, default=""), default=list
+    )
 
     category = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
     )
-    currency = models.ForeignKey(
-        "Currency", on_delete=models.SET_NULL, null=True, blank=True
-    )
+    currency = models.ForeignKey("Currency", on_delete=models.SET_NULL, null=True, blank=True)
 
     participants = models.ManyToManyField(
         to=user_model, blank=True, related_name="event_participants"
     )
-    ratings = models.ManyToManyField(
-        to=Rating, blank=True, related_name="event_ratings",
-    )
-    schedule = models.ManyToManyField(
-        to=Schedule, blank=True, related_name="events",
-    )
-    tags = models.ManyToManyField(
-        to=Tag, related_name="events", blank=True)
+    ratings = models.ManyToManyField(to=Rating, blank=True, related_name="event_ratings")
+    schedule = models.ManyToManyField(to=Schedule, blank=True, related_name="events")
+    tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     favorites = models.ManyToManyField(
         to=user_model, related_name="favorite_events", blank=True, through="FavoriteEvent"
     )

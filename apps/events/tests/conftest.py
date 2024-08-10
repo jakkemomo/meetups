@@ -6,24 +6,28 @@ from typing import List
 
 import pytest
 from django.utils import timezone
-
-from apps.events.models import Event, Category, Tag, Currency
-from apps.profiles.tests.utils import get_tokens
 from rest_framework.test import APIClient
+
+from apps.events.models import Category, Currency, Event, Tag
+from apps.profiles.tests.utils import get_tokens
 
 
 @pytest.fixture
 def hundred_events() -> List:
     events = []
     for i in range(100):
-        name = ''.join(choices(string.ascii_uppercase + string.digits, k=20))
+        name = "".join(choices(string.ascii_uppercase + string.digits, k=20))
         start_date = timezone.now() + datetime.timedelta(days=i)
         end_date = start_date + datetime.timedelta(hours=random.randint(1, 5))
         # todo: change time handling to freezegun or mock
-        start_time = (datetime.datetime.combine(datetime.date.today(), datetime.time()) + datetime.timedelta(
-            minutes=random.randint(1, 1440))).time()
-        end_time = (datetime.datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(
-            hours=random.randint(1, 5))).time()
+        start_time = (
+            datetime.datetime.combine(datetime.date.today(), datetime.time())
+            + datetime.timedelta(minutes=random.randint(1, 1440))
+        ).time()
+        end_time = (
+            datetime.datetime.combine(datetime.date.today(), start_time)
+            + datetime.timedelta(hours=random.randint(1, 5))
+        ).time()
 
         event = Event.objects.create(
             name=name,
@@ -35,11 +39,6 @@ def hundred_events() -> List:
         events.append(event)
 
     return events
-
-
-@pytest.fixture
-def category() -> Category:
-    return Category.objects.create(name="test_category")
 
 
 @pytest.fixture
@@ -71,10 +70,7 @@ def event_data(currency, tag, category, city_minsk) -> dict:
         # "country_id": 36,
         "type": "open",
         "description": "This is an example event.",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
+        "location": {"latitude": 53.902284, "longitude": 27.561831},
         "cost": 10.99,
         "repeatable": False,
         "participants_age": 25,
@@ -89,7 +85,7 @@ def event_data(currency, tag, category, city_minsk) -> dict:
         "start_date": "2024-05-15",
         "end_date": "2024-05-20",
         "start_time": "08:00:00",
-        "end_time": "18:00:00"
+        "end_time": "18:00:00",
     }
 
 
@@ -102,10 +98,7 @@ def event_yandex_city_location_data(currency, tag, category) -> dict:
         # "country_id": 36,
         "type": "open",
         "description": "This is an example event.",
-        "location": {
-            "latitude": 53.902284,
-            "longitude": 27.561831
-        },
+        "location": {"latitude": 53.902284, "longitude": 27.561831},
         # "city_location": city_location_minsk_yandex_data,
         "cost": 10.99,
         "repeatable": False,
@@ -121,7 +114,7 @@ def event_yandex_city_location_data(currency, tag, category) -> dict:
         "start_date": "2024-05-15",
         "end_date": "2024-05-20",
         "start_time": "08:00:00",
-        "end_time": "18:00:00"
+        "end_time": "18:00:00",
     }
 
 

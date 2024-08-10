@@ -5,13 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0040_remove_event_city_location_alter_event_city_and_more'),
-    ]
+    dependencies = [("events", "0040_remove_event_city_location_alter_event_city_and_more")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='event',
-            name='country',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="event", name="country")]

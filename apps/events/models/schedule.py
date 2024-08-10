@@ -1,5 +1,6 @@
-from apps.core.models import AbstractBaseModel
 from django.db import models
+
+from apps.core.models import AbstractBaseModel
 
 
 class Schedule(AbstractBaseModel):
@@ -11,6 +12,7 @@ class Schedule(AbstractBaseModel):
         THU = "thu", "Thursday"
         FRI = "fri", "Friday"
         SAT = "sat", "Saturday"
+
     """
     "schedules": [
     {
@@ -28,13 +30,17 @@ class Schedule(AbstractBaseModel):
     day_of_week: enum ( 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
     """
 
-    event = models.ForeignKey("events.Event", on_delete=models.CASCADE, related_name="schedules", blank=False,)
-    day_of_week = models.CharField(max_length=3, choices=DayOfWeek.choices, blank=False, null=False)
+    event = models.ForeignKey(
+        "events.Event", on_delete=models.CASCADE, related_name="schedules", blank=False
+    )
+    day_of_week = models.CharField(
+        max_length=3, choices=DayOfWeek.choices, blank=False, null=False
+    )
     time = models.TimeField(blank=False, null=False)
 
     class Meta:
         verbose_name = "Schedule"
         verbose_name_plural = "Schedules"
         unique_together = ("event", "day_of_week")
-        db_table = 'events_schedule'
-        ordering = ['event', 'day_of_week']
+        db_table = "events_schedule"
+        ordering = ["event", "day_of_week"]

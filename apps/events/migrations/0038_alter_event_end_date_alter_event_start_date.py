@@ -5,19 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0037_merge_0035_event_chat_0036_category_image_url'),
-    ]
+    dependencies = [("events", "0037_merge_0035_event_chat_0036_category_image_url")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='end_date',
+            model_name="event",
+            name="end_date",
             field=models.DateField(blank=True, default=None, null=True),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='start_date',
+            model_name="event",
+            name="start_date",
             field=models.DateField(blank=True, default=None, null=True),
         ),
     ]

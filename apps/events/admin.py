@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from rest_framework.reverse import reverse
 
-from .models import Category, Event, Tag, Rating
+from .models import Category, Event, Rating, Tag
 
 
 class RatingInline(admin.TabularInline):
@@ -32,14 +32,10 @@ class EventAdmin(admin.ModelAdmin):
     def participants_number(self, obj):
         count = obj.participants.count()
         query = "?id__in={}".format(
-            ','.join(map(str, obj.participants.values_list('id', flat=True)))
+            ",".join(map(str, obj.participants.values_list("id", flat=True)))
         )
         link = reverse("admin:profiles_user_changelist") + query
-        return format_html(
-            "<a href={}>{}</a>",
-            link,
-            count,
-        )
+        return format_html("<a href={}>{}</a>", link, count)
 
 
 @admin.register(Category)
