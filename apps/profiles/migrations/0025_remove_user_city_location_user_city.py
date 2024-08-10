@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cities_light', '0012_city_display_name_en_city_display_name_ru_and_more'),
+        ('cities_light', '0011_alter_city_country_alter_city_region_and_more'),
         ('profiles', '0024_merge_20240616_1925'),
     ]
 

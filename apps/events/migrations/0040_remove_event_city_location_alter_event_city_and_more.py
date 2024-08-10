@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('profiles', '0025_remove_user_city_location_user_city'),
-        ('cities_light', '0012_city_display_name_en_city_display_name_ru_and_more'),
+        ('cities_light', '0011_alter_city_country_alter_city_region_and_more'),
         ('events', '0039_remove_event_city_north_east_point_and_more'),
     ]
 
