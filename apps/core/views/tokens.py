@@ -1,5 +1,6 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework_simplejwt.views import (
     TokenVerifyView,
     TokenBlacklistView,
@@ -55,4 +56,10 @@ class DecoratedTokenObtainPairView(TokenObtainPairView):
         tags=['auth'],
     )
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        if request.user.is_email_verified:
+            return super().post(request, *args, **kwargs)
+        else:
+            return Response(
+                data={"user.is_email_verified": "False, but must be True"},
+                status=status.HTTP_403_FORBIDDEN,
+            )

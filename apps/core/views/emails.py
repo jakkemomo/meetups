@@ -70,7 +70,7 @@ class VerifyEmailView(APIView):
 
         try:
             user = user_model.objects.get(id=user_id)
-        except(TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as exc:
             logger.error(exc)
 
             return Response(
@@ -79,6 +79,7 @@ class VerifyEmailView(APIView):
             )
 
         if user.is_email_verified:
+
             return Response(
                 'Email is already verified',
                 status=status.HTTP_400_BAD_REQUEST
@@ -175,9 +176,7 @@ class ChangeEmailView(APIView):
         email = request.data["email"].lower()
         if User.objects.filter(email=email).exists():
             return Response(status=status.HTTP_409_CONFLICT, data="This email has already been registered")
-        user.is_email_verified = False
-        user.email = email
-        user.save()
+
         try:
             helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL)
         except Exception as e:
