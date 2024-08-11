@@ -4,7 +4,6 @@ from apps.chats.models import Chat
 from apps.profiles.utils import is_follower
 
 
-
 class ChatPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj: Chat):
         return request.user in obj.participants.all()

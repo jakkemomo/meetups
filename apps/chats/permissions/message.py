@@ -8,6 +8,7 @@ class MessagePermissions(permissions.BasePermission):
     """
     Is owner or readonly if participant of a message chats
     """
+
     def has_object_permission(self, request, view, obj: Message):
         if request.user not in obj.chat.participants.all():
             return False

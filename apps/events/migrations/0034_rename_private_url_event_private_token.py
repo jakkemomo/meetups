@@ -5,14 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0033_event_ratings'),
-    ]
+    dependencies = [("events", "0033_event_ratings")]
 
     operations = [
         migrations.RenameField(
-            model_name='event',
-            old_name='private_url',
-            new_name='private_token',
-        ),
+            model_name="event", old_name="private_url", new_name="private_token"
+        )
     ]

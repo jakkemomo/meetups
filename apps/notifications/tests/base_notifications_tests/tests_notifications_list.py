@@ -8,20 +8,13 @@ from config import settings
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_notifications_list_valid(
-        async_client,
-        async_user,
-        async_user_notification,
-):
+async def test_notifications_list_valid(async_client, async_user, async_user_notification):
     # user logs in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # user gets notifications list
-    response = await async_client.get(
-        reverse(NOTIFICATIONS_LIST_URL),
-        headers=header,
-    )
+    response = await async_client.get(reverse(NOTIFICATIONS_LIST_URL), headers=header)
 
     # assertions
     assert response.status_code == 200
@@ -40,13 +33,9 @@ async def test_notifications_list_valid(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_notifications_list_unauthorized(
-        async_client,
-):
+async def test_notifications_list_unauthorized(async_client):
     # User gets notifications list without authorization
-    response = await async_client.get(
-        reverse(NOTIFICATIONS_LIST_URL),
-    )
+    response = await async_client.get(reverse(NOTIFICATIONS_LIST_URL))
 
     # Assertions
     assert response.status_code == 401
@@ -54,19 +43,13 @@ async def test_notifications_list_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_notifications_list_empty(
-        async_client,
-        async_user,
-):
+async def test_notifications_list_empty(async_client, async_user):
     # User logs in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # User gets notifications list
-    response = await async_client.get(
-        reverse(NOTIFICATIONS_LIST_URL),
-        headers=header,
-    )
+    response = await async_client.get(reverse(NOTIFICATIONS_LIST_URL), headers=header)
 
     # Assertions
     assert response.status_code == 200
@@ -79,19 +62,14 @@ async def test_notifications_list_empty(
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_notifications_list_hundred_notifications(
-        async_client,
-        async_user,
-        async_user_hundred_notifications,
+    async_client, async_user, async_user_hundred_notifications
 ):
     # User logs in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # User gets notifications list
-    response = await async_client.get(
-        reverse(NOTIFICATIONS_LIST_URL),
-        headers=header,
-    )
+    response = await async_client.get(reverse(NOTIFICATIONS_LIST_URL), headers=header)
 
     # Assertions
     assert response.status_code == 200

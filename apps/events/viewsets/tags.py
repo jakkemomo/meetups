@@ -4,10 +4,10 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from apps.events.models import Tag
 from apps.events.permissions import TagPermissions
 from apps.events.serializers import (
-    TagRetrieveSerializer,
     TagCreateSerializer,
-    TagUpdateSerializer,
     TagListSerializer,
+    TagRetrieveSerializer,
+    TagUpdateSerializer,
 )
 
 

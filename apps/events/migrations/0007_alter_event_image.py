@@ -11,10 +11,7 @@ class Migration(migrations.Migration):
             model_name="event",
             name="image",
             field=models.ImageField(
-                blank=True,
-                default="events/image/default-event.jpg",
-                null=True,
-                upload_to=None,
+                blank=True, default="events/image/default-event.jpg", null=True, upload_to=None
             ),
         )
     ]

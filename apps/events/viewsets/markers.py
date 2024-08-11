@@ -17,15 +17,14 @@ class MarkerViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = Event.objects.filter(Q(is_visible=True) & Q(is_finished=False))
     serializer_class = GeoJsonSerializer
 
-    @swagger_auto_schema(
-        tags=['map'],
-        operation_description="Get all events in GeoJSON format",
-    )
+    @swagger_auto_schema(tags=["map"], operation_description="Get all events in GeoJSON format")
     def list(self, request, *args, **kwargs):
         geo_events = json.loads(
             serialize(
-                "geojson", self.queryset.all(),
+                "geojson",
+                self.queryset.all(),
                 geometry_field="location",
-                fields=["id", "name", "start_date", "end_date", "description", "address"])
+                fields=["id", "name", "start_date", "end_date", "description", "address"],
+            )
         )
         return Response(geo_events, status=status.HTTP_200_OK)

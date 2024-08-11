@@ -6,13 +6,11 @@ from apps.profiles.models import User
 
 
 class PasswordResetSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        required=True,
-    )
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ("email", )
+        fields = ("email",)
 
     def validate(self, attrs):
         email = attrs["email"].lower()
@@ -31,9 +29,7 @@ class PasswordResetSerializer(serializers.ModelSerializer):
 
 class PasswordFormSerializer(serializers.Serializer):
     password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
+        write_only=True, required=True, validators=[validate_password]
     )
 
     def validate(self, attrs):
@@ -41,9 +37,7 @@ class PasswordFormSerializer(serializers.Serializer):
 
         user = self.context.get("user")
         if not user:
-            raise serializers.ValidationError(
-                {"user": "The user is not authenticated"}
-            )
+            raise serializers.ValidationError({"user": "The user is not authenticated"})
 
         if user.check_password(attrs["password"]):
             raise serializers.ValidationError(
@@ -55,9 +49,7 @@ class PasswordFormSerializer(serializers.Serializer):
 
 class PasswordChangeSerializer(PasswordFormSerializer):
     old_password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password],
+        write_only=True, required=True, validators=[validate_password]
     )
 
     def validate(self, attrs):
@@ -65,8 +57,6 @@ class PasswordChangeSerializer(PasswordFormSerializer):
 
         user = self.context.get("user")
         if not user.check_password(attrs["old_password"]):
-            raise serializers.ValidationError(
-                {"old_password": "Existing password is incorrect"}
-            )
+            raise serializers.ValidationError({"old_password": "Existing password is incorrect"})
 
         return attrs

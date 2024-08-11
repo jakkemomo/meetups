@@ -1,18 +1,9 @@
+from .emails import ChangeEmailView, CheckEmailExistsView, ReverifyEmailView, VerifyEmailView
+from .passwords import PasswordChangeView, PasswordResetConfirmView, PasswordResetView
 from .register import RegisterView
-from .emails import (
-    VerifyEmailView,
-    ReverifyEmailView,
-    CheckEmailExistsView,
-    ChangeEmailView,
-)
 from .tokens import (
-    DecoratedTokenObtainPairView,
     DecoratedTokenBlacklistView,
-    DecoratedTokenVerifyView,
+    DecoratedTokenObtainPairView,
     DecoratedTokenRefreshView,
-)
-from .passwords import (
-    PasswordResetView,
-    PasswordResetConfirmView,
-    PasswordChangeView,
+    DecoratedTokenVerifyView,
 )

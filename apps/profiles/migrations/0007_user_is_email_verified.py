@@ -6,13 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profiles', '0004_url_field_instead_of_image_field_squashed_0006_imagedields_to_charfields'),
+        (
+            "profiles",
+            "0004_url_field_instead_of_image_field_squashed_0006_imagedields_to_charfields",
+        )
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='is_email_verified',
-            field=models.BooleanField(default=False),
-        ),
+            model_name="user", name="is_email_verified", field=models.BooleanField(default=False)
+        )
     ]

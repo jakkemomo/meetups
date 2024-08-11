@@ -1,6 +1,5 @@
 from django.db.models import fields
 
-
 from apps.core.models import AbstractBaseModel
 
 

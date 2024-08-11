@@ -9,17 +9,11 @@ user_model = settings.AUTH_USER_MODEL
 
 class Message(AbstractBaseModel):
     chat = models.ForeignKey(
-        to="Chat",
-        on_delete=models.CASCADE,
-        related_name="chat_messages",
-        verbose_name=_("Chat"),
+        to="Chat", on_delete=models.CASCADE, related_name="chat_messages", verbose_name=_("Chat")
     )
-    message_text = models.TextField(
-        max_length=528,
-        verbose_name=_("Message text"),
-    )
+    message_text = models.TextField(max_length=528, verbose_name=_("Message text"))
 
-    class Meta():
+    class Meta:
         ordering = ["created_at"]
         verbose_name = "Message"
         verbose_name_plural = "Messages"

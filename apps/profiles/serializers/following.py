@@ -9,10 +9,4 @@ class FollowingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follower
-        fields = (
-            "user",
-            "follower",
-            "status",
-            "username",
-            "image_url",
-        )
+        fields = ("user", "follower", "status", "username", "image_url")

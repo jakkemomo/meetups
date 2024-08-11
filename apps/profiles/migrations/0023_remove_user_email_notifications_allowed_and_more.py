@@ -5,17 +5,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0022_user_email_notifications_allowed_and_more'),
-    ]
+    dependencies = [("profiles", "0022_user_email_notifications_allowed_and_more")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='user',
-            name='email_notifications_allowed',
-        ),
-        migrations.RemoveField(
-            model_name='user',
-            name='in_app_notifications_allowed',
-        ),
+        migrations.RemoveField(model_name="user", name="email_notifications_allowed"),
+        migrations.RemoveField(model_name="user", name="in_app_notifications_allowed"),
     ]

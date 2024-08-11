@@ -39,21 +39,11 @@ class Notification(AbstractBaseModel):
         related_name="notification_recipient",
         verbose_name=_("Recipient"),
     )
-    type = models.CharField(
-        max_length=50,
-        choices=Type.choices,
-        verbose_name=_("Type"),
-    )
+    type = models.CharField(max_length=50, choices=Type.choices, verbose_name=_("Type"))
     status = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default="NEW",
-        verbose_name=_("Status"),
+        max_length=10, choices=Status.choices, default="NEW", verbose_name=_("Status")
     )
-    text = models.TextField(
-        verbose_name=_("Text"),
-        default="New notification"
-    )
+    text = models.TextField(verbose_name=_("Text"), default="New notification")
     additional_data = models.JSONField(
         null=True,
         blank=True,

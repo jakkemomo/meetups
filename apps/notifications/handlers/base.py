@@ -11,30 +11,27 @@ class AbstractNotificationsHandler(ABC):
         self.preferences_model = self.get_preferences_model()
 
     def handle(
-            self,
-            created_by: User,
-            recipient: User,
-            notification_type: Notification.Type,
-            additional_data: dict
+        self,
+        created_by: User,
+        recipient: User,
+        notification_type: Notification.Type,
+        additional_data: dict,
     ):
-        if self.check_preference(
-            recipient=recipient,
-            notification_type=notification_type
-        ):
+        if self.check_preference(recipient=recipient, notification_type=notification_type):
             self.notify(
                 created_by=created_by,
                 recipient=recipient,
                 notification_type=notification_type,
-                additional_data=additional_data
+                additional_data=additional_data,
             )
 
     @abstractmethod
     def notify(
-            self,
-            created_by: User,
-            recipient: User,
-            notification_type: Notification.Type,
-            additional_data: dict
+        self,
+        created_by: User,
+        recipient: User,
+        notification_type: Notification.Type,
+        additional_data: dict,
     ):
         """
         This method must have an implementation to
@@ -51,15 +48,10 @@ class AbstractNotificationsHandler(ABC):
         ...
 
     def check_preference(self, recipient, notification_type):
-        preferences_object = (self.preferences_model.objects
-                              .filter(user=recipient)
-                              .first()
-                              )
+        preferences_object = self.preferences_model.objects.filter(user=recipient).first()
         if not preferences_object:
             try:
-                preferences_object = self.preferences_model.objects.create(
-                    user=recipient
-                )
+                preferences_object = self.preferences_model.objects.create(user=recipient)
             except Exception as exc:
                 raise MissingPreferencesObjectException(detail=exc)
 

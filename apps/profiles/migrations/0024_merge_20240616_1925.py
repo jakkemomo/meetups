@@ -7,9 +7,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profiles', '0022_remove_user_city_user_city_location'),
-        ('profiles', '0023_remove_user_email_notifications_allowed_and_more'),
+        ("profiles", "0022_remove_user_city_user_city_location"),
+        ("profiles", "0023_remove_user_email_notifications_allowed_and_more"),
     ]
 
-    operations: List = [
-    ]
+    operations: List = []

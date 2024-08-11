@@ -6,12 +6,11 @@ from django.db import models
 from django.db.models import fields
 from django.utils.translation import gettext_lazy as _
 
+from apps.chats.models import Chat
 from apps.core.models import AbstractBaseModel
-from apps.events.models.city import City
 from apps.events.models.rating import Rating
 from apps.events.models.schedule import Schedule
 from apps.events.models.tags import Tag
-from apps.chats.models import Chat
 
 user_model = settings.AUTH_USER_MODEL
 
@@ -19,8 +18,6 @@ user_model = settings.AUTH_USER_MODEL
 class Event(AbstractBaseModel):
     name = fields.CharField(max_length=250, unique=True, null=True, blank=True)
     address = fields.CharField(max_length=250, null=False, blank=False, default="Беларусь, Минск")
-    city = fields.CharField(max_length=50, null=False, blank=False, default="Минск")
-    country = fields.CharField(max_length=50, null=False, blank=False, default="Беларусь")
     image_url = models.CharField(max_length=250, null=True, blank=True)
     type = fields.CharField(
         max_length=10,
@@ -30,7 +27,8 @@ class Event(AbstractBaseModel):
         blank=False,
     )
     description = fields.TextField(max_length=250, null=True, blank=True)
-    city_location = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
+    city = models.ForeignKey("cities_light.City", on_delete=models.PROTECT, null=True, blank=True)
+    # country = models.ForeignKey("cities_light.Country", on_delete=models.PROTECT, null=True, blank=True)
     location = PointField(default=Point(27.561831, 53.902284))
 
     participants_age = fields.PositiveSmallIntegerField(default=18, null=False, blank=False)
@@ -48,26 +46,21 @@ class Event(AbstractBaseModel):
     repeatable = fields.BooleanField(default=False)
     free = fields.BooleanField(default=True)
 
-    gallery = ArrayField(models.CharField(max_length=250, null=True, blank=True, default=""), default=list)
+    gallery = ArrayField(
+        models.CharField(max_length=250, null=True, blank=True, default=""), default=list
+    )
 
     category = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name="category_events", null=True, blank=True
     )
-    currency = models.ForeignKey(
-        "Currency", on_delete=models.SET_NULL, null=True, blank=True
-    )
+    currency = models.ForeignKey("Currency", on_delete=models.SET_NULL, null=True, blank=True)
 
     participants = models.ManyToManyField(
         to=user_model, blank=True, related_name="event_participants"
     )
-    ratings = models.ManyToManyField(
-        to=Rating, blank=True, related_name="event_ratings",
-    )
-    schedule = models.ManyToManyField(
-        to=Schedule, blank=True, related_name="events",
-    )
-    tags = models.ManyToManyField(
-        to=Tag, related_name="events", blank=True)
+    ratings = models.ManyToManyField(to=Rating, blank=True, related_name="event_ratings")
+    schedule = models.ManyToManyField(to=Schedule, blank=True, related_name="events")
+    tags = models.ManyToManyField(to=Tag, related_name="events", blank=True)
     favorites = models.ManyToManyField(
         to=user_model, related_name="favorite_events", blank=True, through="FavoriteEvent"
     )

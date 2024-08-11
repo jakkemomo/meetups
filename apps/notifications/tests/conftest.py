@@ -9,17 +9,14 @@ async def async_user_notification(async_user, async_user_2) -> Notification:
     data = {
         "created_by": async_user_2,
         "recipient": async_user,
-        "type": Notification.Type.NEW_FOLLOWER
+        "type": Notification.Type.NEW_FOLLOWER,
     }
     return await database_sync_to_async(Notification.objects.create)(**data)
 
 
 @pytest.fixture
 async def async_user_hundred_notifications(async_user) -> list:
-    data = {
-        "recipient": async_user,
-        "type": Notification.Type.NEW_FOLLOWER
-    }
+    data = {"recipient": async_user, "type": Notification.Type.NEW_FOLLOWER}
     notifications = []
     for _ in range(100):
         notification = await database_sync_to_async(Notification.objects.create)(**data)

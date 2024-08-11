@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import AbstractBaseModel
 from config import settings
 
-
 user_model = settings.AUTH_USER_MODEL
 
 
@@ -13,19 +12,12 @@ class Chat(AbstractBaseModel):
         EVENT = "EVENT"
         DIRECT = "DIRECT"
 
-    type = models.CharField(
-        max_length=15,
-        choices=Type.choices,
-        verbose_name=_("Type"),
-    )
+    type = models.CharField(max_length=15, choices=Type.choices, verbose_name=_("Type"))
     participants = models.ManyToManyField(
-        to=user_model,
-        blank=True,
-        related_name="chat_participants",
-        verbose_name=_("Participants"),
+        to=user_model, blank=True, related_name="chat_participants", verbose_name=_("Participants")
     )
 
-    class Meta():
+    class Meta:
         ordering = ["created_at"]
         verbose_name = "Chat"
         verbose_name_plural = "Chats"

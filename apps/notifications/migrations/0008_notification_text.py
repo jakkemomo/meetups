@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0005_alter_notification_type_and_more_squashed_0007_alter_emailnotificationspreferences_options_and_more'),
+        (
+            "notifications",
+            "0005_alter_notification_type_and_more_squashed_0007_alter_emailnotificationspreferences_options_and_more",
+        )
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='text',
-            field=models.TextField(default='New notification', verbose_name='Text'),
-        ),
+            model_name="notification",
+            name="text",
+            field=models.TextField(default="New notification", verbose_name="Text"),
+        )
     ]

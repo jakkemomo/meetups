@@ -8,19 +8,14 @@ from apps.profiles.tests.utils import async_get_tokens
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_chats_chat_event_participants_valid(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-        chat_event_add_message,
+    async_client, async_user, event, chat_event_add_user, chat_event_add_message
 ):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     response = await async_client.get(
-        reverse(CHATS_GET_PARTICIPANTS_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_PARTICIPANTS_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     # assertions
@@ -36,13 +31,9 @@ async def test_chats_chat_event_participants_valid(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_chats_chat_event_participants_unauthorized(
-        async_client,
-        async_user,
-        event,
-):
+async def test_chats_chat_event_participants_unauthorized(async_client, async_user, event):
     response = await async_client.get(
-        reverse(CHATS_GET_PARTICIPANTS_URL, kwargs={"chat_id": event.chat.id}),
+        reverse(CHATS_GET_PARTICIPANTS_URL, kwargs={"chat_id": event.chat.id})
     )
 
     # assertions
@@ -51,18 +42,13 @@ async def test_chats_chat_event_participants_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_chats_chat_event_participants_not_participants(
-        async_client,
-        async_user,
-        event,
-):
+async def test_chats_chat_event_participants_not_participants(async_client, async_user, event):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     response = await async_client.get(
-        reverse(CHATS_GET_PARTICIPANTS_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_PARTICIPANTS_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     # assertions

@@ -15,8 +15,4 @@ class ReverifyEmailSerializer(serializers.ModelSerializer):
 
 
 class EmailCheckSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        max_length=None,
-        min_length=None,
-        allow_blank=False
-    )
+    email = serializers.EmailField(max_length=None, min_length=None, allow_blank=False)

@@ -14,7 +14,7 @@ def has_chat_permissions(user, chat):
     return user in participants
 
 
-list_chats_raw = '''
+list_chats_raw = """
             SELECT
                 chats_chat.id,
                 chats_chat.type,
@@ -48,4 +48,4 @@ list_chats_raw = '''
                 WHERE user_id = %s
                 )
             ORDER BY chats_chat.id;
-            '''
+            """

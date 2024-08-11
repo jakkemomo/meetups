@@ -20,3 +20,5 @@ channels==4.0.0
 channels-redis==4.2.0
 daphne==4.1.0
 channels-postgres==1.0.4
+django-modeltranslation==0.19.6
+django-cities-light==3.10.1

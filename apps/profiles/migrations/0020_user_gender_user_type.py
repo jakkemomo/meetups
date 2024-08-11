@@ -5,19 +5,27 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0019_user_date_of_birth'),
-    ]
+    dependencies = [("profiles", "0019_user_date_of_birth")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='gender',
-            field=models.CharField(choices=[('MALE', 'Male'), ('FEMALE', 'Female'), ('NONE', 'None')], default='NONE', max_length=15, verbose_name='Gender'),
+            model_name="user",
+            name="gender",
+            field=models.CharField(
+                choices=[("MALE", "Male"), ("FEMALE", "Female"), ("NONE", "None")],
+                default="NONE",
+                max_length=15,
+                verbose_name="Gender",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='type',
-            field=models.CharField(choices=[('INDIVIDUAL', 'Individual'), ('COMPANY', 'Company')], default='INDIVIDUAL', max_length=15, verbose_name='Type'),
+            model_name="user",
+            name="type",
+            field=models.CharField(
+                choices=[("INDIVIDUAL", "Individual"), ("COMPANY", "Company")],
+                default="INDIVIDUAL",
+                max_length=15,
+                verbose_name="Type",
+            ),
         ),
     ]
