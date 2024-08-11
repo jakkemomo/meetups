@@ -1,6 +1,10 @@
+from cities_light.contrib.restframework3 import City
 from django.contrib.gis.geos import Polygon
+from django.db.models import Q, ExpressionWrapper, F, FloatField
+from django.db.models.functions.math import Sqrt
 from django_filters import Filter
 from django_filters import rest_framework as filters
+from rest_framework import serializers
 
 from apps.events.models import Event
 
@@ -100,3 +104,39 @@ class EventFilter(filters.FilterSet):
             bbox = (float(min_lng), float(min_lat), float(max_lng), float(max_lat))
             area = Polygon.from_bbox(bbox)
             return queryset.filter(location__within=area)
+
+
+class CityFilter(filters.FilterSet):
+    name = filters.CharFilter(lookup_expr="exact", field_name="name")
+    country_name = filters.CharFilter(lookup_expr="exact", field_name="country__name")
+
+    class Meta:
+        model = City
+        fields = ["name", "country_name"]
+
+    # def find_by_coordinates(self, queryset, *lat_lng):
+    #     lat = self.data.get("lat")
+    #     lng = self.data.get("lng")
+    #
+    #     if lat and lng:
+    #         lat = float(lat)
+    #         lng = float(lng)
+    #         approximate_distance = 3  # Approximate range in degrees
+    #
+    #         # Step 1: Filter cities within a rough distance range
+    #         filtered_cities = queryset.filter(
+    #             Q(latitude__range=(lat - approximate_distance, lat + approximate_distance)) &
+    #             Q(longitude__range=(lng - approximate_distance, lng + approximate_distance))
+    #         )
+    #
+    #         # Step 2: Annotate with accurate distance using Euclidean distance
+    #         queryset = filtered_cities.annotate(
+    #             distance=ExpressionWrapper(
+    #                 Sqrt((F('latitude') - lat) ** 2 + (F('longitude') - lng) ** 2),
+    #                 output_field=FloatField()
+    #             )
+    #         ).order_by('distance')
+    #         print(queryset.query)
+    #         return queryset
+    #     else:
+    #         raise serializers.ValidationError("lat and lng are required")
