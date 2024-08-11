@@ -5,14 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0010_userrating'),
-    ]
+    dependencies = [("profiles", "0010_userrating")]
 
     operations = [
         migrations.AlterField(
-            model_name='userrating',
-            name='value',
-            field=models.SmallIntegerField(null=True),
-        ),
+            model_name="userrating", name="value", field=models.SmallIntegerField(null=True)
+        )
     ]

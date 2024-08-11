@@ -1,14 +1,14 @@
-from rest_framework import viewsets, serializers
+from rest_framework import serializers, viewsets
 from rest_framework.response import Response
 
-from apps.events.models import Rating, Event
+from apps.events.models import Event, Rating
 from apps.events.permissions import RatingPermissions
 from apps.events.serializers import (
-    RatingRetrieveSerializer,
-    RatingCreateSerializer,
-    RatingUpdateSerializer,
-    RatingListSerializer,
     EmptySerializer,
+    RatingCreateSerializer,
+    RatingListSerializer,
+    RatingRetrieveSerializer,
+    RatingUpdateSerializer,
 )
 
 
@@ -25,7 +25,9 @@ class RatingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return Rating.objects.none()
-        self.queryset = Rating.objects.filter(event_id=self.kwargs["event_id"], user=self.request.user)
+        self.queryset = Rating.objects.filter(
+            event_id=self.kwargs["event_id"], user=self.request.user
+        )
         return self.queryset.all()
 
     def get_serializer_class(self):

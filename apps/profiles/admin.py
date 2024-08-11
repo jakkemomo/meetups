@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models.users import User
 from .models.followers import Follower
+from .models.users import User
 
 
 class FollowerInline(admin.TabularInline):
@@ -14,8 +14,18 @@ class FollowerInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("id", "username", "email", "first_name", "last_name", "followers_number_link", "following_number_link", "is_staff", "is_private")
-    search_fields = ("username", "email", "first_name", "last_name",)
+    list_display = (
+        "id",
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "followers_number_link",
+        "following_number_link",
+        "is_staff",
+        "is_private",
+    )
+    search_fields = ("username", "email", "first_name", "last_name")
     readonly_fields = ("date_joined",)
 
     filter_horizontal = ()
@@ -23,7 +33,18 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         ("Personal info", {"fields": ("first_name", "last_name", "email", "image_url")}),
-        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "is_email_verified", "is_private")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "is_email_verified",
+                    "is_private",
+                )
+            },
+        ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     inlines = [FollowerInline]
@@ -32,31 +53,23 @@ class UserAdmin(admin.ModelAdmin):
         queryset = Follower.objects.filter(user=obj, status="ACCEPTED")
         count = queryset.count()
         query = "?id__in={}".format(
-            ','.join(map(str, queryset.values_list('follower__id', flat=True)))
+            ",".join(map(str, queryset.values_list("follower__id", flat=True)))
         )
         link = reverse("admin:profiles_user_changelist") + query
-        return format_html(
-            "<a href={}>{}</a>",
-            link,
-            count,
-        )
+        return format_html("<a href={}>{}</a>", link, count)
 
-    followers_number_link.short_description = "Followers number" # type: ignore
+    followers_number_link.short_description = "Followers number"  # type: ignore
 
     def following_number_link(self, obj):
         queryset = Follower.objects.filter(follower=obj, status="ACCEPTED")
         count = queryset.count()
         query = "?id__in={}".format(
-            ','.join(map(str, queryset.values_list('user__id', flat=True)))
+            ",".join(map(str, queryset.values_list("user__id", flat=True)))
         )
         link = reverse("admin:profiles_user_changelist") + query
-        return format_html(
-            "<a href={}>{}</a>",
-            link,
-            count,
-        )
+        return format_html("<a href={}>{}</a>", link, count)
 
-    following_number_link.short_description = "Following number" # type: ignore
+    following_number_link.short_description = "Following number"  # type: ignore
 
 
 @admin.register(Follower)
@@ -66,31 +79,17 @@ class FollowerAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = (queryset.select_related("user").select_related("follower"))
+        queryset = queryset.select_related("user").select_related("follower")
         return queryset
 
     def user_link(self, obj):
-        link = reverse(
-            "admin:profiles_user_change",
-            args=(obj.user.id,)
-        )
-        return format_html(
-            "<a href={}>{}</a>",
-            link,
-            obj.user.email,
-        )
+        link = reverse("admin:profiles_user_change", args=(obj.user.id,))
+        return format_html("<a href={}>{}</a>", link, obj.user.email)
 
-    user_link.short_description = "User" # type: ignore
+    user_link.short_description = "User"  # type: ignore
 
     def follower_link(self, obj):
-        link = reverse(
-            "admin:profiles_user_change",
-            args=(obj.follower.id,)
-        )
-        return format_html(
-            "<a href={}>{}</a>",
-            link,
-            obj.follower.email,
-        )
+        link = reverse("admin:profiles_user_change", args=(obj.follower.id,))
+        return format_html("<a href={}>{}</a>", link, obj.follower.email)
 
-    follower_link.short_description = "Follower" # type: ignore
+    follower_link.short_description = "Follower"  # type: ignore

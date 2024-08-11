@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0032_remove_event_ratings'),
-    ]
+    dependencies = [("events", "0032_remove_event_ratings")]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='ratings',
-            field=models.ManyToManyField(blank=True, related_name='event_ratings', to='events.rating'),
-        ),
+            model_name="event",
+            name="ratings",
+            field=models.ManyToManyField(
+                blank=True, related_name="event_ratings", to="events.rating"
+            ),
+        )
     ]

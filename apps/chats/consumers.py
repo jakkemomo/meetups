@@ -1,8 +1,8 @@
 import json
 import logging
 
-from apps.core.websockets.base import AbstractConsumer
 from apps.chats.utils import get_chat_async, has_chat_permissions
+from apps.core.websockets.base import AbstractConsumer
 
 logger = logging.getLogger("chats_app")
 
@@ -11,23 +11,17 @@ class ChatConsumer(AbstractConsumer):
     async def connect(self):
         user = self.scope.get("user")
         if not user or user.is_anonymous:
-            logger.warning(
-                f"Anonymous user request in {self.__class__.__name__}"
-            )
+            logger.warning(f"Anonymous user request in {self.__class__.__name__}")
             await self.close()
 
         chat_id = self.scope.get("url_route").get("kwargs").get("chat_id")
         chat = await get_chat_async(chat_id)
         if not chat:
-            logger.warning(
-                f"Chat not found in {self.__class__.__name__}"
-            )
+            logger.warning(f"Chat not found in {self.__class__.__name__}")
             await self.close()
 
         if not await has_chat_permissions(user=user, chat=chat):
-            logger.warning(
-                f"User not authorised in {self.__class__.__name__}"
-            )
+            logger.warning(f"User not authorised in {self.__class__.__name__}")
             await self.close()
 
         self.group_name = f"chat_{chat_id}"

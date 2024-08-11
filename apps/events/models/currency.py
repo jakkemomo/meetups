@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+
 from apps.core.models import AbstractBaseModel
 
 user_model = settings.AUTH_USER_MODEL

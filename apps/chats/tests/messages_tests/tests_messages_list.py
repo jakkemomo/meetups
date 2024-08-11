@@ -9,21 +9,14 @@ from config import settings
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_messages_list_valid(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-        chat_event_add_hundred_messages,
+    async_client, async_user, event, chat_event_add_user, chat_event_add_hundred_messages
 ):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # user gets messages list
-    response = await async_client.get(
-        reverse(MESSAGES_LIST_URL),
-        headers=header,
-    )
+    response = await async_client.get(reverse(MESSAGES_LIST_URL), headers=header)
 
     assert response.status_code == 200
     assert response.data.get("count") == 100
@@ -43,37 +36,23 @@ async def test_messages_list_valid(
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_messages_list_unauthorized(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-        chat_event_add_hundred_messages,
+    async_client, async_user, event, chat_event_add_user, chat_event_add_hundred_messages
 ):
     # user gets messages list
-    response = await async_client.get(
-        reverse(MESSAGES_LIST_URL),
-    )
+    response = await async_client.get(reverse(MESSAGES_LIST_URL))
 
     assert response.status_code == 401
 
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_messages_list_empty(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-):
+async def test_messages_list_empty(async_client, async_user, event, chat_event_add_user):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # user gets messages list
-    response = await async_client.get(
-        reverse(MESSAGES_LIST_URL),
-        headers=header,
-    )
+    response = await async_client.get(reverse(MESSAGES_LIST_URL), headers=header)
 
     # assertions
     assert response.status_code == 200

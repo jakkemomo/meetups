@@ -6,12 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0017_url_field_instead_of_image_field_squashed_0019_imagedields_to_charfields'),
+        ("events", "0017_url_field_instead_of_image_field_squashed_0019_imagedields_to_charfields")
     ]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='event',
-            name='current_participants_number',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="event", name="current_participants_number")]

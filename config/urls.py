@@ -14,10 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import include, path, re_path
 
 from apps.chats.consumers import ChatConsumer
 from apps.notifications.consumers import NotificationConsumer
@@ -25,7 +26,7 @@ from apps.notifications.consumers import NotificationConsumer
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("apps.core.urls", namespace="core")),
-    path("", include('apps.upload.urls', namespace="upload")),
+    path("", include("apps.upload.urls", namespace="upload")),
     path("", include("apps.events.urls", namespace="events")),
     path("", include("apps.profiles.urls", namespace="profiles")),
     path("", include("apps.chats.urls", namespace="chats")),

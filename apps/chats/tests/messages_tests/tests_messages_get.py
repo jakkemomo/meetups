@@ -8,11 +8,7 @@ from apps.profiles.tests.utils import async_get_tokens
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_messages_get_valid(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-        chat_event_add_message,
+    async_client, async_user, event, chat_event_add_user, chat_event_add_message
 ):
     # user log_in
     token = await async_get_tokens(async_user)
@@ -20,8 +16,7 @@ async def test_messages_get_valid(
 
     # user gets messages list
     response = await async_client.get(
-        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}),
-        headers=header,
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}), headers=header
     )
 
     assert response.status_code == 200
@@ -35,10 +30,7 @@ async def test_messages_get_valid(
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_messages_get_not_participant(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_message,
+    async_client, async_user, event, chat_event_add_message
 ):
     # user log_in
     token = await async_get_tokens(async_user)
@@ -46,8 +38,7 @@ async def test_messages_get_not_participant(
 
     # user gets messages list
     response = await async_client.get(
-        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}),
-        headers=header,
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}), headers=header
     )
 
     assert response.status_code == 403
@@ -55,15 +46,10 @@ async def test_messages_get_not_participant(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_messages_get_unauthorized(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_message,
-):
+async def test_messages_get_unauthorized(async_client, async_user, event, chat_event_add_message):
     # user gets messages list
     response = await async_client.get(
-        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}),
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id})
     )
 
     assert response.status_code == 401
@@ -71,18 +57,14 @@ async def test_messages_get_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_messages_get_nonexistent_message(
-        async_client,
-        async_user,
-):
+async def test_messages_get_nonexistent_message(async_client, async_user):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # user gets messages list
     response = await async_client.get(
-        reverse(MESSAGES_GET_URL, kwargs={"message_id": 9999999}),
-        headers=header,
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": 9999999}), headers=header
     )
 
     assert response.status_code == 404

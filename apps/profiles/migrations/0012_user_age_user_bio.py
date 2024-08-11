@@ -5,19 +5,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0011_alter_userrating_value'),
-    ]
+    dependencies = [("profiles", "0011_alter_userrating_value")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='age',
-            field=models.PositiveIntegerField(default=18, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)]),
+            model_name="user",
+            name="age",
+            field=models.PositiveIntegerField(
+                default=18,
+                validators=[
+                    django.core.validators.MinValueValidator(1),
+                    django.core.validators.MaxValueValidator(100),
+                ],
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='bio',
+            model_name="user",
+            name="bio",
             field=models.CharField(blank=True, max_length=1000, null=True),
         ),
     ]

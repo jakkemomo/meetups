@@ -5,19 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0029_event_any_participant_number_and_more'),
-    ]
+    dependencies = [("events", "0029_event_any_participant_number_and_more")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='address',
-            field=models.CharField(default='Беларусь, Минск', max_length=250),
+            model_name="event",
+            name="address",
+            field=models.CharField(default="Беларусь, Минск", max_length=250),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='desired_participants_number',
+            model_name="event",
+            name="desired_participants_number",
             field=models.PositiveIntegerField(blank=True, default=0, null=True),
         ),
     ]

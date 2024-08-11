@@ -5,14 +5,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('notifications', '0001_squashed_0003_alter_notification_type'),
-    ]
+    dependencies = [("notifications", "0001_squashed_0003_alter_notification_type")]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='type',
-            field=models.CharField(choices=[('NEW_FOLLOWER', 'New Follower'), ('NEW_FOLLOW_REQUEST', 'New Follow Request'), ('ACCEPTED_FOLLOW_REQUEST', 'Accepted Follow Request'), ('NEW_MESSAGE', 'New Message')], max_length=50, verbose_name='Type'),
-        ),
+            model_name="notification",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("NEW_FOLLOWER", "New Follower"),
+                    ("NEW_FOLLOW_REQUEST", "New Follow Request"),
+                    ("ACCEPTED_FOLLOW_REQUEST", "Accepted Follow Request"),
+                    ("NEW_MESSAGE", "New Message"),
+                ],
+                max_length=50,
+                verbose_name="Type",
+            ),
+        )
     ]

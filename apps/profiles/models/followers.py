@@ -1,5 +1,5 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 from apps.core.models import AbstractBaseModel
 
@@ -12,21 +12,9 @@ class Follower(AbstractBaseModel):
         PENDING = "PENDING"
         DECLINED = "DECLINED"
 
-    user = models.ForeignKey(
-        user_model,
-        on_delete=models.CASCADE,
-        related_name="users",
-    )
-    follower = models.ForeignKey(
-        user_model,
-        on_delete=models.CASCADE,
-        related_name="followers",
-    )
-    status = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default="PENDING",
-    )
+    user = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name="users")
+    follower = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name="followers")
+    status = models.CharField(max_length=10, choices=Status.choices, default="PENDING")
 
     class Meta:
         ordering = ["user"]

@@ -5,19 +5,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0021_remove_user_age'),
-    ]
+    dependencies = [("profiles", "0021_remove_user_age")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='email_notifications_allowed',
-            field=models.BooleanField(default=True, verbose_name='Email notifications allowing status'),
+            model_name="user",
+            name="email_notifications_allowed",
+            field=models.BooleanField(
+                default=True, verbose_name="Email notifications allowing status"
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='in_app_notifications_allowed',
-            field=models.BooleanField(default=True, verbose_name='In app notifications allowing status'),
+            model_name="user",
+            name="in_app_notifications_allowed",
+            field=models.BooleanField(
+                default=True, verbose_name="In app notifications allowing status"
+            ),
         ),
     ]

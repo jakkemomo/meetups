@@ -2,13 +2,8 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from apps.notifications.exceptions import MissingPreferencesObjectException
-from apps.notifications.models import (
-    InAppNotificationsPreferences,
-    EmailNotificationsPreferences,
-)
-from apps.notifications.permissions.preferences import (
-    NotificationsPreferencesPermissions,
-)
+from apps.notifications.models import EmailNotificationsPreferences, InAppNotificationsPreferences
+from apps.notifications.permissions.preferences import NotificationsPreferencesPermissions
 from apps.notifications.serializers.preferences import (
     EmailNotificationsPreferencesRetrieveSerializer,
     EmailNotificationsPreferencesUpdateSerializer,

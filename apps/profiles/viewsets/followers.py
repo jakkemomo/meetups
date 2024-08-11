@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema, no_body
-from rest_framework import viewsets, status
+from drf_yasg.utils import no_body, swagger_auto_schema
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
@@ -25,13 +25,11 @@ class FollowerViewSet(viewsets.ModelViewSet):
     lookup_url_kwarg = "user_id"
     filter_backends = [TrigramSimilaritySearchFilter, OrderingFilter, DjangoFilterBackend]
     filterset_class = filters_followers.UserFollowersFilter
-    search_fields = ['user__username', 'user__age', 'user__city', ]
-    ordering_fields = ['user__username', 'user__age', ]
+    search_fields = ["user__username", "user__age", "user__city"]
+    ordering_fields = ["user__username", "user__age"]
 
     # Notifications
-    handlers = (
-        InAppNotificationsHandler(),
-    )
+    handlers = (InAppNotificationsHandler(),)
     notifications_manager = NotificationsChainManager(handlers)
 
     def get_serializer_class(self):
@@ -40,36 +38,24 @@ class FollowerViewSet(viewsets.ModelViewSet):
         else:
             return FollowerSerializer
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
-    @action(
-        methods=["post"],
-        detail=True,
-        url_name="follow_user",
-    )
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=["post"], detail=True, url_name="follow_user")
     def follow(self, request, user_id):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
         follower_object: Follower = Follower.objects.filter(
-            user=user,
-            follower=request.user
+            user=user, follower=request.user
         ).first()
 
         if follower_object:
             if follower_object.status == Follower.Status.ACCEPTED:
                 return Response(
-                    status=status.HTTP_409_CONFLICT,
-                    data={"detail": "Already following"}
+                    status=status.HTTP_409_CONFLICT, data={"detail": "Already following"}
                 )
-            elif follower_object.status in (
-                    Follower.Status.PENDING,
-                    Follower.Status.DECLINED,
-            ):
+            elif follower_object.status in (Follower.Status.PENDING, Follower.Status.DECLINED):
                 return Response(
-                    status=status.HTTP_409_CONFLICT,
-                    data={"detail": "Follow request already sent"}
+                    status=status.HTTP_409_CONFLICT, data={"detail": "Follow request already sent"}
                 )
 
         data = {"user": user.id, "follower": request.user.id}
@@ -92,32 +78,20 @@ class FollowerViewSet(viewsets.ModelViewSet):
                 additional_data={"follower_status": follower_object.status},
             )
 
-        return Response(
-            status=status.HTTP_201_CREATED,
-            data=serializer.data,
-        )
+        return Response(status=status.HTTP_201_CREATED, data=serializer.data)
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
-    @action(
-        methods=["post"],
-        detail=True,
-        url_name="accept_follow_request",
-    )
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=["post"], detail=True, url_name="accept_follow_request")
     def accept(self, request, user_id):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
 
-        follower_object = Follower.objects.filter(
-            user=request.user,
-            follower=user
-        ).first()
+        follower_object = Follower.objects.filter(user=request.user, follower=user).first()
 
         if not follower_object:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
-                data={"detail": "No such follow requests was found"}
+                data={"detail": "No such follow requests was found"},
             )
 
         if follower_object.status == Follower.Status.ACCEPTED:
@@ -137,19 +111,10 @@ class FollowerViewSet(viewsets.ModelViewSet):
             additional_data={"follower_status": follower_object.status},
         )
 
-        return Response(
-            status=status.HTTP_200_OK,
-            data=serializer.data,
-        )
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
-    @action(
-        methods=["delete"],
-        detail=True,
-        url_name="unfollow_user",
-    )
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=["delete"], detail=True, url_name="unfollow_user")
     def unfollow(self, request, user_id):
         user = get_user_object(user_id=user_id)
         is_current_user(request, user)
@@ -157,8 +122,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         follower_object = Follower.objects.filter(user=user, follower=request.user).first()
         if not follower_object:
             return Response(
-                status=status.HTTP_404_NOT_FOUND,
-                data={"detail": f"You are not following {user}"},
+                status=status.HTTP_404_NOT_FOUND, data={"detail": f"You are not following {user}"}
             )
 
         if follower_object.status == Follower.Status.ACCEPTED:
@@ -168,14 +132,9 @@ class FollowerViewSet(viewsets.ModelViewSet):
 
         follower_object.delete()
 
-        return Response(
-            status=status.HTTP_200_OK,
-            data={"detail": message},
-        )
+        return Response(status=status.HTTP_200_OK, data={"detail": message})
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
+    @swagger_auto_schema(request_body=no_body)
     @action(
         methods=["get"],
         detail=False,
@@ -185,13 +144,13 @@ class FollowerViewSet(viewsets.ModelViewSet):
     def list_followers(self, request, user_id):
         user = get_user_object(user_id=user_id)
         queryset = self.queryset.filter(user=user, status=Follower.Status.ACCEPTED)
-        filter_followers = filters_followers.UserFollowersFilter(request.query_params, queryset=queryset).qs
+        filter_followers = filters_followers.UserFollowersFilter(
+            request.query_params, queryset=queryset
+        ).qs
         serializer = self.get_serializer(filter_followers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
+    @swagger_auto_schema(request_body=no_body)
     @action(
         methods=["get"],
         detail=False,
@@ -201,13 +160,13 @@ class FollowerViewSet(viewsets.ModelViewSet):
     def list_following(self, request, user_id):
         user = get_user_object(user_id=user_id)
         queryset = self.queryset.filter(follower=user, status=Follower.Status.ACCEPTED)
-        filter_follows = filters_followers.UserFollowsFilter(request.query_params, queryset=queryset).qs
+        filter_follows = filters_followers.UserFollowsFilter(
+            request.query_params, queryset=queryset
+        ).qs
         serializer = self.get_serializer(filter_follows, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-    @swagger_auto_schema(
-        request_body=no_body,
-    )
+    @swagger_auto_schema(request_body=no_body)
     @action(
         methods=["get"],
         detail=True,
@@ -217,17 +176,11 @@ class FollowerViewSet(viewsets.ModelViewSet):
     def follow_status(self, request, user_id, followed_user_id):
         user = get_user_object(user_id=user_id)
         followed_user = get_user_object(user_id=followed_user_id)
-        follower_object = Follower.objects.filter(
-            user=user,
-            follower=followed_user
-        ).first()
+        follower_object = Follower.objects.filter(user=user, follower=followed_user).first()
 
         if not follower_object:
-            follow_status: str = 'NOT_FOLLOWED'
+            follow_status: str = "NOT_FOLLOWED"
         else:
             follow_status: str = follower_object.status
 
-        return Response(
-            status=status.HTTP_200_OK,
-            data={"status": follow_status},
-        )
+        return Response(status=status.HTTP_200_OK, data={"status": follow_status})

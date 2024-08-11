@@ -17,10 +17,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 def is_participant(request, obj):
-    return (
-            request.user != obj.created_by and
-            request.user in obj.participants.all()
-    )
+    return request.user != obj.created_by and request.user in obj.participants.all()
 
 
 def is_owner(request, obj):

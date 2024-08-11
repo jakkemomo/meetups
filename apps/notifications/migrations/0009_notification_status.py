@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('notifications', '0008_notification_text'),
-    ]
+    dependencies = [("notifications", "0008_notification_text")]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='status',
-            field=models.CharField(choices=[('NEW', 'New'), ('READ', 'Read')], default='NEW', max_length=10, verbose_name='Status'),
-        ),
+            model_name="notification",
+            name="status",
+            field=models.CharField(
+                choices=[("NEW", "New"), ("READ", "Read")],
+                default="NEW",
+                max_length=10,
+                verbose_name="Status",
+            ),
+        )
     ]

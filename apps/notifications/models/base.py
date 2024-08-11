@@ -15,10 +15,8 @@ class AbstractNotificationsPreferences(models.Model):
 
     THE NAME OF ANY PREFERENCE FIELD MUST MATCH ITS TYPE FROM Notification.Type.
     """
-    user = models.OneToOneField(
-        to=user_model,
-        on_delete=models.CASCADE,
-    )
+
+    user = models.OneToOneField(to=user_model, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
