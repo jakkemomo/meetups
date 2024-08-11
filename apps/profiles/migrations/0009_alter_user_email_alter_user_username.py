@@ -5,19 +5,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0008_rename_avatar_url_user_image_url'),
-    ]
+    dependencies = [("profiles", "0008_rename_avatar_url_user_image_url")]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='email',
-            field=models.EmailField(max_length=255, unique=True),
+            model_name="user", name="email", field=models.EmailField(max_length=255, unique=True)
         ),
         migrations.AlterField(
-            model_name='user',
-            name='username',
-            field=models.CharField(max_length=128),
+            model_name="user", name="username", field=models.CharField(max_length=128)
         ),
     ]

@@ -17,9 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="event",
             name="image",
-            field=models.ImageField(
-                blank=True, null=True, upload_to=None
-            ),
+            field=models.ImageField(blank=True, null=True, upload_to=None),
         ),
         migrations.AddField(
             model_name="event",

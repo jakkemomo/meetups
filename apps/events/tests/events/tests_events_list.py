@@ -1,17 +1,13 @@
 import pytest
 from rest_framework.reverse import reverse
 
-from apps.profiles.tests.utils import get_tokens
 from apps.events.tests.events.constants import EVENTS_LIST_URL
+from apps.profiles.tests.utils import get_tokens
 from config import settings
 
 
 @pytest.mark.django_db
-def test_event_list_unauthorised_valid(
-        api_client,
-        event,
-        event_private,
-):
+def test_event_list_unauthorised_valid(api_client, event, event_private):
     response = api_client.get(reverse(EVENTS_LIST_URL))
 
     # assertions
@@ -25,11 +21,7 @@ def test_event_list_unauthorised_valid(
 
 @pytest.mark.django_db
 def test_event_list_authorised_valid(
-        api_client,
-        event,
-        user_2,
-        event_user_2_is_participant,
-        event_private,
+    api_client, event, user_2, event_user_2_is_participant, event_private
 ):
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -46,10 +38,7 @@ def test_event_list_authorised_valid(
 
 @pytest.mark.django_db
 def test_event_list_authorised_with_private_valid(
-        api_client,
-        user_2,
-        event_private,
-        event_private_user_2_is_participant,
+    api_client, user_2, event_private, event_private_user_2_is_participant
 ):
     token = get_tokens(user_2)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
@@ -65,11 +54,7 @@ def test_event_list_authorised_with_private_valid(
 
 
 @pytest.mark.django_db
-def test_event_list_authorised_hundred_valid(
-        api_client,
-        user,
-        hundred_events,
-):
+def test_event_list_authorised_hundred_valid(api_client, user, hundred_events):
     token = get_tokens(user)
     api_client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
     response = api_client.get(reverse(EVENTS_LIST_URL))
@@ -124,13 +109,14 @@ def test_event_get_authorised_not_found(api_client, user, event_private):
 @pytest.mark.django_db
 def test_event_get_filtered_by_geo(api_client, hundred_events):
     response_minsk = api_client.get(
-        reverse(EVENTS_LIST_URL), data={'min_lat': '53.829', 'max_lat': '53.973', 'min_lng': '27.401',
-                                        'max_lng': '27.703', })
+        reverse(EVENTS_LIST_URL),
+        data={"min_lat": "53.829", "max_lat": "53.973", "min_lng": "27.401", "max_lng": "27.703"},
+    )
     response_moscow = api_client.get(
-        reverse(EVENTS_LIST_URL), data={'min_lat': '55.569', 'max_lat': '55.916', 'min_lng': '37.360',
-                                        'max_lng': '37.859', }
+        reverse(EVENTS_LIST_URL),
+        data={"min_lat": "55.569", "max_lat": "55.916", "min_lng": "37.360", "max_lng": "37.859"},
     )
     assert response_minsk.status_code == 200
     assert response_moscow.status_code == 200
-    assert response_minsk.data.get('count') == 100
-    assert response_moscow.data.get('count') == 0
+    assert response_minsk.data.get("count") == 100
+    assert response_moscow.data.get("count") == 0

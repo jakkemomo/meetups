@@ -5,13 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0031_alter_event_end_date_alter_event_end_time_and_more'),
-    ]
+    dependencies = [("events", "0031_alter_event_end_date_alter_event_end_time_and_more")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='event',
-            name='ratings',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="event", name="ratings")]

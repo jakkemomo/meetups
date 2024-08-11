@@ -1,12 +1,12 @@
 class MainRouter:
-    route_app_labels = {'channels_postgres', }
+    route_app_labels = {"channels_postgres"}
 
     def db_for_read(self, model, **hints):
         """
         Attempts to read auth and contenttypes models go to auth_db.
         """
         if model._meta.app_label in self.route_app_labels:
-            return 'channels_postgres'
+            return "channels_postgres"
         return None
 
     def db_for_write(self, model, **hints):
@@ -14,7 +14,7 @@ class MainRouter:
         Attempts to write auth and contenttypes models go to auth_db.
         """
         if model._meta.app_label in self.route_app_labels:
-            return 'channels_postgres'
+            return "channels_postgres"
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
@@ -23,10 +23,10 @@ class MainRouter:
         involved.
         """
         if (
-                obj1._meta.app_label in self.route_app_labels or
-                obj2._meta.app_label in self.route_app_labels
+            obj1._meta.app_label in self.route_app_labels
+            or obj2._meta.app_label in self.route_app_labels
         ):
-            return 'channels_postgres'
+            return "channels_postgres"
         return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
@@ -35,5 +35,5 @@ class MainRouter:
         'auth_db' database.
         """
         if app_label in self.route_app_labels:
-            return db == 'channels_postgres'
-        return db == 'default'
+            return db == "channels_postgres"
+        return db == "default"

@@ -9,11 +9,7 @@ from config import settings
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_chats_chat_event_messages_valid(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-        chat_event_add_hundred_messages,
+    async_client, async_user, event, chat_event_add_user, chat_event_add_hundred_messages
 ):
     # user log_in
     token = await async_get_tokens(async_user)
@@ -21,8 +17,7 @@ async def test_chats_chat_event_messages_valid(
 
     # user gets messages list
     response = await async_client.get(
-        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     pagination = settings.REST_FRAMEWORK.get("PAGE_SIZE")
@@ -50,10 +45,7 @@ async def test_chats_chat_event_messages_valid(
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_chats_chat_event_messages_empty(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
+    async_client, async_user, event, chat_event_add_user
 ):
     # user log_in
     token = await async_get_tokens(async_user)
@@ -61,8 +53,7 @@ async def test_chats_chat_event_messages_empty(
 
     # user gets messages list
     response = await async_client.get(
-        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     # assertions
@@ -75,14 +66,10 @@ async def test_chats_chat_event_messages_empty(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_chats_chat_event_messages_unauthorized(
-        async_client,
-        async_user,
-        event,
-):
+async def test_chats_chat_event_messages_unauthorized(async_client, async_user, event):
     # user gets messages list
     response = await async_client.get(
-        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}),
+        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id})
     )
 
     # assertions
@@ -91,19 +78,14 @@ async def test_chats_chat_event_messages_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_chats_chat_event_messages_not_participants(
-        async_client,
-        async_user,
-        event,
-):
+async def test_chats_chat_event_messages_not_participants(async_client, async_user, event):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     # user gets messages list
     response = await async_client.get(
-        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_MESSAGES_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     # assertions

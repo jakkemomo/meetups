@@ -10,11 +10,7 @@ from apps.profiles.tests.utils import async_get_tokens
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_message_partial_update_valid(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-        chat_event_add_message,
+    async_client, async_user, event, chat_event_add_user, chat_event_add_message
 ):
     # user log_in
     token = await async_get_tokens(async_user)
@@ -28,7 +24,7 @@ async def test_message_partial_update_valid(
         reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}),
         data={"message_text": new_message_text},
         headers=header,
-        content_type='application/json'
+        content_type="application/json",
     )
 
     assert response.status_code == 200
@@ -38,11 +34,7 @@ async def test_message_partial_update_valid(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_message_change_not_participant(
-        async_client,
-        async_user,
-        chat_event_add_message,
-):
+async def test_message_change_not_participant(async_client, async_user, chat_event_add_message):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
@@ -52,11 +44,10 @@ async def test_message_change_not_participant(
 
     # Partially update the message
     response = await async_client.patch(
-        reverse(MESSAGES_GET_URL,
-                kwargs={"message_id": chat_event_add_message.id}),
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}),
         data={"message_text": new_message_text},
         headers=header,
-        content_type='application/json'
+        content_type="application/json",
     )
 
     assert response.status_code == 403
@@ -64,20 +55,15 @@ async def test_message_change_not_participant(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_message_change_unauthorized(
-        async_client,
-        async_user,
-        chat_event_add_message,
-):
+async def test_message_change_unauthorized(async_client, async_user, chat_event_add_message):
     # New message data for partial update
     new_message_text = "Updated message text"
 
     # Partially update the message
     response = await async_client.patch(
-        reverse(MESSAGES_GET_URL,
-                kwargs={"message_id": chat_event_add_message.id}),
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": chat_event_add_message.id}),
         data={"message_text": new_message_text},
-        content_type='application/json'
+        content_type="application/json",
     )
 
     assert response.status_code == 401
@@ -85,11 +71,7 @@ async def test_message_change_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_message_change_not_found(
-        async_client,
-        async_user,
-        event,
-):
+async def test_message_change_not_found(async_client, async_user, event):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
@@ -99,11 +81,10 @@ async def test_message_change_not_found(
 
     # Partially update the message
     response = await async_client.patch(
-        reverse(MESSAGES_GET_URL,
-                kwargs={"message_id": 1000}),
+        reverse(MESSAGES_GET_URL, kwargs={"message_id": 1000}),
         data={"message_text": new_message_text},
         headers=header,
-        content_type='application/json'
+        content_type="application/json",
     )
 
     assert response.status_code == 404

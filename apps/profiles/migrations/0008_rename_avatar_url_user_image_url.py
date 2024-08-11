@@ -5,14 +5,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0007_user_is_email_verified'),
-    ]
+    dependencies = [("profiles", "0007_user_is_email_verified")]
 
     operations = [
-        migrations.RenameField(
-            model_name='user',
-            old_name='avatar_url',
-            new_name='image_url',
-        ),
+        migrations.RenameField(model_name="user", old_name="avatar_url", new_name="image_url")
     ]

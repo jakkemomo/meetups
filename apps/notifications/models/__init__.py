@@ -1,1 +1,2 @@
 from .notifications import Notification
+from .preferences import EmailNotificationsPreferences, InAppNotificationsPreferences

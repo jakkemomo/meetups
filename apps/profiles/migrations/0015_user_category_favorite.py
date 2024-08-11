@@ -5,15 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0024_alter_event_city'),
-        ('profiles', '0014_city_user_city'),
-    ]
+    dependencies = [("events", "0024_alter_event_city"), ("profiles", "0014_city_user_city")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='category_favorite',
-            field=models.ManyToManyField(db_table='user_category_favorite', related_name='categories_favorite', to='events.category'),
-        ),
+            model_name="user",
+            name="category_favorite",
+            field=models.ManyToManyField(
+                db_table="user_category_favorite",
+                related_name="categories_favorite",
+                to="events.category",
+            ),
+        )
     ]

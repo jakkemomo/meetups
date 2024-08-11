@@ -1,5 +1,6 @@
 import logging
 from functools import wraps
+
 from django.core.files.storage import default_storage
 
 logger = logging.getLogger("upload_app")
@@ -11,8 +12,7 @@ def task_logger(func):
         try:
             result = func(*args, **kwargs)
         except Exception as exc:
-            logger.exception(
-                f'{func.__name__}: {exc}')
+            logger.exception(f"{func.__name__}: {exc}")
         else:
             return result
 
@@ -21,6 +21,6 @@ def task_logger(func):
 
 @task_logger
 def upload_image(file):
-    rel_url = f'images/{file.name}'
+    rel_url = f"images/{file.name}"
     default_storage.save(rel_url, file)
     return rel_url

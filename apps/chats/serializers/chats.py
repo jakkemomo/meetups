@@ -2,10 +2,14 @@ import logging
 
 from rest_framework import serializers
 
-from apps.chats.exceptions import ChatWithoutEventException, ChatTypeException, DirectChatUserNotFoundException
+from apps.chats.exceptions import (
+    ChatTypeException,
+    ChatWithoutEventException,
+    DirectChatUserNotFoundException,
+)
 from apps.chats.models import Chat
 
-logger = logging.getLogger("websockets_app_serializer")
+logger = logging.getLogger("chats_app")
 
 
 class ChatRetrieveSerializer(serializers.ModelSerializer):
@@ -30,10 +34,7 @@ class ChatRetrieveSerializer(serializers.ModelSerializer):
             try:
                 event = obj.chat_event
             except Exception as exc:
-                logger.error(
-                    f"Chat {obj} with the 'Event' type has no linked Event: "
-                    f"{exc}"
-                )
+                logger.error(f"Chat {obj} with the 'Event' type has no linked Event: " f"{exc}")
                 raise ChatWithoutEventException
 
             return event
@@ -44,9 +45,7 @@ class ChatRetrieveSerializer(serializers.ModelSerializer):
             ).first()
 
             if not direct_chat_user:
-                logger.error(
-                    f"Chat {obj} with the 'Direct' type has no the second user"
-                )
+                logger.error(f"Chat {obj} with the 'Direct' type has no the second user")
                 raise DirectChatUserNotFoundException
 
             return direct_chat_user
@@ -66,11 +65,4 @@ class ChatListSerializer(ChatRetrieveSerializer):
 
     class Meta:
         model = Chat
-        fields = [
-            "id",
-            "name",
-            "image_url",
-            "type",
-            "last_message_text",
-            "last_message_is_owner",
-        ]
+        fields = ["id", "name", "image_url", "type", "last_message_text", "last_message_is_owner"]

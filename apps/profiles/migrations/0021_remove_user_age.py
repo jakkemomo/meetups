@@ -5,13 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0020_user_gender_user_type'),
-    ]
+    dependencies = [("profiles", "0020_user_gender_user_type")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='user',
-            name='age',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="user", name="age")]

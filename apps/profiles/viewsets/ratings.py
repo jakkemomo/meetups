@@ -4,10 +4,10 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from apps.profiles.models import UserRating
 from apps.profiles.permissions import UserRatingPermissions
 from apps.profiles.serializers import (
-    UserRatingRetrieveSerializer,
     UserRatingCreateSerializer,
-    UserRatingUpdateSerializer,
     UserRatingListSerializer,
+    UserRatingRetrieveSerializer,
+    UserRatingUpdateSerializer,
 )
 
 
@@ -15,8 +15,9 @@ class UserRatingViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing user's ratings.
     """
+
     model = UserRating
-    lookup_url_kwarg = 'rating_id'
+    lookup_url_kwarg = "rating_id"
     permission_classes = [IsAuthenticatedOrReadOnly, UserRatingPermissions]
     http_method_names = ["post", "get", "put", "delete"]
 

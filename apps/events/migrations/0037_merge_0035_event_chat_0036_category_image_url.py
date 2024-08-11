@@ -5,7 +5,4 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0035_event_chat'),
-        ('events', '0036_category_image_url'),
-    ]
+    dependencies = [("events", "0035_event_chat"), ("events", "0036_category_image_url")]

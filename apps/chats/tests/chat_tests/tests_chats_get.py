@@ -8,19 +8,13 @@ from apps.profiles.tests.utils import async_get_tokens
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_chats_get_chat_event_valid(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
-):
+async def test_chats_get_chat_event_valid(async_client, async_user, event, chat_event_add_user):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     response = await async_client.get(
-        reverse(CHATS_GET_EVENT_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_EVENT_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     # assertions
@@ -34,13 +28,10 @@ async def test_chats_get_chat_event_valid(
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_chats_get_chat_event_unauthorized(
-        async_client,
-        async_user,
-        event,
-        chat_event_add_user,
+    async_client, async_user, event, chat_event_add_user
 ):
     response = await async_client.get(
-        reverse(CHATS_GET_EVENT_URL, kwargs={"chat_id": event.chat.id}),
+        reverse(CHATS_GET_EVENT_URL, kwargs={"chat_id": event.chat.id})
     )
 
     # assertions
@@ -49,18 +40,13 @@ async def test_chats_get_chat_event_unauthorized(
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
-async def test_chats_get_chat_event_not_participant(
-        async_client,
-        async_user,
-        event,
-):
+async def test_chats_get_chat_event_not_participant(async_client, async_user, event):
     # user log_in
     token = await async_get_tokens(async_user)
     header = {"Authorization": "Bearer " + token}
 
     response = await async_client.get(
-        reverse(CHATS_GET_EVENT_URL, kwargs={"chat_id": event.chat.id}),
-        headers=header,
+        reverse(CHATS_GET_EVENT_URL, kwargs={"chat_id": event.chat.id}), headers=header
     )
 
     # assertions

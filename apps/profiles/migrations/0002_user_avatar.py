@@ -11,10 +11,7 @@ class Migration(migrations.Migration):
             model_name="user",
             name="avatar",
             field=models.ImageField(
-                blank=True,
-                default="users/image/default-user.jpeg",
-                null=True,
-                upload_to=None,
+                blank=True, default="users/image/default-user.jpeg", null=True, upload_to=None
             ),
         )
     ]

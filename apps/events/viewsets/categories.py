@@ -1,5 +1,5 @@
-from drf_yasg.utils import swagger_auto_schema, no_body
-from rest_framework import viewsets, status
+from drf_yasg.utils import no_body, swagger_auto_schema
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -7,10 +7,10 @@ from rest_framework.response import Response
 from apps.events.models import Category
 from apps.events.permissions import CategoriesPermissions
 from apps.events.serializers import (
-    CategoryRetrieveSerializer,
     CategoryCreateSerializer,
-    CategoryUpdateSerializer,
     CategoryListSerializer,
+    CategoryRetrieveSerializer,
+    CategoryUpdateSerializer,
     EmptySerializer,
 )
 
@@ -39,15 +39,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
             case _:
                 return EmptySerializer
 
-    @swagger_auto_schema(
-        request_body=no_body
-    )
+    @swagger_auto_schema(request_body=no_body)
     @action(
-        methods=['post'],
+        methods=["post"],
         detail=True,
         permission_classes=[IsAuthenticatedOrReadOnly, CategoriesPermissions],
-        url_path='favorite',
-        url_name='category_favorite_add'
+        url_path="favorite",
+        url_name="category_favorite_add",
     )
     def add_category_to_favorite(self, request, category_id: int):
         user = request.user
@@ -55,9 +53,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         user.category_favorite.add(category)
         return Response(status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        request_body=no_body
-    )
+    @swagger_auto_schema(request_body=no_body)
     @add_category_to_favorite.mapping.delete
     def delete_category_from_favorite(self, request, category_id: int):
         user = request.user

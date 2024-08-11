@@ -12,14 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv"
+    "SECRET_KEY", "django-insecure-3hot3eg$sr1avw4o6avilt+&bz@qve)+oklbgp)70dkmz3-xdv"
 )
 DEBUG = True
 DOCKERIZED = os.environ.get("DOCKERIZED", False)
 
 GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "meetups-dev")
-GS_BUCKET_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}'
+GS_BUCKET_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}"
 GS_QUERYSTRING_AUTH = False
 
 SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
@@ -39,7 +38,7 @@ if SERVICE_URL:
     SERVICE_ACCOUNT = True
 else:
     SERVICE_URL = "http://localhost:8000/"
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ["*"]
 
 if DOCKERIZED:
     # Settings for docker startup
@@ -52,28 +51,29 @@ else:
     from google.oauth2 import service_account
 
     # Set "static" folder
-    STATICFILES_STORAGE = 'config.gcs_utils.static'
+    STATICFILES_STORAGE = "config.gcs_utils.static"
 
     # Set "media" folder
-    DEFAULT_FILE_STORAGE = 'config.gcs_utils.media'
+    DEFAULT_FILE_STORAGE = "config.gcs_utils.media"
 
     # Add an unique ID to a file name if same file name exists
     GS_FILE_OVERWRITE = False
 
     try:
         GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-            os.path.join(BASE_DIR, 'gcpCredentials.json'),
+            os.path.join(BASE_DIR, "gcpCredentials.json")
         )
         SERVICE_ACCOUNT = True
     except FileNotFoundError:
-        logging.warning(
-            'No gcpCredentials.json file found. Using default credentials.')
+        logging.warning("No gcpCredentials.json file found. Using default credentials.")
 
-    STATIC_URL = f'{GS_BUCKET_URL}/static/'
+    STATIC_URL = f"{GS_BUCKET_URL}/static/"
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://meetups-ui-6vuzexfx2q-lm.a.run.app',
+    "http://localhost:3000",
+    "https://meetups-ui-6vuzexfx2q-lm.a.run.app",
+    "https://meetups-frontend-6vuzexfx2q-ez.a.run.app",
+    "https://mevent.io",
 ]
 
 # Geo libraries path
@@ -85,6 +85,8 @@ INSTALLED_APPS = [
     "daphne",
     "channels",
     "channels_postgres",
+    "modeltranslation",
+    "cities_light",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -103,7 +105,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "drf_yasg",
-    'django_filters',
+    "django_filters",
     "corsheaders",
     # "debug_toolbar",
 ]
@@ -153,14 +155,14 @@ DATABASES = {
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5555"),
     },
-    'channels_postgres': {
-        'ENGINE': "django.contrib.gis.db.backends.postgis",
+    "channels_postgres": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("WS_DB"),
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5555"),
-    }
+    },
 }
 
 DATABASE_ROUTERS = ["config.db_routers.MainRouter"]
@@ -172,7 +174,7 @@ AUTH_PASSWORD_VALIDATORS: list[dict] = []
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-LANGUAGE_CODE = "en-us"
+# LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
@@ -181,21 +183,20 @@ AUTH_USER_MODEL = "profiles.User"
 LOGIN_URL = os.getenv("LOGIN_URL", "/api/v1/login")
 
 VERIFY_EMAIL_URL = os.getenv(  # регистрация ( не авторизован ) -> возможно редирект на главную
-    "VERIFY_EMAIL_URL",
-    f"{FRONTEND_URL}/register/email/confirm"
+    "VERIFY_EMAIL_URL", f"{FRONTEND_URL}/register/email/confirm"
 )
 CONFIRM_PASSWORD_RESET_URL = os.getenv(  #  забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
-    "CONFIRM_FORGOT_PASSWORD_URL",
-    f"{FRONTEND_URL}/password/reset/confirm"
+    "CONFIRM_FORGOT_PASSWORD_URL", f"{FRONTEND_URL}/password/reset/confirm"
 )
 CHANGE_EMAIL_URL = os.getenv(  # забыл пароль ( не авторизован ) -> редирект на страничку, где вводится новый пароль
-    "CHANGE_EMAIL_URL",
-    f"{FRONTEND_URL}/security/email/confirm"
+    "CHANGE_EMAIL_URL", f"{FRONTEND_URL}/security/email/confirm"
 )
+# todo: make new backend url for changing email, keep it separate from VERIFY_EMAIL_URL
+# todo: store new email in the token that is sent to email
+# todo: use this decoded token upon email change endpoint trigger to set new email in the user model
 
 DEFAULT_USER_AVATAR_URL = os.getenv(
-    "DEFAULT_USER_AVATAR_URL",
-    "images/f4fcce125def40e7a232bb31109de9ac.webp"
+    "DEFAULT_USER_AVATAR_URL", "images/f4fcce125def40e7a232bb31109de9ac.webp"
 )
 
 # Default primary key field type
@@ -208,12 +209,12 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        'rest_framework_simplejwt.authentication.JWTAuthentication', ],
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 24,
-    "DEFAULT_FILTER_BACKENDS": [
-        'django_filters.rest_framework.DjangoFilterBackend'],
-    "DATE_INPUT_FORMATS": ["%Y-%m-%d"]
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DATE_INPUT_FORMATS": ["%Y-%m-%d"],
 }
 
 SIMPLE_JWT = {
@@ -224,60 +225,32 @@ SIMPLE_JWT = {
 }
 
 SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {
-        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}}
 }
 
 # Logging
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"level": "DEBUG", "class": "logging.StreamHandler", "formatter": "verbose"}
     },
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
+    "formatters": {
+        "verbose": {"format": "{levelname} {asctime} {module} {message}", "style": "{"}
     },
-    'loggers': {
-        'upload_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'core_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'profiles_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'notifications_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'chats_app': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
+    "loggers": {
+        "upload_app": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "core_app": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "profiles_app": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "notifications_app": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "chats_app": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "core_websockets": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
     },
 }
 
 # Email
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND",
-                          "django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_USE_SSL = False
@@ -286,20 +259,46 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Websockets
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_postgres.core.PostgresChannelLayer',
-        'CONFIG': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    "default": {
+        "BACKEND": "channels_postgres.core.PostgresChannelLayer",
+        "CONFIG": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
             "NAME": os.getenv("WS_DB"),
             "USER": os.getenv("POSTGRES_USER"),
             "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", "5555"),
         },
-    },
+    }
 }
 
-WS_ALLOWED_ORIGINS = [
-    "*"
-]
+WS_ALLOWED_ORIGINS = ["*"]
 EVENTS_UPDATE_INTERVAL = 60 * 60  # 1 hour
+
+# Notifications
+NOTIFICATION_PREFERENCES = {
+    "IN_APP": "apps.notifications.models.InAppNotificationsPreferences",
+    "EMAIL": "apps.notifications.models.EmailNotificationsPreferences",
+}
+
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ["ru", "en", "be", "abbr"]
+CITIES_LIGHT_INCLUDE_CITY_TYPES = [
+    "PPL",
+    "PPLA",
+    "PPLA2",
+    "PPLA3",
+    "PPLA4",
+    "PPLC",
+    "PPLF",
+    "PPLG",
+    "PPLL",
+    "PPLR",
+    "PPLS",
+    "STLMT",
+]
+
+gettext = lambda s: s
+LANGUAGES = (("ru", gettext("Russian")), ("en", gettext("English")))
+LANGUAGE_CODE = os.environ.get("LANGUAGE_CODE", "en-us")
+# LANGUAGE_CODE = os.environ.get("LANGUAGE_CODE", "ru-ru")
+MODELTRANSLATION_DEFAULT_LANGUAGE = "en"
