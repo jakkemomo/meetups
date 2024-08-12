@@ -2,7 +2,9 @@ import logging
 
 from django.core.files.storage import default_storage
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny
@@ -27,14 +29,10 @@ class UploadViewSet(CreateAPIView):
         file = request.data.get("file")
         serializer = self.serializer_class(data={"file": file})
 
-        if not serializer.is_valid(raise_exception=False):
-            return Response(
-                status=415,
-                data={
-                    "Error": f"{file.content_type} extension is not supported. "
-                    f"Supported extensions are: {serializer.allowed_extensions}"
-                },
-            )
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY, data=e.detail)
 
         file = serializer.validated_data["file"]
         rel_url = upload_image(file)
