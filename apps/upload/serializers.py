@@ -21,6 +21,8 @@ class UploadSerializer(serializers.Serializer):
         if file.content_type != "image/webp":
             file = self.convert_to_webp(file)
         file.name = f"{uuid.uuid4().hex}.webp"
+        if file.size > 20 * 1024 * 1024:
+            raise ValidationError("The image size should be less than 20MB")
         return file
 
     @staticmethod
