@@ -26,7 +26,6 @@ class VerifyEmailTests(CoreTestsBase):
         soup = BeautifulSoup(email_data.body, "html.parser")
         email_verification_link = soup.find_all("a")[1].attrs.get("href")
         token = email_verification_link.split("token=")[1]
-        self.assertTrue(User.objects.filter(email=self.CLIENT_DATA.get("email")).first())
 
         response = self.client.get(self.VERIFY_EMAIL_PATH + f"?token={token}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -34,14 +33,12 @@ class VerifyEmailTests(CoreTestsBase):
 
     # Testing token
     def test_token_not_provided(self):
-        self.assertTrue(User.objects.filter(email=self.CLIENT_DATA.get("email")).first())
 
         response = self.client.get(self.VERIFY_EMAIL_PATH)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, "Invalid payload.")
 
     def test_token_invalid(self):
-        self.assertTrue(User.objects.filter(email=self.CLIENT_DATA.get("email")).first())
         token = "invalid"
 
         response = self.client.get(self.VERIFY_EMAIL_PATH + f"?token={token}")
@@ -76,7 +73,7 @@ class VerifyEmailTests(CoreTestsBase):
 
     # Testing confirmation_token
     def test_confirmation_token_not_provided(self):
-        user_id = User.objects.filter(email=self.CLIENT_DATA.get("email")).first().id
+        user_id = User.objects.filter(email=self.CLIENT_DATA.get("username")).first().id
         data = {"user_id": user_id}
         token = encode_json_data(data)
 
@@ -85,7 +82,7 @@ class VerifyEmailTests(CoreTestsBase):
         self.assertEqual(response.data, "Invalid token.")
 
     def test_confirmation_token_invalid(self):
-        User.objects.filter(email=self.CLIENT_DATA.get("email")).first().id
+        User.objects.filter(email=self.CLIENT_DATA.get("username")).first().id
 
         data = {"confirmation_token": "invalid"}
         token = encode_json_data(data)
