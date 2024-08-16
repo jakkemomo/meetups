@@ -9,14 +9,9 @@ from config import settings
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        required=True,
-        min_length=2,
-        max_length=128
-    )
+    username = serializers.CharField(required=True, min_length=2, max_length=128)
     email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
     )
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]

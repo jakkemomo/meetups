@@ -68,12 +68,12 @@ class VerifyEmailTests(CoreTestsBase):
         token = encode_json_data(data)
 
         response = self.client.get(self.VERIFY_EMAIL_PATH + f"?token={token}")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "User not found")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # Testing confirmation_token
     def test_confirmation_token_not_provided(self):
-        user_id = User.objects.filter(email=self.CLIENT_DATA.get("username")).first().id
+        user_id = User.objects.filter(email=self.CLIENT_DATA.get("email")).first().id
         data = {"user_id": user_id}
         token = encode_json_data(data)
 
@@ -82,7 +82,7 @@ class VerifyEmailTests(CoreTestsBase):
         self.assertEqual(response.data, "Invalid token.")
 
     def test_confirmation_token_invalid(self):
-        User.objects.filter(email=self.CLIENT_DATA.get("username")).first().id
+        User.objects.filter(email=self.CLIENT_DATA.get("email")).first().id
 
         data = {"confirmation_token": "invalid"}
         token = encode_json_data(data)

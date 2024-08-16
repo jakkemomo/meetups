@@ -13,10 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.core import helpers
 from apps.core.helpers import decode_json_data
-from apps.core.serializers.emails import (
-    EmailCheckSerializer,
-    ReverifyEmailSerializer
-)
+from apps.core.serializers.emails import EmailCheckSerializer, ReverifyEmailSerializer
 from apps.profiles.models import User
 from config import settings
 
@@ -30,10 +27,7 @@ class VerifyEmailView(APIView):
         tags=["auth"],
         manual_parameters=[
             openapi.Parameter(
-                "token",
-                openapi.IN_QUERY,
-                description="token",
-                type=openapi.TYPE_STRING
+                "token", openapi.IN_QUERY, description="token", type=openapi.TYPE_STRING
             )
         ],
         responses={
@@ -51,10 +45,7 @@ class VerifyEmailView(APIView):
         except Exception as exc:
             logger.error(f"Decoding failed: {exc}")
 
-            return Response(
-                "Invalid payload.",
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Invalid payload.", status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user_id = data["user_id"]
@@ -63,10 +54,7 @@ class VerifyEmailView(APIView):
         except KeyError as exc:
             logger.warning(f"Data not found: {exc}")
 
-            return Response(
-                "Invalid token.",
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Invalid token.", status=status.HTTP_400_BAD_REQUEST)
 
         user_model = get_user_model()
 
@@ -85,10 +73,7 @@ class VerifyEmailView(APIView):
             )
 
         if user.is_email_verified and user.email == email:
-            return Response(
-                'Email is already verified',
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Email is already verified", status=status.HTTP_400_BAD_REQUEST)
 
         if user.is_email_verified and user.email != email:
             user.email = email
@@ -100,10 +85,7 @@ class VerifyEmailView(APIView):
         refresh = RefreshToken.for_user(user)
         refresh.access_token.set_exp(lifetime=timedelta(hours=1))
 
-        return Response(
-            data={"access": str(refresh.access_token)},
-            status=status.HTTP_200_OK
-        )
+        return Response(data={"access": str(refresh.access_token)}, status=status.HTTP_200_OK)
 
 
 class ReverifyEmailView(generics.CreateAPIView):
@@ -116,8 +98,7 @@ class ReverifyEmailView(generics.CreateAPIView):
             status.HTTP_200_OK: "Email successfully sent",
             status.HTTP_400_BAD_REQUEST: "Email is already verified",
             status.HTTP_404_NOT_FOUND: "User not found",
-            status.HTTP_500_INTERNAL_SERVER_ERROR:
-            "Could not send message at the moment, try later",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Could not send message at the moment, try later",
         },
     )
     def post(self, request, *args, **kwargs):
@@ -125,15 +106,9 @@ class ReverifyEmailView(generics.CreateAPIView):
         if not user:
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         if user.is_email_verified:
-            return Response(
-                "Email is already verified",
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Email is already verified", status=status.HTTP_400_BAD_REQUEST)
         try:
-            helpers.send_verification_email(
-                user,
-                url=settings.VERIFY_EMAIL_URL
-            )
+            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
         except Exception as e:
             logging.error(e)
             return Response(
@@ -164,8 +139,7 @@ class ChangeEmailView(APIView):
             status.HTTP_200_OK: "Email successfully sent",
             status.HTTP_409_CONFLICT: "Email exist",
             status.HTTP_404_NOT_FOUND: "User not found",
-            status.HTTP_500_INTERNAL_SERVER_ERROR:
-            "Could not send message at the moment, try later",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Could not send message at the moment, try later",
         },
     )
     def post(self, request, *args, **kwargs):
@@ -177,32 +151,21 @@ class ChangeEmailView(APIView):
 
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         if not request.data.get("email"):
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data="Email is required"
-            )
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="Email is required")
         email = request.data["email"].lower()
         if User.objects.filter(email=email).exists():
             return Response(
-                status=status.HTTP_409_CONFLICT,
-                data="This email has already been registered"
+                status=status.HTTP_409_CONFLICT, data="This email has already been registered"
             )
         try:
-            helpers.send_verification_email(
-                user,
-                url=settings.CHANGE_EMAIL_URL,
-                email=email
-            )
+            helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL, email=email)
         except Exception as e:
             logging.error(e)
             return Response(
                 "Could not send message at the moment, try later",
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return Response(
-            status=status.HTTP_200_OK,
-            data="Email successfully sent"
-        )
+        return Response(status=status.HTTP_200_OK, data="Email successfully sent")
 
 
 class CheckEmailExistsView(APIView):

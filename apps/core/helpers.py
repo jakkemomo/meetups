@@ -19,9 +19,11 @@ def send_email(user: User, subject, message):
 
 def send_verification_email(user, url: str, email=None):
     confirmation_token = default_token_generator.make_token(user)
-    data = {"user_id": user.id,
-            "confirmation_token": confirmation_token,
-            "email": email}
+    data = {
+        "user_id": user.id,
+        "confirmation_token": confirmation_token,
+        "email": email
+    }
 
     token = encode_json_data(data)
 
