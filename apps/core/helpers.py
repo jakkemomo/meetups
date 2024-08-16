@@ -17,7 +17,7 @@ def send_email(user: User, subject, message):
     email.send()
 
 
-def send_verification_email(user, url: str, email=None):
+def send_verification_email(user, url: str, email=''):
     confirmation_token = default_token_generator.make_token(user)
     data = {
         "user_id": user.id,
