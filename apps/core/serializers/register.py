@@ -22,9 +22,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("username", "email", "password")
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data["username"], email=validated_data["email"].lower()
-        )
+        email = validated_data["email"].lower()
+        user = User.objects.create(username=validated_data["username"], email=email)
         user.set_password(validated_data["password"])
         user.image_url = settings.DEFAULT_USER_AVATAR_URL
         user.save()
@@ -35,7 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             preference_model.objects.create(user=user)
 
         try:
-            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
+            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL, email=email)
         except Exception as e:
             user.delete()
             raise e
