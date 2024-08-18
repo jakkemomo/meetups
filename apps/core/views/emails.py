@@ -50,6 +50,7 @@ class VerifyEmailView(APIView):
         try:
             user_id = data["user_id"]
             confirmation_token = data["confirmation_token"]
+            email = data["email"]
         except KeyError as exc:
             logger.warning(f"Data not found: {exc}")
 
@@ -64,9 +65,6 @@ class VerifyEmailView(APIView):
 
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
 
-        if user.is_email_verified:
-            return Response("Email is already verified", status=status.HTTP_400_BAD_REQUEST)
-
         if not default_token_generator.check_token(user, confirmation_token):
             return Response(
                 "Token is invalid or expired. "
@@ -74,7 +72,13 @@ class VerifyEmailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user.is_email_verified = True
+        if user.is_email_verified:
+            if user.email == email:
+                return Response("Email is already verified", status=status.HTTP_400_BAD_REQUEST)
+            user.email = email
+        else:
+            user.is_email_verified = True
+
         user.save()
 
         refresh = RefreshToken.for_user(user)
@@ -97,13 +101,14 @@ class ReverifyEmailView(generics.CreateAPIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        user = User.objects.filter(email=request.data["email"].lower()).first()
+        email = request.data["email"].lower()
+        user = User.objects.filter(email=email).first()
         if not user:
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         if user.is_email_verified:
             return Response("Email is already verified", status=status.HTTP_400_BAD_REQUEST)
         try:
-            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL)
+            helpers.send_verification_email(user, url=settings.VERIFY_EMAIL_URL, email=email)
         except Exception as e:
             logging.error(e)
             return Response(
@@ -152,11 +157,8 @@ class ChangeEmailView(APIView):
             return Response(
                 status=status.HTTP_409_CONFLICT, data="This email has already been registered"
             )
-        user.is_email_verified = False
-        user.email = email
-        user.save()
         try:
-            helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL)
+            helpers.send_verification_email(user, url=settings.CHANGE_EMAIL_URL, email=email)
         except Exception as e:
             logging.error(e)
             return Response(
