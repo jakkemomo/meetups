@@ -22,7 +22,10 @@ async def chat_event_add_user_2(event, async_user_2) -> Chat:
 @pytest.fixture
 async def chat_event_add_message(event, async_user) -> Message:
     message = await database_sync_to_async(Message.objects.create)(
-        created_by=async_user, chat=event.chat, message_text="Hello, World!"
+        created_by=async_user,
+        chat=event.chat,
+        message_text="Hello, World!",
+        created_at="2024-08-25T17:02:05.676522Z",
     )
     return message
 

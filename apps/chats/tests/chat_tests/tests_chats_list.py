@@ -40,6 +40,7 @@ async def test_chats_list_valid(
                 ("type", Chat.Type.EVENT),
                 ("last_message_text", chat_event_add_message.message_text),
                 ("last_message_is_owner", True),
+                ("last_message_created_at", "2024-08-25T17:02:05.676522Z"),
             ]
         ),
         OrderedDict(
@@ -50,6 +51,7 @@ async def test_chats_list_valid(
                 ("type", Chat.Type.DIRECT),
                 ("last_message_text", None),
                 ("last_message_is_owner", False),
+                ("last_message_created_at", None),
             ]
         ),
     ]

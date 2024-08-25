@@ -61,8 +61,17 @@ class ChatRetrieveSerializer(serializers.ModelSerializer):
 
 class ChatListSerializer(ChatRetrieveSerializer):
     last_message_text = serializers.CharField(max_length=528)
+    last_message_created_at = serializers.DateTimeField()
     last_message_is_owner = serializers.BooleanField()
 
     class Meta:
         model = Chat
-        fields = ["id", "name", "image_url", "type", "last_message_text", "last_message_is_owner"]
+        fields = [
+            "id",
+            "name",
+            "image_url",
+            "type",
+            "last_message_text",
+            "last_message_is_owner",
+            "last_message_created_at",
+        ]
