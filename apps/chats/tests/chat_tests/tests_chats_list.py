@@ -2,10 +2,13 @@ from collections import OrderedDict
 
 import pytest
 from rest_framework.reverse import reverse
+from freezegun import freeze_time
 
 from apps.chats.models import Chat
 from apps.chats.tests.constants import CHATS_LIST_URL
 from apps.profiles.tests.utils import async_get_tokens
+
+FIXED_TIME = "2024-08-25T17:02:05.676522Z"
 
 
 @pytest.mark.django_db(transaction=True)
@@ -19,42 +22,44 @@ async def test_chats_list_valid(
     chat_direct_user_user_2,
     chat_event_add_message,
 ):
-    # user log_in
-    token = await async_get_tokens(async_user)
-    header = {"Authorization": "Bearer " + token}
+    # Use freeze_time to freeze the time at the fixed time
+    with freeze_time(FIXED_TIME):
+        # user log_in
+        token = await async_get_tokens(async_user)
+        header = {"Authorization": "Bearer " + token}
 
-    # user chats_list
-    response = await async_client.get(reverse(CHATS_LIST_URL), headers=header)
+        # user chats_list
+        response = await async_client.get(reverse(CHATS_LIST_URL), headers=header)
 
-    # assertions
-    assert response.status_code == 200
-    assert response.data.get("count") == 2
-    assert response.data.get("next") is None
-    assert response.data.get("previous") is None
-    assert response.data.get("results") == [
-        OrderedDict(
-            [
-                ("id", event.chat.id),
-                ("name", event.name),
-                ("image_url", event.image_url),
-                ("type", Chat.Type.EVENT),
-                ("last_message_text", chat_event_add_message.message_text),
-                ("last_message_is_owner", True),
-                ("last_message_created_at", "2024-08-25T17:02:05.676522Z"),
-            ]
-        ),
-        OrderedDict(
-            [
-                ("id", chat_direct_user_user_2.id),
-                ("name", async_user_2.username),
-                ("image_url", async_user_2.image_url),
-                ("type", Chat.Type.DIRECT),
-                ("last_message_text", None),
-                ("last_message_is_owner", False),
-                ("last_message_created_at", None),
-            ]
-        ),
-    ]
+        # assertions
+        assert response.status_code == 200
+        assert response.data.get("count") == 2
+        assert response.data.get("next") is None
+        assert response.data.get("previous") is None
+        assert response.data.get("results") == [
+            OrderedDict(
+                [
+                    ("id", event.chat.id),
+                    ("name", event.name),
+                    ("image_url", event.image_url),
+                    ("type", Chat.Type.EVENT),
+                    ("last_message_text", chat_event_add_message.message_text),
+                    ("last_message_is_owner", True),
+                    ("last_message_created_at", FIXED_TIME),
+                ]
+            ),
+            OrderedDict(
+                [
+                    ("id", chat_direct_user_user_2.id),
+                    ("name", async_user_2.username),
+                    ("image_url", async_user_2.image_url),
+                    ("type", Chat.Type.DIRECT),
+                    ("last_message_text", None),
+                    ("last_message_is_owner", False),
+                    ("last_message_created_at", None),
+                ]
+            ),
+        ]
 
 
 @pytest.mark.django_db(transaction=True)
