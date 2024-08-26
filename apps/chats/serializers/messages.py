@@ -14,3 +14,9 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ["id", "message_text"]
+
+
+class MessageDeleteSerializer(serializers.Serializer):
+    ids = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=False, write_only=True
+    )
