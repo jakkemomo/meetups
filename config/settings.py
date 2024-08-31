@@ -272,7 +272,7 @@ CHANNEL_LAYERS = {
     }
 }
 
-WS_ALLOWED_ORIGINS = ['https://mevent.io']
+WS_ALLOWED_ORIGINS = ["https://mevent.io"]
 EVENTS_UPDATE_INTERVAL = 60 * 60  # 1 hour
 
 # Notifications

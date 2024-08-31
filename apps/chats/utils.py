@@ -34,6 +34,7 @@ list_chats_raw = """
                     chats_message
                 WHERE
                     status = 'unread'
+                    AND created_by_id != %s
                 GROUP BY
                     chat_id
             )

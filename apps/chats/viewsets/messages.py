@@ -1,3 +1,4 @@
+from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
@@ -12,6 +13,7 @@ from apps.chats.serializers.messages import (
     MessageCreateSerializer,
     MessageRetrieveSerializer,
     MessageDeleteSerializer,
+    MessageMarkReadSerializer,
 )
 from apps.events.serializers import EmptySerializer
 
@@ -32,6 +34,8 @@ class MessageViewSet(viewsets.ModelViewSet):
             return MessageRetrieveSerializer
         elif self.action == "partial_update":
             return MessageCreateSerializer
+        elif self.action == "mark_as_read":
+            return MessageMarkReadSerializer
         return EmptySerializer
 
     def get_queryset(self):
@@ -96,4 +100,50 @@ class MessageViewSet(viewsets.ModelViewSet):
 
         return Response(
             {"message": f"Deleted {delete_count[0]} items."}, status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        method="patch",
+        request_body=MessageMarkReadSerializer,
+        responses={
+            200: openapi.Response(
+                description="Messages marked as read",
+                examples={"application/json": {"message": "Marked 3 items as read."}},
+            ),
+            400: openapi.Response(
+                description="Bad Request: Invalid input",
+                examples={"application/json": {"message": "Invalid input."}},
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                examples={
+                    "application/json": {"message": "You can't mark your own messages as read."}
+                },
+            ),
+        },
+    )
+    @action(
+        methods=["patch"], detail=False, permission_classes=[IsAuthenticated, MessagePermissions]
+    )
+    def mark_as_read(self, request: Request):
+        """
+        Marks a list of messages as read specified by their IDs.
+        """
+        serializer = MessageMarkReadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        message_ids = serializer.validated_data["ids"]
+
+        messages_to_mark = self.get_queryset().filter(id__in=message_ids)
+
+        for message in messages_to_mark:
+            if message.created_by == request.user:
+                return Response(
+                    {"message": "You can't mark your own messages as read."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        updated_count = messages_to_mark.update(status=Message.Status.READ, read_at=timezone.now())
+
+        return Response(
+            {"message": f"Marked {updated_count} items as read."}, status=status.HTTP_200_OK
         )
