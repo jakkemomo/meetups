@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import pytest
 from rest_framework.reverse import reverse
 
@@ -40,6 +39,7 @@ async def test_chats_list_valid(
     assert results[0]["last_message_text"] == chat_event_add_message.message_text
     assert results[0]["last_message_is_owner"] is True
     assert results[0]["last_message_created_at"] is not None  # Check that the value is not None
+    assert results[0]["unread_message_counter"] == 1
 
     assert results[1]["id"] == chat_direct_user_user_2.id
     assert results[1]["name"] == async_user_2.username
@@ -48,6 +48,7 @@ async def test_chats_list_valid(
     assert results[1]["last_message_text"] is None
     assert results[1]["last_message_is_owner"] is False
     assert results[1]["last_message_created_at"] is None  # Should be None for this chat
+    assert results[1]["unread_message_counter"] == 0
 
 
 @pytest.mark.django_db(transaction=True)

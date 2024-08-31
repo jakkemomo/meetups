@@ -12,6 +12,13 @@ class Message(AbstractBaseModel):
         to="Chat", on_delete=models.CASCADE, related_name="chat_messages", verbose_name=_("Chat")
     )
     message_text = models.TextField(max_length=528, verbose_name=_("Message text"))
+    status = models.CharField(
+        max_length=32,
+        choices=[("unread", "unread"), ("read", "read"), ("deleted", "deleted")],
+        default="unread",
+        verbose_name=_("Status"),
+    )
+    read_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Read at"))
 
     class Meta:
         ordering = ["created_at"]
