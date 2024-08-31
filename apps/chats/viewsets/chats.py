@@ -54,7 +54,7 @@ class ChatViewSet(viewsets.ModelViewSet):
             return self.queryset.all()
 
         self.queryset = self.model.objects.raw(
-            list_chats_raw, [self.request.user.id, self.request.user.id]
+            list_chats_raw, [self.request.user.id, self.request.user.id, self.request.user.id]
         )
         return self.queryset
 

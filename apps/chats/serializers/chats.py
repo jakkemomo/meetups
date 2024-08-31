@@ -63,6 +63,7 @@ class ChatListSerializer(ChatRetrieveSerializer):
     last_message_text = serializers.CharField(max_length=528)
     last_message_created_at = serializers.DateTimeField()
     last_message_is_owner = serializers.BooleanField()
+    unread_message_counter = serializers.IntegerField(default=0)
 
     class Meta:
         model = Chat
@@ -74,4 +75,5 @@ class ChatListSerializer(ChatRetrieveSerializer):
             "last_message_text",
             "last_message_is_owner",
             "last_message_created_at",
+            "unread_message_counter",
         ]

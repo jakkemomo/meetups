@@ -15,37 +15,49 @@ def has_chat_permissions(user, chat):
 
 
 list_chats_raw = """
-            SELECT
-                chats_chat.id,
-                chats_chat.type,
-                last_messages.message_text  as last_message_text,
-                last_messages.created_by_id as last_message_created_by,
-                last_messages.created_at    as last_message_created_at,
-                CASE
-                    WHEN last_messages.created_by_id = %s THEN 1 ELSE 0
-                    END AS last_message_is_owner
-            FROM chats_chat
-            LEFT JOIN (
+            WITH last_messages AS (
                 SELECT
-                    chats_message.id,
-                    chats_message.chat_id,
-                    chats_message.message_text,
-                    chats_message.created_by_id,
-                    MAX(chats_message.created_at)
-                        OVER (PARTITION BY chats_message.chat_id) AS created_at
-                    FROM chats_message
-                    WHERE chats_message.created_at in (
-                        SELECT MAX(chats_message.created_at)
-                        FROM chats_message
-                        GROUP BY chats_message.chat_id
-                    )
-                    ORDER BY chats_message.id
-            ) AS last_messages
-            ON chats_chat.id = last_messages.chat_id
-            WHERE chats_chat.id IN (
-                SELECT chat_id
-                FROM chats_chat_participants
-                WHERE user_id = %s
+                    cm.id,
+                    cm.chat_id,
+                    cm.message_text,
+                    cm.created_by_id,
+                    cm.created_at,
+                    ROW_NUMBER() OVER (PARTITION BY cm.chat_id ORDER BY cm.created_at DESC) AS rn
+                FROM
+                    chats_message cm
+            ),
+            unread_messages AS (
+                SELECT
+                    chat_id,
+                    COUNT(*) AS unread_message_counter
+                FROM
+                    chats_message
+                WHERE
+                    status = 'unread'
+                    AND created_by_id != %s
+                GROUP BY
+                    chat_id
+            )
+            SELECT
+                cc.id,
+                cc.type,
+                lm.message_text AS last_message_text,
+                lm.created_by_id AS last_message_created_by,
+                lm.created_at AS last_message_created_at,
+                CASE
+                    WHEN lm.created_by_id = %s THEN 1 ELSE 0
+                END AS last_message_is_owner,
+                COALESCE(um.unread_message_counter, 0) AS unread_message_counter
+            FROM
+                chats_chat cc
+            LEFT JOIN last_messages lm ON cc.id = lm.chat_id AND lm.rn = 1
+            LEFT JOIN unread_messages um ON cc.id = um.chat_id
+            WHERE
+                cc.id IN (
+                    SELECT chat_id
+                    FROM chats_chat_participants
+                    WHERE user_id = %s
                 )
-            ORDER BY chats_chat.id;
+            ORDER BY
+                cc.id;
             """
