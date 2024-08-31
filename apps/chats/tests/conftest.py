@@ -28,6 +28,14 @@ async def chat_event_add_message(event, async_user) -> Message:
 
 
 @pytest.fixture
+async def chat_direct_add_message(chat_direct_user_user_2, async_user) -> Message:
+    message = await database_sync_to_async(Message.objects.create)(
+        created_by=async_user, chat=chat_direct_user_user_2, message_text="Hello, User2!"
+    )
+    return message
+
+
+@pytest.fixture
 async def chat_event_add_hundred_messages(event, async_user) -> list:
     messages = []
     for _ in range(100):
