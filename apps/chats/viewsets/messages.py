@@ -128,6 +128,8 @@ class MessageViewSet(viewsets.ModelViewSet):
     def mark_as_read(self, request: Request):
         """
         Marks a list of messages as read specified by their IDs.
+
+        Only the messages of other users can be marked as read by the requesting user.
         """
         serializer = MessageMarkReadSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
