@@ -6,18 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chats', '0001_squashed_0002_chat_created_by_chat_updated_at_chat_updated_by_and_more'),
+        ("chats", "0001_squashed_0002_chat_created_by_chat_updated_at_chat_updated_by_and_more")
     ]
 
     operations = [
         migrations.AddField(
-            model_name='message',
-            name='read_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Read at'),
+            model_name="message",
+            name="read_at",
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Read at"),
         ),
         migrations.AddField(
-            model_name='message',
-            name='status',
-            field=models.CharField(choices=[('unread', 'unread'), ('read', 'read'), ('deleted', 'deleted')], default='unread', max_length=32, verbose_name='Status'),
+            model_name="message",
+            name="status",
+            field=models.CharField(
+                choices=[("unread", "unread"), ("read", "read"), ("deleted", "deleted")],
+                default="unread",
+                max_length=32,
+                verbose_name="Status",
+            ),
         ),
     ]
