@@ -14,7 +14,6 @@ from apps.chats.serializers.messages import (
     MessageRetrieveSerializer,
     MessageDeleteSerializer,
     MessageMarkReadSerializer,
-
 )
 from apps.events.serializers import EmptySerializer
 

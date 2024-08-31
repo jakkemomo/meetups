@@ -43,7 +43,6 @@ async def test_chats_list_valid_from_sender(
     assert results[0]["last_message_created_at"] is not None
     assert results[0]["unread_message_counter"] == 0
 
-
     assert results[1]["id"] == chat_direct_user_user_2.id
     assert results[1]["name"] == async_user_2.username
     assert results[1]["image_url"] == async_user_2.image_url
@@ -52,7 +51,6 @@ async def test_chats_list_valid_from_sender(
     assert results[1]["last_message_is_owner"] is True
     assert results[1]["last_message_created_at"] is not None
     assert results[1]["unread_message_counter"] == 0
-
 
 
 @pytest.mark.django_db(transaction=True)
