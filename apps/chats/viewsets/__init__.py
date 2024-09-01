@@ -1,2 +1,2 @@
-from .chats import ChatViewSet, DirectChatViewSet
+from .chats import ChatViewSet, DirectChatViewSet, ChatMessagesViewSet
 from .messages import MessageViewSet

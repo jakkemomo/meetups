@@ -2,11 +2,14 @@ from typing import Union
 
 from asgiref.sync import async_to_sync
 from django.forms import model_to_dict
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from drf_yasg.utils import no_body, swagger_auto_schema
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from apps.chats.managers import ChatManager
 from apps.chats.models import Chat, Message
@@ -14,13 +17,13 @@ from apps.chats.permissions.chats import ChatPermissions, DirectChatPermissions
 from apps.chats.serializers.chats import ChatListSerializer, ChatRetrieveSerializer
 from apps.chats.serializers.messages import MessageCreateSerializer, MessageRetrieveSerializer
 from apps.chats.utils import list_chats_raw
+from apps.events.filters import TrigramSimilaritySearchFilter
 from apps.events.serializers import EmptySerializer
 from apps.events.serializers.events import ParticipantSerializer
 from apps.notifications.handlers.in_app import InAppNotificationsHandler
 from apps.notifications.managers.chain import NotificationsChainManager
 from apps.notifications.models import Notification
 from apps.profiles.models import User
-from apps.profiles.utils import get_user_object
 
 
 class ChatViewSet(viewsets.ModelViewSet):
@@ -58,14 +61,14 @@ class ChatViewSet(viewsets.ModelViewSet):
         )
         return self.queryset
 
-    @swagger_auto_schema(request_body=no_body)
-    @action(methods=["get"], detail=True, url_path="messages", url_name="chat_messages")
-    def messages(self, request, chat_id):
-        chat_object: Chat = self.get_object()
-        messages = Message.objects.filter(chat_id=chat_object.id).order_by("-created_at")
-        page = self.paginate_queryset(messages)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+    # @swagger_auto_schema(request_body=no_body)
+    # @action(methods=["get"], detail=True, url_path="messages", url_name="chat_messages")
+    # def messages(self, request, chat_id):
+    #     chat_object: Chat = self.get_object()
+    #     messages = Message.objects.filter(chat_id=chat_object.id).order_by("-created_at")
+    #     page = self.paginate_queryset(messages)
+    #     serializer = self.get_serializer(page, many=True)
+    #     return self.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=no_body)
     @action(methods=["get"], detail=True, url_path="participants", url_name="chat_participants")
@@ -109,6 +112,37 @@ class ChatViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(auto_schema=None)
     def create(self, request, *args, **kwargs):
         pass
+
+
+class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
+    model = Message
+    permission_classes = [IsAuthenticated, ChatPermissions]
+    lookup_url_kwarg = "message_id"
+    queryset = Message.objects.all()
+    serializer_class = MessageRetrieveSerializer
+    filter_backends = [TrigramSimilaritySearchFilter, DjangoFilterBackend]
+    filterset_fields = ["message_text", "created_by"]
+    search_fields = ["message_text", "created_by__username"]
+
+    def get_queryset(self):
+        chat_id = self.kwargs.get("chat_id")
+        if chat_id:
+            chat = Chat.objects.get(id=chat_id)
+            self.check_object_permissions(self.request, chat)
+            self.queryset = self.model.objects.filter(chat_id=chat_id).order_by("-created_at")
+        else:
+            raise ValidationError("Chat id is required")
+        return self.queryset
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(
+        methods=["get"],
+        detail=False,
+        url_path="(?P<chat_id>[^/.]+)/messages",
+        url_name="chat_messages",
+    )
+    def chat_messages(self, request, chat_id):
+        return self.list(request, chat_id=chat_id)
 
 
 class DirectChatViewSet(viewsets.ModelViewSet):

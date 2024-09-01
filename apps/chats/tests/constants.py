@@ -1,7 +1,7 @@
 CHATS_LIST_URL = "chats:Chats-list"
 CHATS_GET_EVENT_URL = "chats:Chats-detail"
 CHATS_GET_DIRECT_URL = "chats:Directs-detail"
-CHATS_GET_MESSAGES_URL = "chats:Chats-chat_messages"
+CHATS_GET_MESSAGES_URL = "chats:ChatMessages-chat_messages"
 CHATS_GET_PARTICIPANTS_URL = "chats:Chats-chat_participants"
 CHATS_SEND_MESSAGE_URL = "chats:Chats-send_message"
 MESSAGES_LIST_URL = "chats:Messages-list"
