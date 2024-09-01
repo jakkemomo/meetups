@@ -27,7 +27,6 @@ from apps.profiles.models import User
 from apps.profiles.serializers import ProfileRetrieveSerializer
 
 
-
 class ChatViewSet(viewsets.ModelViewSet):
     model = Chat
     permission_classes = [IsAuthenticated, ChatPermissions]
@@ -82,7 +81,6 @@ class ChatViewSet(viewsets.ModelViewSet):
     #     page = self.paginate_queryset(participants)
     #     serializer = self.get_serializer(page, many=True)
     #     return self.get_paginated_response(serializer.data)
-
 
     @action(methods=["post"], detail=True, url_path="send_message", url_name="send_message")
     def send_message(self, request, chat_id):
