@@ -33,3 +33,4 @@ from .tags import (
     TagRetrieveSerializer,
     TagUpdateSerializer,
 )
+from .invitations import InvitationSerializer
