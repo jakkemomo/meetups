@@ -1,7 +1,6 @@
-from cities_light.loading import get_cities_models
 from modeltranslation.translator import TranslationOptions, translator
 
-Country, Region, SubRegion, City = get_cities_models()
+from apps.core.models import City
 
 
 class CityTranslationOptions(TranslationOptions):

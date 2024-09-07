@@ -7,6 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
+        ("core", "0001_initial"),
         ("cities_light", "0011_alter_city_country_alter_city_region_and_more"),
         ("profiles", "0024_merge_20240616_1925"),
     ]
@@ -17,10 +18,7 @@ class Migration(migrations.Migration):
             model_name="user",
             name="city",
             field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to="cities_light.city",
+                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="core.city"
             ),
         ),
     ]
