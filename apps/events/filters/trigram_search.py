@@ -47,6 +47,15 @@ class TrigramSimilaritySearchFilter(SearchFilter):
 
         # take the greatest similarity from all conditions
         # and annotate as similarity
-        return queryset.annotate(similarity=Greatest(*conditions)).filter(
-            similarity__gte=trigram_similarity
-        )
+        if len(conditions) > 1:
+            return (
+                queryset.annotate(similarity=Greatest(*conditions))
+                .filter(similarity__gt=trigram_similarity)
+                .order_by("-similarity")
+            )
+        else:
+            return (
+                queryset.annotate(similarity=conditions[0])
+                .filter(similarity__gt=trigram_similarity)
+                .order_by("-similarity")
+            )

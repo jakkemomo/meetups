@@ -1,10 +1,7 @@
 from cities_light.contrib.restframework3 import City
 from django.contrib.gis.geos import Polygon
-from django.db.models import Q, ExpressionWrapper, F, FloatField
-from django.db.models.functions.math import Sqrt
 from django_filters import Filter
 from django_filters import rest_framework as filters
-from rest_framework import serializers
 
 from apps.events.models import Event
 
@@ -107,12 +104,13 @@ class EventFilter(filters.FilterSet):
 
 
 class CityFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr="exact", field_name="name")
-    country_name = filters.CharFilter(lookup_expr="exact", field_name="country__name")
+    name = filters.CharFilter(lookup_expr="istartswith", field_name="name")
+    country_name = filters.CharFilter(lookup_expr="istartswith", field_name="country__name")
+    country_code = filters.CharFilter(lookup_expr="iexact", field_name="country__code2")
 
     class Meta:
         model = City
-        fields = ["name", "country_name"]
+        fields = ["name", "country_name", "country_code"]
 
     # def find_by_coordinates(self, queryset, *lat_lng):
     #     lat = self.data.get("lat")

@@ -1,3 +1,4 @@
 CREATE USER postgres SUPERUSER;
 CREATE DATABASE meetups_ws WITH OWNER postgres;
 CREATE EXTENSION postgis;
+CREATE EXTENSION pg_trgm;

@@ -2,7 +2,6 @@ from typing import Union
 
 from asgiref.sync import async_to_sync
 from django.forms import model_to_dict
-from django_filters.rest_framework.backends import DjangoFilterBackend
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
@@ -131,7 +130,9 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
             self.check_object_permissions(self.request, chat)
             self.queryset = self.model.objects.filter(chat_id=chat_id).order_by("-created_at")
         else:
-            raise ValidationError("Chat id is required")
+            self.queryset = self.model.objects.filter(
+                chat__in=Chat.objects.filter(participants__id=self.request.user.id)
+            ).order_by("-created_at")
         return self.queryset
 
     @swagger_auto_schema(request_body=no_body)
@@ -142,6 +143,43 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
         url_name="chat_messages",
     )
     def chat_messages(self, request, chat_id):
+        return self.list(request, chat_id=chat_id)
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=["get"], detail=False, url_path="all/messages", url_name="all_chat_messages")
+    def all_chat_messages(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class ChatParticipantsViewSet(mixins.ListModelMixin, GenericViewSet):
+    model = User
+    permission_classes = [IsAuthenticated, ChatPermissions]
+    lookup_url_kwarg = "user_id"
+    queryset = User.objects.all()
+    serializer_class = ProfileRetrieveSerializer
+    filter_backends = [TrigramSimilaritySearchFilter]
+    search_fields = ["username", "first_name", "last_name", "email"]
+
+    def get_queryset(self):
+        chat_id = self.kwargs.get("chat_id")
+        if chat_id:
+            chat = Chat.objects.get(id=chat_id)
+            self.check_object_permissions(self.request, chat)
+            self.queryset = self.model.objects.filter(
+                id__in=chat.participants.all().values_list("id", flat=True)
+            )
+        else:
+            raise ValidationError("Chat id is required")
+        return self.queryset
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(
+        methods=["get"],
+        detail=False,
+        url_path="(?P<chat_id>[^/.]+)/participants",
+        url_name="chat_participants",
+    )
+    def chat_participants(self, request, chat_id):
         return self.list(request, chat_id=chat_id)
 
 

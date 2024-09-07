@@ -86,7 +86,6 @@ INSTALLED_APPS = [
     "channels",
     "channels_postgres",
     "modeltranslation",
-    "cities_light",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -101,6 +100,7 @@ INSTALLED_APPS = [
     "apps.upload.apps.UploadConfig",
     "apps.notifications.apps.NotificationsConfig",
     "apps.chats.apps.ChatsConfig",
+    "cities_light",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
@@ -281,7 +281,9 @@ NOTIFICATION_PREFERENCES = {
     "EMAIL": "apps.notifications.models.EmailNotificationsPreferences",
 }
 
+CITIES_LIGHT_APP_NAME = "core"
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ["ru", "en", "be", "abbr"]
+CITIES_LIGHT_INDEX_SEARCH_NAMES = True
 CITIES_LIGHT_INCLUDE_CITY_TYPES = [
     "PPL",
     "PPLA",
