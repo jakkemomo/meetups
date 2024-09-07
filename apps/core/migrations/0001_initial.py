@@ -5,6 +5,7 @@ import cities_light.abstract_models
 import cities_light.validators
 import django.contrib.gis.db.models.fields
 import django.contrib.postgres.indexes
+from django.contrib.postgres.operations import TrigramExtension
 from django.db import migrations, models
 import django.db.models.deletion
 
@@ -16,6 +17,7 @@ class Migration(migrations.Migration):
     dependencies: list[tuple[str, str]] = []
 
     operations = [
+        TrigramExtension(),
         migrations.CreateModel(
             name="Country",
             fields=[
