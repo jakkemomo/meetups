@@ -146,9 +146,10 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
         return self.list(request, chat_id=chat_id)
 
     @swagger_auto_schema(request_body=no_body)
-    @action(methods=["get"], detail=False, url_path='all/messages', url_name="all_chat_messages")
+    @action(methods=["get"], detail=False, url_path="all/messages", url_name="all_chat_messages")
     def all_chat_messages(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
 
 class ChatParticipantsViewSet(mixins.ListModelMixin, GenericViewSet):
     model = User

@@ -6,8 +6,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("chats", "0003_message_read_at_message_status")]
+    dependencies = [("chats", "0003_message_read_at_message_status")]
 
     operations = [
         TrigramExtension(),
