@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
-                to="cities_light.country",
+                to="core.country",
             ),
         ),
         migrations.DeleteModel(name="City"),
