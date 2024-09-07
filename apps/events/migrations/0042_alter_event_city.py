@@ -6,14 +6,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [("core", "__first__"), ("events", "0041_remove_event_country")]
+    dependencies = [("core", "0001_initial"), ("events", "0041_remove_event_country")]
 
     operations = [
         migrations.AlterField(
             model_name="event",
             name="city",
             field=models.ForeignKey(
-                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="core.city"
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="events.Event",
             ),
         )
     ]
