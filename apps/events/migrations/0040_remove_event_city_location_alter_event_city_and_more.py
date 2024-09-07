@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("profiles", "0025_remove_user_city_location_user_city"),
-        ("cities_light", "0011_alter_city_country_alter_city_region_and_more"),
         ("events", "0039_remove_event_city_north_east_point_and_more"),
     ]
 
@@ -28,7 +27,10 @@ class Migration(migrations.Migration):
             model_name="event",
             name="city",
             field=models.ForeignKey(
-                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="core.city"
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="events.Event",
             ),
         ),
         migrations.AddField(

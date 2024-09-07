@@ -6,10 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("cities_light", "0011_alter_city_country_alter_city_region_and_more"),
-        ("profiles", "0024_merge_20240616_1925"),
-    ]
+    dependencies = [("profiles", "0024_merge_20240616_1925")]
 
     operations = [
         migrations.RemoveField(model_name="user", name="city_location"),

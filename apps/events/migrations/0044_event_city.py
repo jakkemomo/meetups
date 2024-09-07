@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [("core", "0001_initial"), ("events", "0043_remove_event_city")]
+    dependencies = [("events", "0043_remove_event_city")]
 
     operations = [
         migrations.AddField(
