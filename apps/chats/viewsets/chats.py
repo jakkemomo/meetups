@@ -183,38 +183,6 @@ class ChatParticipantsViewSet(mixins.ListModelMixin, GenericViewSet):
         return self.list(request, chat_id=chat_id)
 
 
-class ChatParticipantsViewSet(mixins.ListModelMixin, GenericViewSet):
-    model = User
-    permission_classes = [IsAuthenticated, ChatPermissions]
-    lookup_url_kwarg = "user_id"
-    queryset = User.objects.all()
-    serializer_class = ProfileRetrieveSerializer
-    filter_backends = [TrigramSimilaritySearchFilter]
-    search_fields = ["username", "first_name", "last_name", "email"]
-
-    def get_queryset(self):
-        chat_id = self.kwargs.get("chat_id")
-        if chat_id:
-            chat = Chat.objects.get(id=chat_id)
-            self.check_object_permissions(self.request, chat)
-            self.queryset = self.model.objects.filter(
-                id__in=chat.participants.all().values_list("id", flat=True)
-            )
-        else:
-            raise ValidationError("Chat id is required")
-        return self.queryset
-
-    @swagger_auto_schema(request_body=no_body)
-    @action(
-        methods=["get"],
-        detail=False,
-        url_path="(?P<chat_id>[^/.]+)/participants",
-        url_name="chat_participants",
-    )
-    def chat_participants(self, request, chat_id):
-        return self.list(request, chat_id=chat_id)
-
-
 class DirectChatViewSet(viewsets.ModelViewSet):
     model = User
     permission_classes = [IsAuthenticated, DirectChatPermissions]
