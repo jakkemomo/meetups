@@ -59,6 +59,9 @@ RUN pip install --no-cache /wheels/*
 # copy project
 COPY . $APP_HOME
 
+# Ensure the app user has permission to the packages to run migrations on them
+RUN chown -R app:app /usr/local/lib/python3.11/site-packages/cities_light
+
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
 RUN chown app:app $HOME/staticfiles
