@@ -2,7 +2,6 @@ from typing import Union
 
 from asgiref.sync import async_to_sync
 from django.forms import model_to_dict
-from django_filters.rest_framework.backends import DjangoFilterBackend
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
@@ -131,7 +130,9 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
             self.check_object_permissions(self.request, chat)
             self.queryset = self.model.objects.filter(chat_id=chat_id).order_by("-created_at")
         else:
-            raise ValidationError("Chat id is required")
+            self.queryset = self.model.objects.filter(
+                chat__in=Chat.objects.filter(participants__id=self.request.user.id)
+            ).order_by("-created_at")
         return self.queryset
 
     @swagger_auto_schema(request_body=no_body)
@@ -144,6 +145,10 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
     def chat_messages(self, request, chat_id):
         return self.list(request, chat_id=chat_id)
 
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=["get"], detail=False, url_path='all/messages', url_name="all_chat_messages")
+    def all_chat_messages(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 class ChatParticipantsViewSet(mixins.ListModelMixin, GenericViewSet):
     model = User
