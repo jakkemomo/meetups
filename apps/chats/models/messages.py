@@ -1,3 +1,4 @@
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -26,6 +27,9 @@ class Message(AbstractBaseModel):
         ordering = ["created_at"]
         verbose_name = "Message"
         verbose_name_plural = "Messages"
+        indexes = [
+            GinIndex(name="trigram_text_idx", fields=["message_text"], opclasses=["gin_trgm_ops"])
+        ]
 
     def __str__(self):
         return f"Message from sender {self.created_by} to chats {self.chat}"

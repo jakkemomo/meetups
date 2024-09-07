@@ -38,11 +38,11 @@ class CityViewSet(CitiesLightListModelViewSet):
     serializer_class = CitySerializer
     queryset = City.objects.all()
     filter_backends = [TrigramSimilaritySearchFilter, DjangoFilterBackend]
-    search_fields = ["name", "display_name", "alternate_names"]
+    search_fields = ["name_ru", "name_en"]
     filterset_class = CityFilter
 
     def get_queryset(self, *args, **kwargs):
-        queryset = self.queryset
+        queryset = self.queryset.filter(population__gt=100_000)
 
         if self.action == "cities_with_events":
             queryset = queryset.filter(
@@ -56,6 +56,7 @@ class CityViewSet(CitiesLightListModelViewSet):
         lat = self.request.query_params.get("lat")
         lng = self.request.query_params.get("lng")
         if lat and lng:
+            # todo: update to use point field
             lat = float(lat)
             lng = float(lng)
             approximate_distance = 3  # Approximate range in degrees
