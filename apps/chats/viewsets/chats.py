@@ -128,11 +128,20 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
         if chat_id:
             chat = Chat.objects.get(id=chat_id)
             self.check_object_permissions(self.request, chat)
-            self.queryset = self.model.objects.filter(chat_id=chat_id).order_by("-created_at")
+            self.queryset = (
+                self.model.objects.filter(chat_id=chat_id)
+                .select_related("created_by")
+                .order_by("-created_at")
+            )
         else:
-            self.queryset = self.model.objects.filter(
-                chat__in=Chat.objects.filter(participants__id=self.request.user.id)
-            ).order_by("-created_at")
+            self.queryset = (
+                self.model.objects.filter(
+                    chat__in=Chat.objects.filter(participants__id=self.request.user.id)
+                )
+                .select_related("created_by")
+                .order_by("-created_at")
+            )
+
         return self.queryset
 
     @swagger_auto_schema(request_body=no_body)

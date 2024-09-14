@@ -5,11 +5,14 @@ from apps.chats.serializers.base import SendingBaseSerializer
 
 
 class MessageRetrieveSerializer(SendingBaseSerializer):
+    username = serializers.CharField(source="created_by.username", read_only=True)
+
     class Meta:
         model = Message
         fields = [
             "id",
             "created_by",
+            "username",
             "chat",
             "message_text",
             "created_at",

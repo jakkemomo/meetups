@@ -45,13 +45,17 @@ class MessageViewSet(viewsets.ModelViewSet):
         Otherwise, returns messages for chats the user participates in.
         """
         if self.kwargs.get("message_id"):
-            self.queryset = self.model.objects.all()
+            self.queryset = self.model.objects.all().select_related("created_by")
         else:
-            self.queryset = self.model.objects.filter(
-                id__in=Chat.objects.filter(participants__id=self.request.user.id).values_list(
-                    "chat_messages", flat=True
+            self.queryset = (
+                self.model.objects.filter(
+                    id__in=Chat.objects.filter(participants__id=self.request.user.id).values_list(
+                        "chat_messages", flat=True
+                    )
                 )
-            ).order_by("-created_at")
+                .select_related("created_by")
+                .order_by("-created_at")
+            )
         return self.queryset.all()
 
     @swagger_auto_schema(
