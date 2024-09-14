@@ -141,6 +141,7 @@ class ChatMessagesViewSet(mixins.ListModelMixin, GenericViewSet):
                 .select_related("created_by")
                 .order_by("-created_at")
             )
+
         return self.queryset
 
     @swagger_auto_schema(request_body=no_body)
