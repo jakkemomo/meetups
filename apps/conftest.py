@@ -208,6 +208,12 @@ def follower_user_accepted(user, user_2) -> Follower:
 
 
 @pytest.fixture
+def follower_user_accepted_kick(user, user_2) -> Follower:
+    data = {"user": user, "follower": user_2, "status": Follower.Status.ACCEPTED}
+    return Follower.objects.create(**data)
+
+
+@pytest.fixture
 def follower_user_accepted_private(user_private, user_2_private) -> Follower:
     data = {"user": user_2_private, "follower": user_private, "status": Follower.Status.ACCEPTED}
     return Follower.objects.create(**data)

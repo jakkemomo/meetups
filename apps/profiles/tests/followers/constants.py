@@ -1,6 +1,7 @@
 FOLLOW_URL = "profiles:Followers-follow_user"
 ACCEPT_URL = "profiles:Followers-accept_follow_request"
 UNFOLLOW_URL = "profiles:Followers-unfollow_user"
+KICK_URL = "profiles:Followers-kick_user"
 LIST_FOLLOWERS_URL = "profiles:Followers-list_user_followers"
 LIST_FOLLOWING_URL = "profiles:Followers-list_user_following"
 PROFILE_URL = "profiles:Profiles-detail"
