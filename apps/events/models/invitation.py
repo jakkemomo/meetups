@@ -15,12 +15,12 @@ class Invitation(AbstractBaseModel):
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="event")
     sender = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name="sender")
-    recipient = models.ManyToManyField(user_model, verbose_name="list_of_recipients")
+    recipient = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name="recipient")
     status = models.CharField(max_length=10, choices=Status.choices, default="PENDING")
-    event_url = models.TextField(max_length=250, blank=True)
 
     class Meta:
         ordering = ["sender"]
         verbose_name = "Invitation"
         verbose_name_plural = "Invitations"
         db_table = "invitations"
+        unique_together = ["event", "recipient"]

@@ -9,4 +9,4 @@ class InvitationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invitation
-        fields = ("sender", "recipient", "status", "event_url", "username", "image_url")
+        fields = ("sender", "recipient", "status", "username", "image_url")
