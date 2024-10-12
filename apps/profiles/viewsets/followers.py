@@ -184,3 +184,19 @@ class FollowerViewSet(viewsets.ModelViewSet):
             follow_status: str = follower_object.status
 
         return Response(status=status.HTTP_200_OK, data={"status": follow_status})
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(methods=["delete"], detail=True, url_name="kick_user")
+    def kick_follower(self, request, user_id):
+        follower = get_user_object(user_id=user_id)
+        follower_object = Follower.objects.filter(user=request.user, follower=follower).first()
+
+        if not follower_object:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND, data={"detail": "User is not following you"}
+            )
+
+        follower_object.delete()
+        return Response(
+            status=status.HTTP_200_OK, data={"detail": "User is no longer following you"}
+        )
