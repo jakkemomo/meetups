@@ -25,6 +25,8 @@ class Notification(AbstractBaseModel):
         EVENT_START = "event_start"
         NEW_INVITE_TO_EVENT = "new_invite_to_event"
         NEW_INTERESTING_EVENT_NEAR = "new_interesting_event_near"
+        INVITE_TO_EVENT_ACCEPTED = "invitation to event accepted"
+        INVITE_TO_EVENT_REJECTED = "invitation to event rejected"
         # Followers events
         NEW_FOLLOWING_USER_EVENT = "new_following_user_event"
         FOLLOWING_USER_NEAR_GOING_TO_EVENT = "following_user_near_going_to_event"

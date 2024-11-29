@@ -7,3 +7,4 @@ from .participants import ParticipantViewSet
 from .ratings import RatingViewSet
 from .reviews import ReviewViewSet
 from .tags import TagViewSet
+from .invitation import InvitationViewSet
